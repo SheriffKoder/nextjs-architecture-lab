@@ -1,0 +1,43 @@
+/**
+ * Custom scrollbar: WebKit pseudo-elements do not reliably pick up Tailwind
+ * arbitrary utilities; use plain CSS for track/thumb colors.
+ */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  /* Firefox: thumb, track */
+  scrollbar-color: #c2c2c2 #00ff8000;
+}
+
+.dark .custom-scrollbar {
+  scrollbar-width: thin;
+  /* Firefox: thumb, track */
+  scrollbar-color: #525252 #00ff8000;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Light: subtle track — a near-black track (#000000f6) plus WebKit’s hover
+   thumb transparency made the thumb read as black. */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: rgba(255, 0, 0, 0.0);
+  border-radius: 9999px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background-color: #000000f6;
+  border-radius: 9999px;
+}
+
+
+.tertiary-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #8691aaad #00ff8000;
+}
+
+.dark .tertiary-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #96a6cf59 #00ff8000;
+}

@@ -1,0 +1,878 @@
+/**
+ * VirtualizedTable Component
+ * 
+ * Purpose: High-performance virtualized table with sorting, filtering, and pagination
+ * Used in: app/virtualized-table/page.tsx
+ * Why: Provides efficient rendering of large datasets with full functionality
+ * 
+ * Steps:
+ * 1. Import hooks and utilities for separated concerns
+ * 2. Initialize state using custom hooks
+ * 3. Handle data processing through hooks
+ * 4. Render table with rowRenderer logic
+ */
+
+"use client";
+
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { VariableSizeList, FixedSizeList } from "react-window";
+import VirtualizedTableHeader from "./components/filtering-table-header";
+import VirtualizedTablePagination from "./components/table-pagination-buttons";
+import VirtualizedTablePaginationNumbers from "./components/table-pagination-buttons-2";
+import { VirtualizedTableRow } from "./components/rows/table-row";
+import { LoadingSpinner } from "../../components/loading-spinner";
+import { LoadingRows } from "./components/rows/rows-loading-state";
+import { TableRowMeasurer } from "./components/TableRowMeasurer";
+import { useRowExpansion } from "./components/row-expand/useRowExpansion";
+import { TableColumn, TableConfig, FilterConfig, FilterUniqueValuesMap } from "../../types";
+import { RowExpansionConfig } from "./components/row-expand/types";
+import { GroupConfig, groupData, GroupedData } from "./utils/grouping-utils";
+import { useGroupState } from "./hooks/useGroupState";
+import { useGroupSortState } from "./hooks/useGroupSortState";
+import { flattenGroupedRows, FlattenedRow } from "./utils/flatten-grouped-rows";
+import { sortGroupedData } from "./utils/sort-grouped-data";
+import { GroupHeader } from "./components/group-header";
+
+////////////////////////////////////
+// Type Definitions: Component props and interfaces
+////////////////////////////////////
+
+/**
+ * Props for the VirtualizedTableComponent
+ * Some props come directly from parent, others are destructured from tableConfig and filterConfig
+ */
+interface VirtualizedTableComponentProps<T = any> {
+  // ============================================
+  // Data & Display Props
+  // ============================================
+  data: T[];
+  columns: TableColumn<T>[];
+  visibleColumns: TableColumn<T>[];
+  sortedData: T[];
+  filteredData: T[];
+  
+  // ============================================
+  // Refs
+  // ============================================
+  listRef: React.RefObject<FixedSizeList | VariableSizeList | null>;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  
+  // ============================================
+  // Event Handlers
+  // ============================================
+  onRowClick?: (row: T) => void;
+  onActionClick?: (action: string, row: T) => void;
+  onCellValueChange?: (rowIndex: number, columnKey: string, newValue: any) => void;
+  actionConfigs?: (row: T) => any[];
+  
+  // ============================================
+  // Sorting & Filtering Props
+  // ============================================
+  sortConfig: { key: string; direction: "ascending" | "descending" | "none" } | null;
+  handleSort: (columnKey: string) => void;
+  filters: Record<string, any>;
+  handleFilterChange: (columnKey: string, values: any) => void;
+  getFilteredDataExcludingColumn: (columnKey: string) => T[];
+  effectiveSearchText: string;
+  
+  // ============================================
+  // Pagination Props
+  // ============================================
+  usePagination: boolean;
+  currentPage: number;
+  handlePageChange: (page: number) => void;
+  togglePaginationMode: () => void;
+  /** When set, pagination uses this as total (API/server pagination). displayData is not sliced. */
+  totalItemCount?: number;
+  
+  // ============================================
+  // Accordion & Grouping Props
+  // ============================================
+  accordionConfig?: {
+    groups: Array<{
+      id: string;
+      name: string;
+      color: string;
+      textColor: string;
+    }>;
+  };
+  handleGroupToggle: (groupId: string) => void;
+  openGroups: Set<string>;
+  
+  // ============================================
+  // Selection & State Props
+  // ============================================
+  selectedItemId?: string | number;
+  isItemLoading?: boolean;
+  
+  // ============================================
+  // Configuration Objects
+  // ============================================
+  tableConfig?: TableConfig<T>;
+  filterConfig?: FilterConfig<T>;
+  filterUniqueValues?: FilterUniqueValuesMap;
+  onFilterApply?: (key: string, items: string[], type: string, columnConfig?: { filterApiParams?: { text?: string; number?: { from: string; to: string }; date?: { start: string; end: string }; isArray?: boolean; valueField?: 'id' | 'item' } }) => void;
+  // Column actions configuration - maps column keys to action handler functions
+  columnActions?: Record<string, (item: T, value: any) => void | Promise<void>>;
+  // List view configuration for grouped table view
+  listViewConfig?: GroupConfig;
+  // Dynamic grouping state (overrides config)
+  selectedGroupBy?: string | null;
+  selectedSubGroupBy?: string | null;
+  // When true, ignore config-based grouping and use only selectedGroupBy
+  minimalControlsConfig?: {
+    availableColumns?: string[];
+  };
+};
+////////////////////////////////////
+// Component Implementation: Main table logic
+////////////////////////////////////
+
+/**
+ * High-performance virtualized table component
+ * Supports sorting, filtering, pagination, and virtualization
+ * 
+ * @template T - The type of data items in the table
+ * @param {VirtualizedTableComponentProps<T>} props - Component props
+ * @returns {JSX.Element} Complete table component
+ */
+export function VirtualizedTableComponent<T = any>({
+  // Data & Display Props
+  data,
+  columns,
+  visibleColumns,
+  sortedData,
+  filteredData,
+  
+  // Refs
+  listRef,
+  scrollContainerRef,
+  
+  // Event Handlers
+  onRowClick,
+  onActionClick,
+  onCellValueChange,
+  actionConfigs,
+  
+  // Sorting & Filtering Props
+  sortConfig,
+  handleSort,
+  filters,
+  handleFilterChange,
+  getFilteredDataExcludingColumn,
+  effectiveSearchText,
+  
+  // Pagination Props
+  usePagination,
+  currentPage,
+  handlePageChange,
+  togglePaginationMode,
+  totalItemCount,
+  
+  // Accordion & Grouping Props
+  accordionConfig,
+  handleGroupToggle,
+  openGroups,
+  
+  // Selection & State Props
+  selectedItemId,
+  isItemLoading,
+  
+  // Configuration Objects
+  tableConfig,
+  filterConfig,
+  filterUniqueValues,
+  onFilterApply,
+  columnActions,
+  listViewConfig,
+  selectedGroupBy,
+  selectedSubGroupBy,
+  minimalControlsConfig,
+}: VirtualizedTableComponentProps<T>) {
+  // Extract props from tableConfig
+  const {
+    rowHeight = 40,
+    minRowHeight = 40,
+    tableHeight,
+    dynamicRowHeight = true,
+    emptyMessage = "No data available",
+    loading,
+    loadingStateShimmer = false,
+    rowExpansion,
+    actionMode = 'inline',
+    editableColumns,
+    groupStylerConfig,
+    rowStyler,
+    transparentHeader = false,
+  } = tableConfig || {};
+
+  // Extract props from filterConfig
+  const {
+    itemsPerPage = 20,
+    searchHighlightStyle = "bg-yellow-200 font-medium px-0 rounded text-inherit",
+    autoApplyDropdown,
+    showBadgesDropdown,
+    rangeOpen,
+    hidePaginationSwitch = false,
+  } = filterConfig || {};
+  ////////////////////////////////////
+  // Refs: Virtualized list reference for scroll control
+  ////////////////////////////////////
+  
+  // Reference to the virtualized list for scroll control - REMOVED
+
+
+  ////////////////////////////////////
+  // Row Height State: Track calculated row height
+  ////////////////////////////////////
+  
+  // State to store the calculated row height from measurement
+  const [calculatedRowHeight, setCalculatedRowHeight] = useState(rowHeight);
+
+  ////////////////////////////////////
+  // Row Expansion: Manage expandable row state
+  ////////////////////////////////////
+  
+  // Initialize row expansion hook if config is provided
+  const rowExpansionEnabled = rowExpansion?.enabled !== false && !!rowExpansion;
+  const {
+    isRowExpanded,
+    toggleRow,
+    getChildren,
+    isLoadingChildren,
+    setListRef,
+    resetAfterIndex
+  } = useRowExpansion<T>(rowExpansionEnabled ? rowExpansion : undefined);
+
+
+
+
+
+
+
+  ////////////////////////////////////
+  // Pagination Hook: Manage pagination state and logic - REMOVED
+  ////////////////////////////////////
+
+  ////////////////////////////////////
+  // Internal Search State: Manage global search results - REMOVED
+  ////////////////////////////////////
+
+  
+  ////////////////////////////////////
+  // Filtering Hook: Manage filtering state and logic - REMOVED
+  ////////////////////////////////////
+
+  // Initialize accordion column management - REMOVED
+  
+  ////////////////////////////////////
+  // Sorting Hook: Manage sorting state and logic - REMOVED
+  ////////////////////////////////////
+
+  ////////////////////////////////////
+  // Search Effect: Run global search when search text changes - REMOVED
+  ////////////////////////////////////
+  
+
+  ////////////////////////////////////
+  // Grouping Logic: Group data if listViewConfig is provided
+  ////////////////////////////////////
+  
+  /**
+   * Per-group sort state management
+   */
+  const groupSortState = useGroupSortState();
+
+  /**
+   * Determine effective grouping
+   * If minimalControlsConfig is present, only use selectedGroupBy (ignore config)
+   * Otherwise, use selectedGroupBy with config as fallback
+   */
+  const isMinimalControlsEnabled = minimalControlsConfig !== undefined;
+  const effectiveGroupBy = isMinimalControlsEnabled 
+    ? selectedGroupBy || null 
+    : selectedGroupBy || listViewConfig?.groupBy;
+  const effectiveSubGroupBy = isMinimalControlsEnabled 
+    ? selectedSubGroupBy || null 
+    : selectedSubGroupBy || listViewConfig?.subGroupBy;
+
+  /**
+   * Group data if effectiveGroupBy is set
+   * Apply per-group sorting after grouping
+   */
+  const groupedData = useMemo(() => {
+    if (!effectiveGroupBy) return null;
+    
+    const effectiveConfig: GroupConfig = {
+      groupBy: effectiveGroupBy || undefined,
+      subGroupBy: effectiveSubGroupBy || undefined,
+      groupKeyFormatter: listViewConfig?.groupKeyFormatter,
+      subGroupKeyFormatter: listViewConfig?.subGroupKeyFormatter,
+      groupSpacing: listViewConfig?.groupSpacing,
+    };
+    
+    const grouped = groupData(filteredData as Record<string, any>[], effectiveConfig);
+    // Apply per-group sorting
+    const sortConfigs = groupSortState.getSortConfigs();
+    return sortGroupedData(grouped, sortConfigs, columns as TableColumn<Record<string, any>>[]) as GroupedData<T>[];
+  }, [filteredData, effectiveGroupBy, effectiveSubGroupBy, listViewConfig, groupSortState, columns]);
+
+  /**
+   * Group state management
+   */
+  const groupState = useGroupState(groupedData || []);
+
+  /**
+   * Flatten grouped rows for virtualization
+   */
+  const flattenedRows = useMemo(() => {
+    if (!groupedData) return null;
+    
+    const effectiveConfig: GroupConfig = {
+      groupBy: effectiveGroupBy || undefined,
+      subGroupBy: effectiveSubGroupBy || undefined,
+      groupKeyFormatter: listViewConfig?.groupKeyFormatter,
+      subGroupKeyFormatter: listViewConfig?.subGroupKeyFormatter,
+      groupSpacing: listViewConfig?.groupSpacing,
+    };
+    
+    return flattenGroupedRows(groupedData, groupState, effectiveConfig);
+  }, [groupedData, groupState, effectiveGroupBy, effectiveSubGroupBy, listViewConfig]);
+
+  ////////////////////////////////////
+  // Data Processing: Calculate display data based on pagination
+  ////////////////////////////////////
+  
+  /**
+   * Get data to display based on pagination settings.
+   * When grouping is enabled, use flattened rows.
+   * When totalItemCount is set (API pagination), data is already the current page — no slice.
+   * Otherwise returns current page slice of sortedData.
+   */
+  const displayData = useMemo(() => {
+    // If grouping is enabled, return flattened rows (they will be handled differently in rowRenderer)
+    if (flattenedRows) {
+      return flattenedRows as any[];
+    }
+    
+    // Normal pagination logic
+    if (!usePagination) return sortedData;
+    if (totalItemCount != null) return sortedData; // API pagination: data is already one page
+    const totalItems = sortedData.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const actualPage = (currentPage > totalPages && totalPages > 0) ? 1 : currentPage;
+    const startIndex = (actualPage - 1) * itemsPerPage;
+    return sortedData.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedData, usePagination, currentPage, itemsPerPage, totalItemCount, flattenedRows]);
+
+  const effectiveTotal = totalItemCount ?? sortedData.length;
+  const effectiveTotalPages = Math.ceil(effectiveTotal / itemsPerPage);
+
+  ////////////////////////////////////
+  // Row Height Calculation: Calculate height based on content
+  ////////////////////////////////////
+  
+  /**
+   * Calculate row height using measured height from TableRowMeasurer
+   * Accounts for expanded content if row expansion is enabled
+   * Also handles different row types when grouping is enabled
+   */
+  const calculateRowHeight = useCallback((index: number): number => {
+    // If grouping is enabled, check row type
+    if (flattenedRows && flattenedRows[index]) {
+      const flattenedRow = flattenedRows[index];
+      
+      switch (flattenedRow.type) {
+        case 'spacer':
+          // Return configured spacing or 0
+          return listViewConfig?.groupSpacing || 0;
+        
+        case 'group-header':
+        case 'sub-group-header':
+          return 40; // Fixed height for group headers
+        
+        case 'table-header':
+          return 50; // Fixed height for table headers
+        
+        case 'data-row':
+          // Use existing row height calculation
+          const baseHeight = calculatedRowHeight;
+          
+          // If row expansion is enabled, check if this row is expanded
+          if (rowExpansionEnabled && flattenedRow.data) {
+            const rowId = (flattenedRow.data as any)?.id;
+            
+            if (rowId && isRowExpanded(rowId)) {
+              // Row is expanded, calculate height based on children count
+              const children = getChildren(rowId);
+              const childrenCount = children.length;
+              
+              if (childrenCount === 0) {
+                return baseHeight + 20;
+              }
+              
+              const heightPerChild = 40;
+              const expandedHeight = childrenCount * heightPerChild;
+              
+              return baseHeight + expandedHeight;
+            }
+          }
+          
+          return baseHeight;
+      }
+    }
+    
+    // Default behavior (no grouping)
+    const baseHeight = calculatedRowHeight;
+    
+    // If row expansion is enabled, check if this row is expanded
+    if (rowExpansionEnabled && displayData[index]) {
+      const item = displayData[index];
+      const rowId = (item as any)?.id;
+      
+      if (rowId && isRowExpanded(rowId)) {
+        // Row is expanded, calculate height based on children count
+        const children = getChildren(rowId);
+        const childrenCount = children.length;
+        
+        if (childrenCount === 0) {
+          return baseHeight + 20;
+        }
+        
+        const heightPerChild = 40;
+        const expandedHeight = childrenCount * heightPerChild;
+        
+        return baseHeight + expandedHeight;
+      }
+    }
+    
+    // Default: return base height
+    return baseHeight;
+  }, [calculatedRowHeight, rowExpansionEnabled, displayData, isRowExpanded, getChildren, flattenedRows, listViewConfig]);
+
+
+  ////////////////////////////////////
+  // Dynamic Height Calculation: Calculate height based on visible rows
+  ////////////////////////////////////
+  
+  /**
+   * Calculate table height based on the number of visible rows
+   * Uses either fixed height or calculates based on row count
+   * For variable list: sums individual row heights (including expanded children) up to itemsPerPage
+   */
+  const bodyHeight = useMemo(() => {
+    // If fixed height is provided, use it
+    if (tableHeight && tableHeight > 0) {
+      return tableHeight;
+    }
+    
+    // Calculate height based on visible rows
+    // For variable list: sum individual row heights (including expanded children) up to itemsPerPage
+    const rowCount = Math.min(displayData.length, itemsPerPage);
+    const baseRowHeight = rowHeight || calculatedRowHeight || 40;
+    
+    let calculatedHeight: number;
+    
+    if (rowExpansionEnabled && dynamicRowHeight) {
+      // Sum up all individual row heights (including expanded children)
+      calculatedHeight = 0;
+      for (let i = 0; i < rowCount; i++) {
+        calculatedHeight += calculateRowHeight(i);
+      }
+    } else {
+      // Simple calculation: row count * row height
+      calculatedHeight = rowCount * baseRowHeight;
+    }
+    
+    // Ensure minimum height (but don't cap maximum - let it grow as needed)
+    const minHeight = 200;
+    
+    return Math.max(minHeight, calculatedHeight);
+  }, [tableHeight, displayData.length, rowHeight, calculatedRowHeight, itemsPerPage, rowExpansionEnabled, dynamicRowHeight, calculateRowHeight]);
+
+
+
+  ////////////////////////////////////
+  // Row Renderer: Render individual table rows
+  ////////////////////////////////////
+  
+  /**
+   * Render individual table rows with proper formatting
+   * Handles cell value formatting and row click events
+   * Also handles different row types when grouping is enabled
+   */
+  const rowRenderer = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) => {
+    // If grouping is enabled, handle different row types
+    if (flattenedRows && flattenedRows[index]) {
+      const flattenedRow = flattenedRows[index];
+      
+      switch (flattenedRow.type) {
+        case 'spacer':
+          // Render empty div with spacing height
+          return <div style={style} />;
+        
+        case 'group-header':
+          // Extract field name from effectiveGroupBy path (e.g., "category" from "category" or "company.name")
+          // Use effectiveGroupBy instead of listViewConfig?.groupBy to support dynamic grouping
+          const groupFieldName = effectiveGroupBy 
+            ? effectiveGroupBy.split('.').pop() || ''
+            : '';
+          return (
+            <GroupHeader
+              groupKey={flattenedRow.groupKey!}
+              groupValue={flattenedRow.groupData!.groupValue}
+              isExpanded={groupState.isGroupExpanded(flattenedRow.groupKey!)}
+              onToggle={() => groupState.toggleGroup(flattenedRow.groupKey!)}
+              level={flattenedRow.level || 0}
+              itemCount={flattenedRow.groupData!.items.length + (flattenedRow.groupData!.subGroups?.reduce((sum, sg) => sum + sg.items.length, 0) || 0)}
+              style={style}
+              fieldName={groupFieldName}
+            />
+          );
+        
+        case 'sub-group-header':
+          // Extract field name from effectiveSubGroupBy path
+          const subGroupFieldName = effectiveSubGroupBy 
+            ? effectiveSubGroupBy.split('.').pop() || ''
+            : '';
+          return (
+            <GroupHeader
+              groupKey={flattenedRow.subGroupKey!}
+              groupValue={flattenedRow.subGroupData!.groupValue}
+              isExpanded={groupState.isSubGroupExpanded(flattenedRow.groupKey!, flattenedRow.subGroupKey!)}
+              onToggle={() => groupState.toggleSubGroup(flattenedRow.groupKey!, flattenedRow.subGroupKey!)}
+              level={flattenedRow.level || 1}
+              itemCount={flattenedRow.subGroupData!.items.length}
+              style={style}
+              fieldName={subGroupFieldName}
+            />
+          );
+        
+        case 'table-header':
+          // Create group-specific sort handler
+          const handleGroupSort = (columnKey: string) => {
+            const groupKey = flattenedRow.groupKey!;
+            const subGroupKey = flattenedRow.subGroupKey;
+            groupSortState.handleGroupSort(groupKey, subGroupKey, columnKey);
+          };
+          
+          // Get group-specific sort config
+          const groupSortConfig = groupSortState.getGroupSortConfig(
+            flattenedRow.groupKey!,
+            flattenedRow.subGroupKey
+          );
+          
+          // Calculate indentation to align with parent group header
+          // Same formula as group headers: level * 20px
+          const tableHeaderIndent = (flattenedRow.level || 0) * 20;
+          
+          return (
+            <div style={style}>
+              <div 
+                style={{ 
+                  marginLeft: `${tableHeaderIndent}px`,
+                  width: tableHeaderIndent > 0 ? `calc(100% - ${tableHeaderIndent}px)` : '100%'
+                }} 
+                className="border-b border-gray-200"
+              >
+              <VirtualizedTableHeader
+                columns={visibleColumns}
+                  sortConfig={groupSortConfig || { key: "", direction: "none" }}
+                  handleSort={handleGroupSort}
+                activeFilters={filters}
+                handleFilterChange={handleFilterChange}
+                data={data}
+                filteredData={filteredData}
+                getFilteredDataExcludingColumn={getFilteredDataExcludingColumn}
+                autoApplyDropdown={autoApplyDropdown}
+                showBadgesDropdown={showBadgesDropdown}
+                rangeOpen={rangeOpen}
+                filterUniqueValues={filterUniqueValues}
+                onFilterApply={onFilterApply}
+                transparentHeader={transparentHeader}
+                  hideFilters={true}
+              />
+              </div>
+            </div>
+          );
+        
+        case 'data-row':
+          const item = flattenedRow.data!;
+          const isSelected = selectedItemId && (item as any).id && (item as any).id.toString() === selectedItemId.toString();
+          const rowId = (item as any)?.id;
+          
+          // Calculate indentation to align with parent group header
+          // Same formula as group headers: level * 20px
+          const dataRowIndent = (flattenedRow.level || 0) * 20;
+          
+          // Create toggle handler that resets list after index
+          const handleToggleRow = rowId ? async () => {
+            await toggleRow(rowId, item as T);
+            setTimeout(() => {
+              resetAfterIndex(index);
+            }, 0);
+          } : undefined;
+          
+          return (
+            <div style={style}>
+              <div 
+                style={{ 
+                  marginLeft: `${dataRowIndent}px`,
+                  width: dataRowIndent > 0 ? `calc(100% - ${dataRowIndent}px)` : '100%'
+                }} 
+                className="border-b border-gray-200"
+              >
+              <VirtualizedTableRow
+                item={item as T}
+                columns={visibleColumns}
+                onRowClick={onRowClick}
+                  style={{ height: style.height, width: '100%' }}
+                isLastRow={index === flattenedRows.length - 1}
+                onActionClick={onActionClick}
+                actionMode={actionMode}
+                actionClickConfigs={actionConfigs?.(item as T)}
+                globalSearchText={effectiveSearchText}
+                truncateText={!dynamicRowHeight}
+                isSelected={!!isSelected}
+                editableColumns={editableColumns}
+                onCellValueChange={onCellValueChange}
+                rowIndex={index}
+                calculatedRowHeight={calculatedRowHeight}
+                groupStylerConfig={groupStylerConfig}
+                rowStyler={rowStyler}
+                searchHighlightStyle={searchHighlightStyle}
+                rowExpansionEnabled={rowExpansionEnabled}
+                isRowExpanded={rowId ? isRowExpanded(rowId) : false}
+                onToggleRow={handleToggleRow}
+                expandedChildren={rowId && rowExpansionEnabled ? getChildren(rowId) : []}
+                isLoadingChildren={rowId && rowExpansionEnabled ? isLoadingChildren(rowId) : false}
+                renderExpandedContent={rowExpansion?.renderExpandedContent}
+                expandedContentHeight={rowExpansion?.expandedContentHeight}
+                columnActions={columnActions}
+              />
+              </div>
+            </div>
+          );
+      }
+    }
+    
+    // Default behavior (no grouping)
+    const item = displayData[index];
+    const isSelected = selectedItemId && (item as any).id && (item as any).id.toString() === selectedItemId.toString();
+    const rowId = (item as any)?.id;
+    
+    // Create toggle handler that resets list after index
+    const handleToggleRow = rowId ? async () => {
+      await toggleRow(rowId, item);
+      setTimeout(() => {
+        resetAfterIndex(index);
+      }, 0);
+    } : undefined;
+    
+    return (
+      <VirtualizedTableRow
+        item={item}
+        columns={visibleColumns}
+        onRowClick={onRowClick}
+        style={style}
+        isLastRow={index === displayData.length - 1}
+        onActionClick={onActionClick}
+        actionMode={actionMode}
+        actionClickConfigs={actionConfigs?.(item)}
+        globalSearchText={effectiveSearchText}
+        truncateText={!dynamicRowHeight}
+        isSelected={!!isSelected}
+        editableColumns={editableColumns}
+        onCellValueChange={onCellValueChange}
+        rowIndex={index}
+        calculatedRowHeight={calculatedRowHeight}
+        groupStylerConfig={groupStylerConfig}
+        rowStyler={rowStyler}
+        searchHighlightStyle={searchHighlightStyle}
+        rowExpansionEnabled={rowExpansionEnabled}
+        isRowExpanded={rowId ? isRowExpanded(rowId) : false}
+        onToggleRow={handleToggleRow}
+        expandedChildren={rowId && rowExpansionEnabled ? getChildren(rowId) : []}
+        isLoadingChildren={rowId && rowExpansionEnabled ? isLoadingChildren(rowId) : false}
+        renderExpandedContent={rowExpansion?.renderExpandedContent}
+        expandedContentHeight={rowExpansion?.expandedContentHeight}
+        columnActions={columnActions}
+      />
+    );
+  }, [displayData, visibleColumns, onRowClick, onActionClick, actionMode, actionConfigs, dynamicRowHeight, effectiveSearchText, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, searchHighlightStyle, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, flattenedRows, groupState, groupSortState, sortConfig, handleSort, filters, handleFilterChange, data, filteredData, getFilteredDataExcludingColumn, autoApplyDropdown, showBadgesDropdown, rangeOpen, filterUniqueValues, onFilterApply, transparentHeader]);
+
+  ////////////////////////////////////
+  // Scroll Container Ref- REMOVED
+  ////////////////////////////////////
+
+
+  return (
+    <div className="flex flex-col h-full gap-0 p-0 relative">
+      {/* Hidden measurement component for accurate row height calculation (only when dynamic height is enabled) */}
+      {dynamicRowHeight && displayData.length > 0 && (
+        <TableRowMeasurer
+          data={displayData}
+          columns={columns}
+          onHeightCalculated={setCalculatedRowHeight}
+          onRowClick={onRowClick}
+          onActionClick={onActionClick}
+          actionMode={actionMode}
+          actionConfigs={actionConfigs}
+          globalSearchText={effectiveSearchText}
+          minRowHeight={minRowHeight}
+        />
+      )}
+      
+      {/* TABLE HEADER AND ROWS LIST CONTAINER
+      contain the table header and the table rows list in a flex-col
+      this allows the table header to be away from the scroll container, being visible all the time.
+      */}
+      
+      <div className="flex flex-col flex-1 w-full overflow-auto">
+        <div className={`sticky top-0 z-10 w-full ${accordionConfig?.groups && accordionConfig?.groups?.length > 0 ? 'pt-[40px]' : ''}`}>
+          {/* Table header with sorting and filtering */}
+          <VirtualizedTableHeader
+            columns={visibleColumns}
+            sortConfig={sortConfig || { key: "", direction: "none" }}
+            handleSort={handleSort}
+            activeFilters={filters}
+            handleFilterChange={handleFilterChange}
+            data={data}
+            filteredData={filteredData}
+            getFilteredDataExcludingColumn={getFilteredDataExcludingColumn}
+            autoApplyDropdown={autoApplyDropdown}
+            showBadgesDropdown={showBadgesDropdown}
+            rangeOpen={rangeOpen}
+            accordionConfig={accordionConfig}
+            handleGroupToggle={handleGroupToggle}
+            openGroups={openGroups}
+            filterUniqueValues={filterUniqueValues}
+            onFilterApply={onFilterApply}
+            transparentHeader={transparentHeader}
+          />
+        </div>
+
+        {/* #3 Table container - takes remaining space, and the absolute will overflow the component
+        will leave overflow here as this div has width not allowing sticky to work till the end. better UX */}
+        <div className="relative flex-1 w-full" ref={scrollContainerRef}>
+          <div className={` top-0 left-0 h-full min-w-full  border-gray-200`}>
+          {/* Table container with proper flex layout */}
+            <div className={`h-full flex flex-col flex-1 min-h-0 rounded
+              ${!isItemLoading ? '' : 'opacity-20 pointer-events-none'}`}>
+
+
+              
+              {/* Table body with virtualization - this is the key container */}
+              <div className="flex-1 min-h-0 overflow">
+                {loading ? (
+                  loadingStateShimmer ? (
+                    <LoadingRows
+                      columns={columns}
+                      rowHeight={rowHeight}
+                      containerHeight={bodyHeight}
+                      showActions={!!onActionClick}
+                      actionMode={actionMode}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <LoadingSpinner />
+                    </div>
+                  )
+                ) : displayData.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center text-gray-500">
+                      <p className="text-lg font-medium mb-2">No data found</p>
+                      <p className="text-sm">Try adjusting your filters or search terms</p>
+                    </div>
+                  </div>
+                ) : displayData.length > 0 ? (
+                  <div className="h-full relative">
+                    {dynamicRowHeight ? (
+                      <VariableSizeList
+                        key={`table-${calculatedRowHeight}`} // Force re-render when height changes
+                        ref={(ref: any) => {
+                          listRef.current = ref;
+                          if (rowExpansionEnabled) {
+                            setListRef(ref);
+                          }
+                        }}
+                        height={bodyHeight}
+                        width="100%"
+                        itemCount={displayData.length}
+                        itemSize={calculateRowHeight}
+                        style={{
+                          overflow: 'visible' // for sticky columns
+                        }}
+                      >
+                        {rowRenderer}
+                      </VariableSizeList>
+                    ) : (
+                      <FixedSizeList
+                        ref={listRef as React.RefObject<FixedSizeList>}
+                        height={rowHeight * displayData.length}
+                        width="100%"
+                        itemCount={displayData.length}
+                        itemSize={rowHeight}
+                        style={{
+                          overflow: 'visible' // for sticky columns
+                        }}
+                      >
+                        {rowRenderer}
+                      </FixedSizeList>
+                    )}
+                  </div>
+                ) : (
+                  <div className="px-4 py-8 text-center text-gray-500">
+                    {emptyMessage}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      
+      {/* Pagination controls (only shown when pagination is enabled) */}
+      {usePagination && (
+        <div className="flex flex-col gap-2">
+          <VirtualizedTablePaginationNumbers
+            currentPage={currentPage}
+            totalPages={effectiveTotalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
+      
+      {/* Table footer with stats and pagination toggle */}
+      <div className={`flex items-center justify-between px-4 py-2 ${!usePagination ? 'bg-gray-50 border-t border-gray-200' : ''}`}>
+        {!usePagination && (
+        <div className="text-sm text-gray-500">
+          Showing {displayData.length} of {effectiveTotal} items
+        </div>
+        )}
+        {usePagination && (
+        <div className="text-sm text-gray-500">
+          {effectiveTotal === 0
+            ? '0 items'
+            : `Showing ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, effectiveTotal)} of ${effectiveTotal} items`}
+        </div>
+        )}
+        {!hidePaginationSwitch && (
+        <div className="flex items-center ml-auto">
+          <label className="flex items-center text-sm text-gray-600 mr-2">
+            <input
+              type="checkbox"
+              checked={usePagination}
+              onChange={togglePaginationMode}
+              className="mr-1"
+            />
+              Use pagination
+            </label>
+          </div>
+        )}
+      </div>
+    </div>
+
+  );
+} 

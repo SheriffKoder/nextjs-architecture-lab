@@ -1,0 +1,5 @@
+.login-background-light {
+    background-color: hsla(0, 0%, 100%, 0);
+    background-image: radial-gradient(circle at 61% 46%, rgb(56, 110, 172) 0%, transparent 40.59367058278773%), radial-gradient(circle at 49% 52%, rgb(28, 49, 68) 0%, transparent 50%), radial-gradient(circle at 40% 65%, rgb(90, 135, 143) 0%, transparent 31.921862044225964%), radial-gradient(circle at 54% 55%, rgb(119, 139, 151) 0%, transparent 50%);
+    background-blend-mode: normal, normal, normal, normal;
+}
