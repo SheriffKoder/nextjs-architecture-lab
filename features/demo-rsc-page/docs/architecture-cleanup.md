@@ -4,13 +4,13 @@
 
 Today the TanStack demo client builds `RentalCarListQuery` in the client from URL hooks. For parity with RSC, that encoding must live in **one pure module** under this feature.
 
-* **Scaffold** `features/demo-rsc-page/lib/build-rental-car-list-query.ts` — implementation is **commented out** until RSC uses the same `RentalCarListQuery` + `/page-client` path as TanStack; see file header NOTE.
+* **Implemented** — `features/demo-rsc-page/lib/build-rental-car-list-query.ts` — `buildRentalCarListQuery` + `rentalCarListQueryToSearchParams` (mirrors `demo-client-index.tsx` listQuery; used by `getRentalCarsPageData`).
 
 * **Signature** — take the same shape Next passes after you `await searchParams` (not `URLSearchParams`):
 
 ```ts
-import type { DemoRscPageSearchParams } from '@/features/demo-rsc-page/utils/ui/demo-rsc-page-url'
-import type { RentalCarListQuery } from '@/features/demo-client-page/tanstack'
+import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
+import type { RentalCarListQuery } from '@/features/demo-rsc-page/types/rental-car-list-query'
 
 export function buildRentalCarListQuery(
   params: DemoRscPageSearchParams
@@ -33,27 +33,21 @@ Goal is **not** “TanStack inside RSC” for this route today — it is **the s
 
 * **Implemented** — `features/demo-rsc-page/utils/server/get-rental-cars-page-data.ts` (`getRentalCarsPageData`).
 
-* **Implement** `getRentalCarsPageData(params: DemoRscPageSearchParams)`:
+* **Implement** `getRentalCarsPageData(params)` — **cars + pagination only** (wrapped in `react` `cache()`). Filter facets load in `FiltersSection` via `getFilterOptionsServer` (separate Suspense).
 
-  * `const query = buildRentalCarListQuery(params)`
-  * `Promise.all` — list + filter options (same pairing as the client page).
-  * Return `{ carsPayload, filters }` where `carsPayload` matches the handler response used by TanStack list queries.
+  * (Future) `const query = buildRentalCarListQuery(params)` before HTTP list fetch.
+  * Return `{ carsPayload }` where `carsPayload` matches the handler response used by TanStack list queries.
 
 * **Reuse** existing fetch helpers where they already match the API (`fetchRentalCars`, `fetchRentalCarFilterOptions` from demo-client-page, or thin wrappers that call the same routes).
 
 ---
 
-## Step 3 — Single parent async: fetch once, pass down
+## Step 3 — Suspense boundaries (filters / table / pagination)
 
-Avoid calling `getRentalCarsPageData` inside **three** separate `Suspense` children (filters / table / pagination) — that repeats work unless every path is wrapped in `react` `cache()` with identical args.
+**Implemented** — three async sections in `demo-rsc-index.tsx`:
 
-**Preferred pattern:** one async RSC parent awaits `getRentalCarsPageData` once, then passes props to presentational children (client or server).
-
-**Implemented** — `features/demo-rsc-page/components/demo-rsc-data-shell.tsx`: awaits `searchParams`, calls `getRentalCarsPageData` once, renders `FiltersHeader` + `DemoRscContent` + `PaginationFooter`.
-
-* **Optional** — wrap only `<DemoRscDataShell searchParams={…} />` in one `<Suspense fallback={…}>` so the shell streams as a unit; split inner fallbacks only if you introduce secondary async work.
-
-* **Naming** — `DataSection` is fine as an alias; you can also **use `DemoRscContent` directly** in this shell once data is lifted (no extra wrapper required).
+* `FiltersSection` — `getFilterOptionsServer` only.
+* `TableSection` / `PaginationSection` — both `await getRentalCarsPageData(params)`; **deduped** via `cache()` in `get-rental-cars-page-data.ts` so list work runs once per URL per request.
 
 ---
 
@@ -61,7 +55,7 @@ Avoid calling `getRentalCarsPageData` inside **three** separate `Suspense` child
 
 * In `app/(root)/demo-rsc-page/page.tsx`, **`await searchParams`** (per your Next version) and pass the resolved object down.
 
-* Type that object as **`DemoRscPageSearchParams`** (or a dedicated `NormalizedSearchParams` alias in `utils/ui/demo-rsc-page-url.ts`) — do **not** assume `URLSearchParams` unless you explicitly convert.
+* Type that object as **`DemoRscPageSearchParams`** (exported from `app/(root)/demo-rsc-page/page.tsx` next to `normalizeParams`) — do **not** assume `URLSearchParams` unless you explicitly convert.
 
 ```tsx
 // page.tsx (sketch)
@@ -75,13 +69,13 @@ export default async function Page({
 }
 ```
 
-* **`DemoRscIndex`** — sync shell + `<Suspense><DemoRscDataShell searchParams={searchParams} /></Suspense>` (`features/demo-rsc-page/demo-rsc-index.tsx`).
+* **`DemoRscIndex`** — sync shell + three `<Suspense>` regions (`filters-section.tsx`, `table-section.tsx`, `pagination-section.tsx`).
 
 ---
 
 ## Summary checklist
 
 * [x] `getRentalCarsPageData` in `features/demo-rsc-page/utils/server/get-rental-cars-page-data.ts` (mock path; swap for HTTP when aligning with `/page-client`).
-* [x] Single async parent `DemoRscDataShell` awaits `getRentalCarsPageData` once.
-* [ ] `buildRentalCarListQuery` — uncomment `lib/build-rental-car-list-query.ts` when wiring TanStack/API parity.
-* [x] **`DemoRscPageSearchParams`** on `page.tsx` + `demo-rsc-index.tsx` + data shell.
+* [x] Split RSC sections + `cache()` on `getRentalCarsPageData` for table + pagination.
+* [x] `buildRentalCarListQuery` / `rentalCarListQueryToSearchParams` — wired; swap mock `getRentalCarsData` for HTTP when aligning with `/page-client`.
+* [x] **`DemoRscPageSearchParams`** on `page.tsx` + `demo-rsc-index.tsx` + section components.

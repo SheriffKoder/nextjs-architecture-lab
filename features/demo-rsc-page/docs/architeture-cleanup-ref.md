@@ -110,3 +110,65 @@ export default async function PaginationSection({ params }) {
     />
   )
 }
+
+////////////////////////////////////////////////////////////////////
+✅ How RSC Actually Works (Important)
+
+In Next.js App Router:
+
+Same request + same function + same params
+= automatically deduped ✅
+
+So this:
+
+await getRentalCarsPageData(params)
+
+called in:
+
+TableSection
+PaginationSection
+
+👉 will NOT trigger two backend calls (if implemented correctly)
+
+⚠️ BUT — Only If You Do This Right
+Your server function must be cacheable
+export async function getRentalCarsPageData(params) {
+  // ❌ BAD
+  // random logic / non-deterministic / no caching
+
+  // ✅ GOOD
+  return await fetch(..., {
+    cache: 'force-cache' // or default in RSC
+  })
+}
+
+OR if using DB (Supabase etc.):
+
+👉 Next.js still dedupes within the same request
+
+✅ So Yes, You can safely do:
+// TableSection
+const { carsPayload } = await getRentalCarsPageData(params)
+
+// PaginationSection
+const { carsPayload } = await getRentalCarsPageData(params)
+
+👉 and it behaves like:
+
+ONE fetch
+MULTIPLE consumers
+🧠 Why I Suggested Splitting
+
+Not for performance.
+
+👉 For architecture flexibility.
+
+////////////////////////////////////////////////////////////////
+
+lib/build-rental-car-list-query.ts
+features/demo-rsc-page/lib/… is already a good fit: it’s pure, reusable logic (URL → list query, query → flat params), not a React component and not a route file.
+
+features/demo-rsc-page/utils/domain is less ideal as a name because:
+
+utils often becomes a junk drawer.
+domain usually means types + rules + invariants, not “misc helpers.”
