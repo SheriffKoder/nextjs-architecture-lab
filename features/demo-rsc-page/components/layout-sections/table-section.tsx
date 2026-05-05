@@ -5,8 +5,8 @@
  * Used in: `demo-rsc-index.tsx` inside `<Suspense>`
  */
 
-import DemoRscContent from '../demo-rsc-content'
-import { getRentalCarsPageData } from '../utils/server/get-rental-cars-page-data'
+import DemoRscContent from '../../demo-rsc-content'
+import { getRentalCarsPageData } from '../../utils/server/get-rental-cars-page-data'
 import type { RentalCarListQuery } from '@/features/demo-rsc-page/types/rental-car-list-query'
 
 export default async function TableSection({ query }: { query: RentalCarListQuery }) {

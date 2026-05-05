@@ -40,7 +40,7 @@ export const tableDisplayConfig: TableConfig<RentalCarTableItem> = {
   // Row expansion configuration
   rowExpansion: undefined,           // No row expansion for this demo
   
-  // Action configuration
+  // Action configuration — row delete (drawer-header-style); view/edit row shortcuts commented in `demo-rsc-row-action-configs`.
   actionMode: 'inline',              // 'inline' | 'dropdown' for row actions
   
   // Selection and editing

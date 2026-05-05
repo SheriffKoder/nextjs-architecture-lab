@@ -10,8 +10,8 @@ import {
   rentalCarSearchConfig,
   rentalCarFiltersHeaderConfig,
   rentalCarBaseFilters,
-} from '../config/header-filters-config'
-import { getFilterOptionsServer } from '../utils/server/get-filter-options-server'
+} from '../../config/header-filters-config'
+import { getFilterOptionsServer } from '../../utils/server/get-filter-options-server'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 
 export default async function FiltersSection({

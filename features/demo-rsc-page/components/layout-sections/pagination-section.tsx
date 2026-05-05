@@ -6,8 +6,8 @@
  */
 
 import { PaginationFooter } from '@/features/ui/filters/components/pagination-footer'
-import { rentalCarPaginationConfig } from '../config/header-filters-config'
-import { getRentalCarsPageData } from '../utils/server/get-rental-cars-page-data'
+import { rentalCarPaginationConfig } from '../../config/header-filters-config'
+import { getRentalCarsPageData } from '../../utils/server/get-rental-cars-page-data'
 import type { RentalCarListQuery } from '@/features/demo-rsc-page/types/rental-car-list-query'
 
 export default async function PaginationSection({ query }: { query: RentalCarListQuery }) {

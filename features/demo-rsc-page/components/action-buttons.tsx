@@ -1,28 +1,31 @@
 /**
  * Action Buttons Component
  *
- * Purpose: Shared header actions — Mailchimp export stub; optional Add Car (client drawer demo only)
- * Used in: `demo-rsc-index.tsx`
- * Why: Consistent action button layout for the demo RSC page
+ * Purpose: Shared header actions — Mailchimp export stub; optional URL-drawer Add Car; optional demo controls
+ * Used in: `demo-rsc-index.tsx`, `demo-client-page/demo-client-index.tsx`
+ * Why: Demo RSC passes `showAddCarDrawerButton`; client page composes its own TanStack Add Car beside this row
  */
 
 'use client'
 
 import React from 'react'
-import { Plus } from 'lucide-react'
 import PrimaryButton from '@/components/design/primary-button'
 import LogoIconPair from '@/components/side-nav/components/logo-icon-pair'
+import AddCarButton from './add-car-button'
 
 interface ActionButtonsProps {
   exportForMailchimp: () => void | Promise<void>
-  /** When set (e.g. TanStack demo client page), renders Add Car — omitted on pure RSC demo */
-  openAddCarModal?: () => void | Promise<void>
+  /** When true, renders `AddCarButton` (drawer-2 `openCreate`) after Mailchimp — demo RSC only */
+  showAddCarDrawerButton?: boolean
+  /** Classic header “Add car” for client demo (e.g. TanStack drawer). */
+  openAddCarModal?: () => void
   /** When set, shows a secondary control (e.g. demo toast trigger) */
   onGenerateError?: () => void | Promise<void>
 }
 
 export default function ActionButtons({
   exportForMailchimp,
+  showAddCarDrawerButton,
   openAddCarModal,
   onGenerateError,
 }: ActionButtonsProps) {
@@ -54,16 +57,16 @@ export default function ActionButtons({
         />
       </button>
 
+      {showAddCarDrawerButton ? <AddCarButton /> : null}
+
       {openAddCarModal ? (
         <PrimaryButton
           type="button"
-          onClick={() => void openAddCarModal()}
-          icon={Plus}
-          iconPosition="left"
+          onClick={openAddCarModal}
           buttonClassName="border border-input bg-background text-foreground whitespace-nowrap"
           size="default"
         >
-          Add Car
+          Add car
         </PrimaryButton>
       ) : null}
 

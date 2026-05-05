@@ -97,6 +97,13 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
       return String(value)
     },
   },
+  /** Reserved key: row actions when `FilteringWrapper` gets `onActionClick` + `actionConfigs` (demo: delete only). */
+  {
+    key: 'actions',
+    name: 'Actions',
+    width: '72px',
+    cellRenderer: () => null,
+  },
 ]
 
 ////////////////////////////////////
@@ -136,6 +143,7 @@ export const tableColumns = createColumnArray([
   'pricePerDay',
   'color',
   'licensePlate',
+  'actions',
   // 'rentalStartDate',
   // 'rentalEndDate',
 ]);

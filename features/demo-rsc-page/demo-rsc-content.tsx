@@ -14,6 +14,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useDrawerActions } from '@/features/ui/drawer-2'
 import { FilteringWrapper } from '@/features/filtering-wrapper-multi-display-clean/filtering-wrapper'
 import type { SubheadingsUpdateContext } from '@/features/filtering-wrapper-multi-display-clean/features/subheadings/dnd'
 
@@ -32,6 +33,8 @@ import { mapConfig } from './config/displays/map-config'
 import { timelineConfig } from './config/displays/timeline-config'
 import { subheadingsConfig } from './config/displays/subheadings-config'
 import { listViewConfig } from './config/displays/list-config'
+import { demoRscRowActionConfigs } from './config/demo-rsc-row-action-configs'
+import { DEMO_RSC_CAR_DRAWER_KEY } from './components/drawer-content/rsc-car-drawer-content'
 
 ////////////////////////////////////////////////////////////
 // Filter Configs Types
@@ -57,7 +60,37 @@ export default function DemoRscContent({
   filters,
   onSubheadingsDragEnd,
 }: DemoRscContentProps) {
+  const { openView, openRowDeleteConfirm } = useDrawerActions()
   const [tableData, setTableData] = useState<RentalCarTableItem[]>(cars)
+
+  const handleRowClick = useCallback(
+    (row: RentalCarTableItem) => {
+      openView(DEMO_RSC_CAR_DRAWER_KEY, row.id)
+    },
+    [openView]
+  )
+
+  const onActionClick = useCallback(
+    (action: string, row: RentalCarTableItem) => {
+      // if (action === 'view') {
+      //   openView(DEMO_RSC_CAR_DRAWER_KEY, row.id)
+      //   return
+      // }
+      // if (action === 'edit') {
+      //   openEdit(DEMO_RSC_CAR_DRAWER_KEY, row.id)
+      //   return
+      // }
+      if (action === 'delete') {
+        openRowDeleteConfirm(DEMO_RSC_CAR_DRAWER_KEY, row.id)
+      }
+    },
+    [openRowDeleteConfirm]
+  )
+
+  const getRowActionConfigs = useCallback(
+    (row: RentalCarTableItem) => demoRscRowActionConfigs(onActionClick, row),
+    [onActionClick]
+  )
 
   useEffect(() => {
     setTableData(cars)
@@ -92,6 +125,9 @@ export default function DemoRscContent({
         data={tableData}
         columns={tableColumns}
         filters={filters}
+        onRowClick={handleRowClick}
+        onActionClick={onActionClick}
+        actionConfigs={getRowActionConfigs}
         minimalControlsConfig={minimalControlsConfig}
         availableViews={['table', 'kanban', 'calendar', 'map', 'timeline', 'subheadings', 'list']}
         tableConfig={{
