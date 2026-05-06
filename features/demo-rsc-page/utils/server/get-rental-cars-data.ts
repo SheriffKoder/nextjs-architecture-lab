@@ -7,26 +7,31 @@
  * 
  * Function Index:
  * - getRentalCarsData: Server function that returns filtered, sorted, and paginated rental cars
- *   Example input: getRentalCarsData({ status: "available,rented", make: "Toyota", page: "1", limit: "10" })
+ *   Example input: getRentalCarsData({ status: ['available','rented'], make: ['Toyota'], page: 1, limit: 10 })
  *   Example output: { cars: RentalCarTableItem[], pagination: { totalItems, page, limit } }
  */
 
 import { rentalCars } from './data-source'
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
+import type { RentalCarListQuery } from '../../types/rental-car-list-query'
+import { rentalCarListQueryToSearchParams } from '../../lib/build-rental-car-list-query'
 import { filterRentalCars } from './backend-simulate/filter-rental-cars'
 import { parseSorts, applySorts } from '../../../ui/filters/feature-sorting/utils'
 import { parsePagination } from '../../../ui/filters/feature-pagination/utils'
 import { rentalCarPaginationConfig } from '../../config/header-filters-config'
 import { decodeFilters } from '../../../ui/filters/feature-query-builder-filter/utils'
+import {
+  DEMO_RSC_SIMULATE_RENTAL_CARS_MS,
+  simulateServerDelay,
+} from './simulate-server-delay'
+
 /**
  * Get mock rental cars data with optional filtering, sorting, and pagination
- * WHY: Provides mock data for development with URL parameter filtering, sorting, and pagination
- * HOW: Processes searchParams through multiple steps: filter → sort → paginate
- * @param {Object} searchParams - URL search parameters for filtering, sorting, and pagination
- * @returns {Promise<{cars: RentalCarTableItem[], pagination: {totalItems: number, page: number, limit: number}}>} Filtered, sorted, and paginated cars with pagination metadata
+ * WHY: List loader accepts the same `RentalCarListQuery` shape as TanStack / `buildRentalCarListQuery`
+ * HOW: Converts query → flat URL-style params, then filter → sort → paginate
  */
 export async function getRentalCarsData(
-  searchParams: { [key: string]: string | string[] | undefined } = {}
+  query: RentalCarListQuery = {}
 ): Promise<{
   cars: RentalCarTableItem[]
   pagination: {
@@ -35,6 +40,10 @@ export async function getRentalCarsData(
     limit: number
   }
 }> {
+  await simulateServerDelay(DEMO_RSC_SIMULATE_RENTAL_CARS_MS)
+
+  const searchParams = rentalCarListQueryToSearchParams(query)
+
   //////////////////////////////////
   // STEP 1: Filter cars based on URL parameters
   //////////////////////////////////

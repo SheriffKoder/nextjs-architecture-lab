@@ -14,6 +14,7 @@
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
 
 /////////////////////////////////////////////////////////////
 // updateParams — immutable URLSearchParams patch
@@ -54,6 +55,8 @@ export function useDrawerActions() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  const { wrapNavigation } = useNavigationTransitionOptional()
+
   /**
    * Applies new query string or strips `?` when empty.
    * Why `scroll: false`: filtering/drawer toggles should not jump scroll position.
@@ -83,7 +86,8 @@ export function useDrawerActions() {
         id,
         action: null,
       })
-      replace(next)
+      // replace(next)
+      wrapNavigation(() => replace(next)) // useTransition wrapper on router.replace
     },
 
     /** Opens edit mode for an existing id. */

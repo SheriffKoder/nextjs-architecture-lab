@@ -15,6 +15,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
 import type { SortSpec } from '../types'
 
 /**
@@ -27,6 +28,9 @@ export function useInitialSorts(initialSorts: SortSpec[]) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
+  const { wrapNavigation } = useNavigationTransitionOptional()
+  const wrapRef = useRef(wrapNavigation)
+  wrapRef.current = wrapNavigation
   const hasAppliedRef = useRef(false)
 
   useEffect(() => {
@@ -44,7 +48,9 @@ export function useInitialSorts(initialSorts: SortSpec[]) {
       // Update URL with initial sorts in a single operation
       const params = new URLSearchParams(searchParams.toString())
       params.set('sort', sortString)
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+      wrapRef.current(() => {
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+      })
       
       hasAppliedRef.current = true
     } else if (sortParam) {

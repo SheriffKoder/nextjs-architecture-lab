@@ -10,6 +10,7 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useCallback } from 'react'
+import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
 import type { FilterNode } from '../types/filter'
 import { encodeFilters, decodeFilters } from '../utils'
 
@@ -22,6 +23,7 @@ export function useUrlQueryFilter() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
+  const { wrapNavigation } = useNavigationTransitionOptional()
 
   /**
    * Get current filter from URL
@@ -33,6 +35,7 @@ export function useUrlQueryFilter() {
 
   /**
    * Set filter in URL
+   * Skips replace when the serialized query is unchanged so mount-time clears do not start a transition.
    */
   const setFilter = useCallback((filter: FilterNode | null) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -43,9 +46,13 @@ export function useUrlQueryFilter() {
     } else {
       params.delete('filter')
     }
+
+    if (params.toString() === searchParams.toString()) return
     
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-  }, [router, pathname, searchParams])
+    wrapNavigation(() => {
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    })
+  }, [router, pathname, searchParams, wrapNavigation])
 
   /**
    * Clear filter from URL

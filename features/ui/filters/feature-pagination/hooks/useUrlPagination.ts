@@ -18,6 +18,7 @@
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
 import { useMemo, useCallback } from 'react'
 import { parsePagination, calculatePagination as calcPagination } from '../utils'
 import type { PaginationConfig, PaginationState, PaginationCalculated } from '../types'
@@ -46,6 +47,7 @@ export function useUrlPagination(config: PaginationConfig = {}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
+  const { wrapNavigation } = useNavigationTransitionOptional()
 
   // Get default limit from config or use 20
   // WHY: Allow configurable default page size
@@ -69,13 +71,20 @@ export function useUrlPagination(config: PaginationConfig = {}) {
   /**
    * Updates the URL with new search parameters
    * WHY: Use replace() instead of push() to prevent history spam when pagination changes frequently
-   * HOW: Replaces current URL with new params, preserving pathname but updating query string
+   * HOW: Replaces current URL with new params, preserving pathname but updating query string; returns early when the query string is unchanged
    * IMPACT: Better UX - back button doesn't go through every page change, cleaner history
    * @param {URLSearchParams} params - The new search parameters to set in URL
    */
-  const updateUrl = useCallback((params: URLSearchParams) => {
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-  }, [router, pathname])
+  const updateUrl = useCallback(
+    (params: URLSearchParams) => {
+      // Avoid no-op navigations so useTransition (wrapNavigation) does not briefly show pending UI.
+      if (params.toString() === searchParams.toString()) return
+      wrapNavigation(() => {
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+      })
+    },
+    [router, pathname, searchParams, wrapNavigation]
+  )
 
   //////////////////////////////////
   // GETTERS: Read pagination from URL

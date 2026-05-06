@@ -6,9 +6,7 @@
  * Why: Await `searchParams` once here, normalize to a plain object, then pass into the feature (no `Promise` in children)
  */
 
-import { Suspense } from 'react'
 import DemoRscIndex from '@/features/demo-rsc-page/demo-rsc-index'
-import DemoRscLoading from './loading'
 
 /**
  * Canonical shape for this route’s query string after `await searchParams` (Next App Router).
@@ -32,9 +30,5 @@ export default async function DemoRscPage({
   const raw = await searchParams
   const params = normalizeParams(raw)
 
-  return (
-    <Suspense fallback={<DemoRscLoading />}>
-      <DemoRscIndex params={params} />
-    </Suspense>
-  )
+  return <DemoRscIndex params={params} />
 }

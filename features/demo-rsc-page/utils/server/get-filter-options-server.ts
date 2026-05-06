@@ -53,6 +53,10 @@ import {
 import { filterRentalCarsExcludingColumn } from "./backend-simulate/filter-rental-cars"
 import type { FilterConfig } from "../../../ui/filters/feature-filtering/components/filter-types"
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
+import {
+  DEMO_RSC_SIMULATE_FILTER_OPTIONS_MS,
+  simulateServerDelay,
+} from './simulate-server-delay'
 
 /**
  * Server function to get filter options for RSC pages (rental cars)
@@ -66,6 +70,8 @@ export async function getFilterOptionsServer(
   baseConfigs: FilterConfig[] = rentalCarBaseFilters,
   searchParams: Record<string, string | string[] | undefined> = {}
 ): Promise<FilterConfig[]> {
+  await simulateServerDelay(DEMO_RSC_SIMULATE_FILTER_OPTIONS_MS)
+
   // Calculate filtered data for each filter to get proper initialCount
   return Promise.all(
     baseConfigs.map(async (config) => {

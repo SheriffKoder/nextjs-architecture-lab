@@ -24,6 +24,7 @@
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
 
 /**
  * Custom hook for managing URL-based filter state
@@ -48,6 +49,7 @@ export function useUrlFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
+  const { wrapNavigation } = useNavigationTransitionOptional()
 
   //////////////////////////////////
   // Helper Functions: Build and update URL parameters
@@ -64,12 +66,17 @@ export function useUrlFilters() {
   /**
    * Updates the URL with new search parameters
    * WHY: Use replace() instead of push() to prevent history spam when filters change frequently
-   * HOW: Replaces current URL with new params, preserving pathname but updating query string
+   * HOW: Replaces current URL with new params, preserving pathname but updating query string; returns early when the query string is unchanged
    * IMPACT: Better UX - back button doesn't go through every filter change, cleaner history
    * @param {URLSearchParams} params - The new search parameters to set in URL
    */
   const updateUrl = (params: URLSearchParams) => {
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    // Skip replace + wrapNavigation when nothing changed: same query string still schedules a transition
+    // (e.g. QueryBuilder calling clearFilter on mount when `filter` is already absent), which flashes dimmers.
+    if (params.toString() === searchParams.toString()) return
+    wrapNavigation(() => {
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    })
   }
 
   //////////////////////////////////
@@ -260,7 +267,9 @@ export function useUrlFilters() {
    * HOW: Replaces entire URL with just pathname, removing all query parameters
    */
   const clearAll = () => {
-    router.replace(pathname, { scroll: false }) // Navigate to pathname only, removing all query params
+    wrapNavigation(() => {
+      router.replace(pathname, { scroll: false }) // Navigate to pathname only, removing all query params
+    })
   }
 
   //////////////////////////////////

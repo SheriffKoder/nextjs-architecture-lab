@@ -55,15 +55,15 @@ export function QueryBuilder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // Only on mount
 
-  // Sync builder changes to URL (only complete conditions)
+  // Sync builder → URL when the tree changes.
+  // - Complete tree → write `filter` param (setFilter no-ops if serialized query unchanged).
+  // - Incomplete/empty tree → clear URL only if `filter` exists; otherwise skip (avoids mount-time wrapNavigation + list dimmers).
   useEffect(() => {
-    // Only sync complete conditions to URL
     const completeFilter = filterCompleteConditions(filterBuilder.filterTree)
-    
+
     if (completeFilter) {
       setFilter(completeFilter)
-    } else {
-      // Clear URL if no complete conditions
+    } else if (getFilter() != null) {
       clearFilter()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
