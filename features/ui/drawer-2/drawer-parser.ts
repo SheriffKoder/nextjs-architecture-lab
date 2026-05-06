@@ -8,8 +8,8 @@
  * Steps:
  * 1. Normalize `string | string[]` values to single strings (App Router compatibility)
  * 2. Run Zod `safeParse` — on failure, return a safe “closed” state
- * 3. Default `mode` to `view` when omitted but other fields exist
- * 4. Derive `isOpen`: create is open without id; view/edit require a non-empty id
+ * 3. Default returned `mode` to `view` when omitted (for a stable `DrawerState` shape); `isOpen` does not use this default
+ * 4. Derive `isOpen`: only when `mode` is explicitly present — create without id, or view/edit with id
  */
 
 import {
@@ -72,13 +72,14 @@ export function parseDrawerState(
   }
 
   const { drawer, mode, id, action } = parsed.data
-  // When `mode` is omitted but `drawer` is present, default to view (matches doc).
+  // Stable normalized mode for consumers; when `mode` was omitted from the URL, `isOpen` is still false below.
   const resolvedMode = mode ?? 'view'
 
-  // Open rules: create flow has no id; view/edit require an id so we never show an empty entity drawer.
+  // Drawer shell opens only when `mode` is explicitly set (no implicit view). Omitting `mode` allows e.g.
+  // `drawer` + `id` + `action=delete` so `DeleteActionModal` can open without mounting `DrawerWrapper` content.
   const isOpen =
-    resolvedMode === 'create' ||
-    ((resolvedMode === 'view' || resolvedMode === 'edit') && !!id)
+    mode === 'create' ||
+    ((mode === 'view' || mode === 'edit') && !!id)
 
   return {
     drawer: drawer ?? null,

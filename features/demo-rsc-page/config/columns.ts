@@ -6,6 +6,8 @@
  * Why: Centralizes column definitions for consistency and reusability
  */
 
+import React from 'react'
+import { Trash2 } from 'lucide-react'
 import { TableColumn } from "@/features/filtering-wrapper-multi-display-clean/types";
 import type { RentalCarTableItem } from "../types/rental-car-table-item";
 
@@ -97,12 +99,52 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
       return String(value)
     },
   },
-  /** Reserved key: row actions when `FilteringWrapper` gets `onActionClick` + `actionConfigs` (demo: delete only). */
+  /**
+   * Reserved key: row actions column — `VirtualizedTable` renders `ActionButton` (dropdown: View / Edit for demo RSC).
+   * `cellRenderer` unused for this key; kept as stub for type consistency.
+   */
   {
     key: 'actions',
     name: 'Actions',
-    width: '72px',
+    // width: '72px',
     cellRenderer: () => null,
+  },
+  /**
+   * Delete column (table only): centered trash control; same interaction pattern as checkbox column (stopPropagation → no row click).
+   * Handler supplied via `FilteringWrapper` `columnActions.delete`.
+   */
+  {
+    key: 'delete',
+    name: 'Delete',
+    // width: '56px',
+    // minWidth: '52px',
+    cellRenderer: (value, item, columnAction): React.ReactElement | null => {
+      if (!item || !columnAction) return null
+      return React.createElement(
+        'div',
+        {
+          className: 'flex items-center justify-center px-2 w-full h-full',
+          onClick: (e: React.MouseEvent) => {
+            e.stopPropagation()
+          },
+        },
+        React.createElement(
+          'button',
+          {
+            type: 'button',
+            className:
+              'rounded-md bg-foreground/5 p-2 text-destructive transition-colors hover:bg-destructive/10 dark:bg-transparent dark:hover:bg-destructive/15',
+            'aria-label': 'Delete car',
+            title: 'Delete',
+            onClick: (e: React.MouseEvent) => {
+              e.stopPropagation()
+              void columnAction(item, value)
+            },
+          },
+          React.createElement(Trash2, { size: 18 })
+        )
+      )
+    },
   },
 ]
 
@@ -143,6 +185,7 @@ export const tableColumns = createColumnArray([
   'pricePerDay',
   'color',
   'licensePlate',
+  'delete',
   'actions',
   // 'rentalStartDate',
   // 'rentalEndDate',

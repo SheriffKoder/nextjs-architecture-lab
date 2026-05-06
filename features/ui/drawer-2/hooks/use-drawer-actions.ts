@@ -121,13 +121,12 @@ export function useDrawerActions() {
     },
 
     /**
-     * From a closed drawer (e.g. table row): opens car drawer on edit and sets `action=delete`
-     * in one replace so `DeleteActionModal` can run. Prefer over `openEdit` + `triggerDelete` (two navigations).
+     * Table row delete entry point: sets `drawer`, `id`, and `action=delete`. Does not read or write `mode`,
+     * so an open view/edit drawer keeps its mode; a bare table URL stays without `mode` (drawer stays closed per parser).
      */
     openRowDeleteConfirm: (drawer: string, id: string) => {
       const next = updateParams(searchParams, {
         drawer,
-        mode: 'edit',
         id,
         action: 'delete',
       })

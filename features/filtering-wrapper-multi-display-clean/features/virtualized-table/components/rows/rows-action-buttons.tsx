@@ -52,7 +52,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   const handleClick = (e: React.MouseEvent, actionKey: string) => {
     // Prevent event bubbling to avoid triggering row click
     e.stopPropagation();
-    
+
     // Find and call the specific action
     const action = actions.find(a => a.key === actionKey);
     if (action) {
@@ -88,7 +88,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         return React.createElement('button', {
           key: action.key,
           className: `${padding} ${background} ${hoverBackground} ${borderRadius} ${border} transition-colors`,
-          onClick: (e: React.MouseEvent) => handleClick(e, action.key),
+          onClick: (e: React.MouseEvent) => { e.stopPropagation(); handleClick(e, action.key) },
           'aria-label': action.label
         }, React.createElement('span', {
           className: color

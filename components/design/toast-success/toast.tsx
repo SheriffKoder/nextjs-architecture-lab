@@ -80,6 +80,7 @@ export interface ToastProps {
   className?: string
   index?: number // Internal use for stacking
   zIndex?: number // Custom z-index
+  gap?: number
 }
 
 /**
@@ -152,6 +153,7 @@ export default function Toast({
   showCloseButton = true,
   className = '',
   index,
+  gap = 20,
   zIndex
 }: ToastProps) {
   const [isVisible, setIsVisible] = useState(true)
@@ -170,19 +172,19 @@ export default function Toast({
       return null
     }
 
-    const offset = index * 80 // 80px per toast (includes margin)
+    const offset = index * gap // 80px per toast (includes margin)
 
     if (stacking === ToastStacking.PUSH_UP) {
       if (position.includes('top')) {
-        return `translateY(-${offset}px)`
+        return `translateY(-${offset+(gap*index)}px)`
       }
-      return `translateY(${offset}px)`
+      return `translateY(${offset+(gap*index)}px)`
     }
     if (stacking === ToastStacking.PUSH_DOWN) {
       if (position.includes('top')) {
-        return `translateY(${offset}px)`
+        return `translateY(${offset+(gap*index)}px)`
       }
-      return `translateY(-${offset}px)`
+      return `translateY(-${offset+(gap*index)}px)`
     }
 
     return null

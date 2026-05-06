@@ -13,7 +13,8 @@
 
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useDrawerActions } from '@/features/ui/drawer-2'
 import { FilteringWrapper } from '@/features/filtering-wrapper-multi-display-clean/filtering-wrapper'
 import type { SubheadingsUpdateContext } from '@/features/filtering-wrapper-multi-display-clean/features/subheadings/dnd'
@@ -35,6 +36,9 @@ import { subheadingsConfig } from './config/displays/subheadings-config'
 import { listViewConfig } from './config/displays/list-config'
 import { demoRscRowActionConfigs } from './config/demo-rsc-row-action-configs'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './components/drawer-content/rsc-car-drawer-content'
+
+/** Must stay aligned with `FilteringWrapper` `availableViews` default (`table` when `view` param absent). */
+const DEMO_RSC_TABLE_VIEW_KEYS = ['table'] as const
 
 ////////////////////////////////////////////////////////////
 // Filter Configs Types
@@ -60,8 +64,21 @@ export default function DemoRscContent({
   filters,
   onSubheadingsDragEnd,
 }: DemoRscContentProps) {
-  const { openView, openRowDeleteConfirm } = useDrawerActions()
+  const searchParams = useSearchParams()
+  const { openView, openEdit, openRowDeleteConfirm } = useDrawerActions()
   const [tableData, setTableData] = useState<RentalCarTableItem[]>(cars)
+
+  const viewParam = searchParams.get('view')
+  const isTableSurface =
+    !viewParam || (DEMO_RSC_TABLE_VIEW_KEYS as readonly string[]).includes(viewParam)
+
+  const columnsForActiveView = useMemo(
+    () =>
+      tableColumns.map((col) =>
+        col.key === 'delete' ? { ...col, isHidden: !isTableSurface } : col
+      ),
+    [isTableSurface]
+  )
 
   const handleRowClick = useCallback(
     (row: RentalCarTableItem) => {
@@ -72,17 +89,26 @@ export default function DemoRscContent({
 
   const onActionClick = useCallback(
     (action: string, row: RentalCarTableItem) => {
-      // if (action === 'view') {
-      //   openView(DEMO_RSC_CAR_DRAWER_KEY, row.id)
-      //   return
-      // }
-      // if (action === 'edit') {
-      //   openEdit(DEMO_RSC_CAR_DRAWER_KEY, row.id)
-      //   return
-      // }
-      if (action === 'delete') {
-        openRowDeleteConfirm(DEMO_RSC_CAR_DRAWER_KEY, row.id)
+      if (action === 'view') {
+        openView(DEMO_RSC_CAR_DRAWER_KEY, row.id)
+        return
       }
+      if (action === 'edit') {
+        openEdit(DEMO_RSC_CAR_DRAWER_KEY, row.id)
+      }
+      //
+      // if (action === 'delete') {
+      //   openRowDeleteConfirm(DEMO_RSC_CAR_DRAWER_KEY, row.id)
+      //   return
+      // }
+    },
+    [openEdit, openView]
+  )
+
+  /** Wired to `delete` column via `columnActions`; preserves URL `mode` if any (does not force edit). */
+  const handleDeleteColumnAction = useCallback(
+    (item: RentalCarTableItem) => {
+      openRowDeleteConfirm(DEMO_RSC_CAR_DRAWER_KEY, item.id)
     },
     [openRowDeleteConfirm]
   )
@@ -123,11 +149,14 @@ export default function DemoRscContent({
     <div className="flex min-h-0 flex-1 flex-col">
       <FilteringWrapper
         data={tableData}
-        columns={tableColumns}
+        columns={columnsForActiveView}
         filters={filters}
         onRowClick={handleRowClick}
         onActionClick={onActionClick}
         actionConfigs={getRowActionConfigs}
+        columnActions={{
+          delete: (item) => handleDeleteColumnAction(item),
+        }}
         minimalControlsConfig={minimalControlsConfig}
         availableViews={['table', 'kanban', 'calendar', 'map', 'timeline', 'subheadings', 'list']}
         tableConfig={{

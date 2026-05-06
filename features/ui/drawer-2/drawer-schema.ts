@@ -25,7 +25,7 @@ export const drawerActionSchema = z.enum(['delete'])
 
 /**
  * Partial URL object: every field is optional because users can bookmark incomplete URLs;
- * the parser applies defaults and derives `isOpen`.
+ * the parser derives `isOpen` only when `mode` is explicitly present (see `drawer-parser.ts`).
  */
 export const drawerSearchParamsSchema = z.object({
   drawer: z.string().optional(),

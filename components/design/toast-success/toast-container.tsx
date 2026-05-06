@@ -33,6 +33,7 @@ interface ToastContainerProps {
   position?: ToastPosition
   maxToasts?: number
   stacking?: ToastStacking
+  gap?: number
 }
 
 /**
@@ -41,9 +42,10 @@ interface ToastContainerProps {
  * @returns {JSX.Element} Toast container with management functions
  */
 export default function ToastContainer({ 
-  position = ToastPosition.TOP_RIGHT,
+  position = ToastPosition.BOTTOM_RIGHT,
   maxToasts = 5,
-  stacking = ToastStacking.PUSH_UP
+  stacking = ToastStacking.PUSH_DOWN,
+  gap = 50
 }: ToastContainerProps) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
 
@@ -127,6 +129,7 @@ export default function ToastContainer({
     <div className="fixed inset-0 pointer-events-none z-[100]">
       {toasts.map((toast, index) => (
         <Toast
+          gap={gap}
           key={toast.id}
           {...toast}
           index={index}

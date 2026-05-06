@@ -10,6 +10,8 @@ import { Suspense } from 'react'
 import FiltersSkeleton from '@/components/layout/loading-skeletons/filters-skeleton'
 import TableSkeleton from '@/components/layout/loading-skeletons/table-skeleton'
 import PageHeader from '@/components/layout/page-header'
+import ToastContainer from '@/components/design/toast-success/toast-container'
+import { ToastPosition, ToastStacking } from '@/components/design/toast-success/toast'
 import { NavigationTransitionRoot } from '@/features/ui/filters/navigation-transition-context'
 import ActionButtons from './components/action-buttons'
 import DemoRscDrawerLayer from './components/drawer-content/demo-rsc-drawer-layer'
@@ -29,6 +31,11 @@ function TableLoading() {
 export default function DemoRscIndex({ params }: { params: DemoRscPageSearchParams }) {
   return (
     <NavigationTransitionRoot>
+      {/* Registers `window.toast` for `useToast()` — create drawer / actions depend on it (same pattern as `demo-client-index`). */}
+      <ToastContainer
+        position={ToastPosition.BOTTOM_RIGHT}
+        stacking={ToastStacking.PUSH_DOWN}
+      />
       <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
         <header className="flex shrink-0 flex-col items-center justify-between gap-4 border-b border-tertiary/10 p-4 md:flex-row">
           <PageHeader subTitle="Demo RSC page with server-side data fetching, filtering, and pagination" />

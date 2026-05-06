@@ -1,21 +1,32 @@
 /**
- * Row action buttons for demo RSC table.
- * Shape matches `filtering-wrapper-multi-display-clean/constants/actions` `actionConfigs` entries.
+ * Row action buttons for demo RSC table (Actions column — dropdown).
  *
- * Active: delete only (styled like drawer edit-header trash). View / edit blocks kept commented for toggling.
+ * Purpose: View + Edit entries for `ActionButton` `mode="dropdown"`; Delete lives on separate `delete` column (`columnActions`).
+ * Used in: `demo-rsc-content.tsx` → `actionConfigs={getRowActionConfigs}`
+ *
+ * Shape matches `filtering-wrapper-multi-display-clean/constants/actions` `actionConfigs` entries.
  */
 
 import type { MouseEvent } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Eye, Pencil } from 'lucide-react'
 import type { ActionHandler } from '@/features/filtering-wrapper-multi-display-clean/constants/actions'
 
-/** Matches trash control in `rsc-car-drawer-sticky-header.tsx` (`deleteToolbarBtnClass`). */
-const rowDeleteButtonStyle = {
+const rowViewButtonStyle = {
   buttonPadding: 'p-2',
   buttonBackground: 'bg-foreground/5 dark:bg-transparent',
-  buttonHoverBackground: 'hover:bg-destructive/10 dark:hover:bg-destructive/15',
-  iconColor: 'text-destructive',
-  iconSize: 18,
+  buttonHoverBackground: 'hover:bg-info/10 dark:hover:bg-info/15',
+  iconColor: 'text-info',
+  iconSize: 16,
+  buttonBorderRadius: 'rounded-md',
+  buttonBorder: '',
+} as const
+
+const rowEditButtonStyle = {
+  buttonPadding: 'p-2',
+  buttonBackground: 'bg-foreground/5 dark:bg-transparent',
+  buttonHoverBackground: 'hover:bg-success/10 dark:hover:bg-success/15',
+  iconColor: 'text-success',
+  iconSize: 16,
   buttonBorderRadius: 'rounded-md',
   buttonBorder: '',
 } as const
@@ -25,44 +36,19 @@ export function demoRscRowActionConfigs<T>(
   rowData: T
 ) {
   return [
-    /* Row “view” — off; table `onRowClick` opens the drawer in view mode. Re-enable: import `Eye` from `lucide-react`.
     {
       key: 'view',
       icon: Eye,
-      label: 'View details',
+      label: 'View',
       onClick: (_e: MouseEvent) => onActionClick('view', rowData),
-      buttonPadding: 'p-2',
-      buttonBackground: 'bg-info/5',
-      buttonHoverBackground: 'hover:bg-info/10',
-      iconColor: 'text-info',
-      iconSize: 16,
-      buttonBorderRadius: 'rounded-md',
-      buttonBorder: 'border border-info',
+      ...rowViewButtonStyle,
     },
-    */
-
-    /* Row “edit” — off; use pencil in drawer header after opening a row. Re-enable: import `Edit` from `lucide-react`.
     {
       key: 'edit',
-      icon: Edit,
-      label: 'Edit item',
+      icon: Pencil,
+      label: 'Edit',
       onClick: (_e: MouseEvent) => onActionClick('edit', rowData),
-      buttonPadding: 'p-2',
-      buttonBackground: 'bg-success/5',
-      buttonHoverBackground: 'hover:bg-success/10',
-      iconColor: 'text-success',
-      iconSize: 16,
-      buttonBorderRadius: 'rounded-md',
-      buttonBorder: 'border border-success',
-    },
-    */
-
-    {
-      key: 'delete',
-      icon: Trash2,
-      label: 'Delete item',
-      onClick: (_e: MouseEvent) => onActionClick('delete', rowData),
-      ...rowDeleteButtonStyle,
+      ...rowEditButtonStyle,
     },
   ]
 }
