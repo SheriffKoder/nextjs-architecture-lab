@@ -44,7 +44,7 @@ import { QueryBuilder } from "@/features/ui/filters/feature-query-builder-filter
 import type { FilterField } from "@/features/ui/filters/feature-query-builder-filter/types/field";
 import { ExpandableSearchControl } from "@/features/ui/filters/feature-filtering/components";
 import type { SearchConfig } from "@/features/ui/filters/feature-filtering/components/search-types";
-
+import { FolderTabShape2View } from "@/features/filtering-wrapper-multi-display-clean/components/folder-tab-shape-2/folder-tab-shape-2-view";
 // Lazy load DashboardContent to avoid loading it when not on dashboard route
 // const DashboardContent = lazy(() => import("@/features/dashboard/dashboard-content"));
 
@@ -345,11 +345,17 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
       )}
       
       {/* View Switcher - if minimal controls are not enabled, display the expanded view switcher */}
-      {!isMinimalControlsEnabled && availableViews && availableViews.length > 1 && (
+      {/* {!isMinimalControlsEnabled && availableViews && availableViews.length > 1 && (
         <div className="w-full flex justify-end my-auto mb-4">
           <ViewSwitcherWrapper
             availableViews={availableViews}
           />
+        </div>
+      )} */}
+
+      {!isMinimalControlsEnabled && availableViews && availableViews.length > 1 && (
+        <div className="w-full flex justify-start my-auto mb-0">
+          <FolderTabShape2View />
         </div>
       )}
 

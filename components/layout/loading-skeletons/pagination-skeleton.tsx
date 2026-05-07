@@ -36,7 +36,7 @@ const slots: Slot[] = [
 
 export default function PaginationSkeleton({ className }: PaginationSkeletonProps) {
   return (
-    <div className={['shrink-0 pb-2 -mr-2', className].filter(Boolean).join(' ')}>
+    <div className={['shrink-0 pb-2 mr-2', className].filter(Boolean).join(' ')}>
       <div className="flex items-center justify-center gap-1 blur-sm" aria-hidden>
         {slots.map((slot, index) => {
           const appearClass = slot.kind === 'icon' && slot.dim ? styles.itemDim : styles.item

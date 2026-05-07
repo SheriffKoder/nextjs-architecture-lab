@@ -22,7 +22,7 @@ export default async function TableAndPaginationSection({
       <div className="flex min-h-0 flex-1 flex-col">
         <DemoRscContent cars={carsPayload.cars} filters={filtersPayload} />
       </div>
-      <div className="shrink-0">
+      <div className="shrink-0 mr-2">
         <PaginationFooter
           totalItems={carsPayload.pagination.totalItems}
           config={rentalCarPaginationConfig}
