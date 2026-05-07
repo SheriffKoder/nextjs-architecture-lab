@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import GlassInput from '@/components/design/glass-input'
+import GlassInput from '@/components/design/inputs/glass-input'
 import PrimaryButton from '@/components/design/primary-button'
 import { Check } from 'lucide-react'
 import { useCompanies } from '@/hooks'

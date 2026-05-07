@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { InvestorTableItem } from '../config/table-config'
-import GlassInput from '@/components/design/glass-input'
+import GlassInput from '@/components/design/inputs/glass-input'
 import PrimaryButton from '@/components/design/primary-button'
 import { Check, X } from 'lucide-react'
 import { useAllocations } from '@/hooks'

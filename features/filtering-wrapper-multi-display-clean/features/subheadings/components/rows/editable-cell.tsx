@@ -19,6 +19,13 @@ import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { DropdownOption } from '../../../../types/dropdown';
 import { DropdownContainer, DropdownList } from '../../../../components/dropdown';
+import {
+  commitGroupedNumberInput,
+  commitPlainNumericInput,
+  formatGroupedFieldValue,
+  useGroupedNumberInput,
+} from '@/components/grouped-number-input';
+import type { EditableGroupedNumberConfig } from '@/utils/number-formatters/format-grouped-number';
 
 /**
  * Format number to 2 decimal places for display
@@ -32,21 +39,6 @@ const formatNumberForDisplay = (value: any): string => {
     return '';
   }
   return numValue.toFixed(2);
-};
-
-/**
- * Format number for input (remove trailing zeros)
- */
-const formatNumberForInput = (value: any): string => {
-  if (value === null || value === undefined || value === '') {
-    return '';
-  }
-  const numValue = Number(value);
-  if (isNaN(numValue)) {
-    return '';
-  }
-  // Remove trailing zeros but keep at least one decimal place if it's a decimal
-  return numValue.toString();
 };
 
 interface EditableCellProps<T = any> {
@@ -70,6 +62,8 @@ interface EditableCellProps<T = any> {
   dropdownOptions?: DropdownOption[];
   dropdownFormatter?: (option: DropdownOption) => React.ReactElement;
   excludeCurrentSelection?: boolean;
+  /** When set with `isNumberField`, show/edit with comma grouping (stores a number). */
+  editableGroupedNumber?: EditableGroupedNumberConfig;
 }
 
 export function EditableCell<T = any>({
@@ -87,29 +81,47 @@ export function EditableCell<T = any>({
   isDropdown = false,
   dropdownOptions = [],
   dropdownFormatter,
-  excludeCurrentSelection = false
+  excludeCurrentSelection = false,
+  editableGroupedNumber,
 }: EditableCellProps<T>) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(isNumberField ? formatNumberForInput(value) : value);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const cellRef = useRef<HTMLDivElement>(null);
 
-  // Update edit value when prop value changes
-  useEffect(() => {
-    setEditValue(isNumberField ? formatNumberForInput(value) : value);
-  }, [value, isNumberField]);
+  const useGroupedThousands = Boolean(isNumberField && editableGroupedNumber);
+  const inputType = useGroupedThousands ? 'text' : type;
 
-  // Focus input when entering edit mode
+  const inputVariant = !isNumberField
+    ? 'text'
+    : useGroupedThousands
+      ? 'grouped'
+      : 'plainNumber';
+
+  const {
+    inputValue: editValue,
+    onChange: handleInputChange,
+    resetInput,
+  } = useGroupedNumberInput({
+    value,
+    variant: inputVariant,
+    groupedNumber: editableGroupedNumber,
+  });
+
+  // Focus input when entering edit mode (avoid select-all for grouped text — caret jumps with live commas)
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.select();
+      if (!useGroupedThousands) {
+        inputRef.current.select();
+      }
     }
-  }, [isEditing]);
+  }, [isEditing, useGroupedThousands]);
 
+  // `<input type="number">` steps on wheel; React's `onWheel` is passive — attach
+  // a non-passive listener on the real DOM node (after layout so ref is set).
   useLayoutEffect(() => {
-    if (!isEditing || type !== "number") return;
+    if (!isEditing || inputType !== "number") return;
     const el = inputRef.current;
     if (!el) return;
 
@@ -118,7 +130,7 @@ export function EditableCell<T = any>({
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [isEditing, type]);
+  }, [isEditing, inputType]);
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click from triggering
@@ -147,16 +159,40 @@ export function EditableCell<T = any>({
   };
 
   const handleSave = () => {
-    if (onValueChange && editValue !== value) {
-      // Convert to number if it's a number field
-      const finalValue = isNumberField ? Number(editValue) : editValue;
-      onValueChange(finalValue);
+    if (isNumberField) {
+      let finalNum: number;
+      if (editableGroupedNumber) {
+        const n = commitGroupedNumberInput(String(editValue), editableGroupedNumber);
+        if (n === null) {
+          resetInput();
+          setIsEditing(false);
+          return;
+        }
+        finalNum = n;
+      } else {
+        const n = commitPlainNumericInput(String(editValue));
+        if (n === null) {
+          resetInput();
+          setIsEditing(false);
+          return;
+        }
+        finalNum = n;
+      }
+      if (
+        onValueChange &&
+        Number(value) !== finalNum &&
+        !Number.isNaN(finalNum)
+      ) {
+        onValueChange(finalNum);
+      }
+    } else if (onValueChange && editValue !== value) {
+      onValueChange(editValue);
     }
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setEditValue(value);
+    resetInput();
     setIsEditing(false);
   };
 
@@ -179,11 +215,18 @@ export function EditableCell<T = any>({
     return (
       <input
         ref={inputRef}
-        type={type}
+        type={inputType}
+        inputMode={
+          useGroupedThousands
+            ? editableGroupedNumber?.allowDecimals
+              ? 'decimal'
+              : 'numeric'
+            : undefined
+        }
         value={editValue}
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
-        onChange={(e) => setEditValue(e.target.value)}
+        onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         className={`w-full min-h-[32px] rounded-md border border-border bg-transparent px-2 py-0.5 text-sm shadow-sm backdrop-blur-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring dark:shadow-[0_1px_1px_0_rgb(255_255_255_/_0.02),0_3px_10px_-2px_rgb(255_255_255_/_0.03)] ${className}`}
@@ -207,7 +250,11 @@ export function EditableCell<T = any>({
   } else {
     displayValue = cellRendererResult !== null
       ? cellRendererResult
-      : (isNumberField ? formatNumberForDisplay(value) : (value || placeholder));
+      : isNumberField
+        ? editableGroupedNumber
+          ? formatGroupedFieldValue(value, editableGroupedNumber)
+          : formatNumberForDisplay(value)
+        : value || placeholder;
   }
 
   const shellClassName = [

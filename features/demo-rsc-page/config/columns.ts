@@ -14,6 +14,7 @@ import {
   rentalCarLocationDropdownOptions,
   rentalCarLocationFormat,
 } from "./cells/rental-car-location-options";
+import { formatGroupedInteger, formatGroupedNumber } from "@/utils/number-formatters/format-grouped-number";
 
 ////////////////////////////////////
 // Centralized Column Definitions: All columns defined once
@@ -64,17 +65,33 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
     key: 'mileage',
     name: 'Mileage',
     isNumberField: true,
+    editableGroupedNumber: { suffix: ' mi' },
     formatter: (value) => {
-      return typeof value === 'number' ? `${value.toLocaleString()} mi` : String(value)
+      return typeof value === 'number'
+        ? formatGroupedInteger(value, { suffix: ' mi' })
+        : String(value);
     },
   },
   {
     key: 'pricePerDay',
     name: 'Price/Day',
     isNumberField: true,
+    editableGroupedNumber: {
+      prefix: '$',
+      allowDecimals: true,
+      maxDecimalPlaces: 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    },
     formatter: (value) => {
-      return typeof value === 'number' ? `$${value.toFixed(2)}` : String(value)
-    },  
+      return typeof value === 'number'
+        ? formatGroupedNumber(value, {
+            prefix: '$',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        : String(value);
+    },
   },
   {
     key: 'color',

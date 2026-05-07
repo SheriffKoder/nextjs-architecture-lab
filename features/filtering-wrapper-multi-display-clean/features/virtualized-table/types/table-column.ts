@@ -8,6 +8,7 @@
 
 import React from "react"
 import type { DropdownOption } from "../../../types/dropdown"
+import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number"
 
 /**
  * @template T - Row data type
@@ -24,6 +25,8 @@ export interface TableColumn<T = unknown> {
   ) => React.ReactElement | null
   isDateField?: boolean
   isNumberField?: boolean
+  /** When set with `isNumberField`, `EditableCell` uses comma grouping + optional affixes (`@/utils/number-formatters`). */
+  editableGroupedNumber?: EditableGroupedNumberConfig
   isTimeField?: boolean
   decimalPlaces?: number
   width?: string

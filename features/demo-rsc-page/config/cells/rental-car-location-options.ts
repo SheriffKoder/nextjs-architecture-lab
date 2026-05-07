@@ -22,7 +22,7 @@ const RENTAL_CAR_LOCATION_BADGE_PALETTE: BadgePalette = {
   bg: "bg-transparent",
   border: "border-transparent",
   text: "text-inherit",
-  icon: "text-inherit group-hover:fill-none",
+  icon: "text-inherit group-hover:fill-transparent",
 };
 
 const BADGE_CLASS = "min-w-0 max-w-full truncate";

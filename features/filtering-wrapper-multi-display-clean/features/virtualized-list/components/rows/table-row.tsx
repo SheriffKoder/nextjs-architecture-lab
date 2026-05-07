@@ -508,6 +508,7 @@ export function VirtualizedTableRow<T = any>({
                   className="w-full"
                   type={column.isNumberField ? 'number' : 'text'}
                   isNumberField={column.isNumberField || false}
+                  editableGroupedNumber={column.editableGroupedNumber}
                   cellRenderer={column.cellRenderer}
                   item={item}
                   columnAction={columnAction}

@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import GlassInput from '@/components/design/glass-input'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import GlassInput from '@/components/design/inputs/glass-input'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 import PrimaryButton from '@/components/design/primary-button'
 import { Check, DollarSign, Percent, FolderOpen, Tag } from 'lucide-react'
 import { useAllocations, useProjects } from '@/hooks'
@@ -15,7 +15,7 @@ import {
 import { formatDDMMYYYY } from '@/lib/utils'
 import { capitalizeAllFirstLetters } from '@/lib/utils'
 import type { Allocation } from '@/lib/types'
-import type { DropdownItem } from '@/components/design/multi-select-2/utils/types'
+import type { DropdownItem } from '@/components/design/multi-select/utils/types'
 
 function enumToItems(obj: Record<string, string>): DropdownItem[] {
   return Object.values(obj).map((v) => ({ id: v, label: capitalizeAllFirstLetters(v), value: v }))

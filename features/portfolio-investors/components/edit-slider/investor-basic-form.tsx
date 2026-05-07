@@ -4,8 +4,8 @@ import React, { useState } from 'react'
 import { InvestorTableItem } from '../../config/table-config'
 import CollapsibleCard from '@/components/design/CollapsibleCard-sm'
 import { ChevronDownIcon, DollarSign, Percent, Tag } from 'lucide-react'
-import GlassInput from '@/components/design/glass-input'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import GlassInput from '@/components/design/inputs/glass-input'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 
 interface DropdownItem {
   id: string | number

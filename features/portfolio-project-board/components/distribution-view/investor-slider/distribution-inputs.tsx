@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import GlassInput from '@/components/design/glass-input'
+import GlassInput from '@/components/design/inputs/glass-input'
 import { DollarSign } from 'lucide-react'
 
 interface DistributionInputsProps {

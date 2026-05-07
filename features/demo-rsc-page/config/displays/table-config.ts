@@ -44,7 +44,7 @@ export const tableDisplayConfig: TableConfig<RentalCarTableItem> = {
   actionMode: 'inline',              // 'inline' | 'dropdown' for row actions
   
   // Selection and editing
-  editableColumns: [...demoRscEditableColumnKeys, 'mileage'],
+  editableColumns: [...demoRscEditableColumnKeys, 'mileage', 'pricePerDay'],
   
   // Styling configuration
   groupStylerConfig: undefined,     // No custom group styling

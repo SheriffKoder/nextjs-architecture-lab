@@ -38,8 +38,6 @@
   ],
   "exclude": [
     "node_modules",
-    ".next",
-    // exclude the development folder
-    "app/development/**/*",
+    ".next"
   ]
 }

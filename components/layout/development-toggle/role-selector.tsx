@@ -18,7 +18,7 @@
 
 import React, { useState } from 'react'
 import { UserCog } from 'lucide-react'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 import { roleConfig } from './role-config'
 
 interface DropdownItem {

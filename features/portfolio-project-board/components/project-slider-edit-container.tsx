@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect } from 'react'
 import { ProjectBoardTableItem } from '../config/table-config'
-import GlassInput from '@/components/design/glass-input'
+import GlassInput from '@/components/design/inputs/glass-input'
 import PrimaryButton from '@/components/design/primary-button'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 import { Check, Building2, DollarSign, Handshake, Home, HardHat, FileCheck, FolderSymlink, Tag } from 'lucide-react'
 import { useCompanies, useOrgs, useProjects, useTitleCompanies } from '@/hooks'
 import { formatDDMMYYYY } from '@/lib/utils'
 import { ProjectStatusEnum } from '@/lib/constants'
 import { getProjectStatusDisplayName } from '@/utils/projects/project-status-utils'
-import type { DropdownItem } from '@/components/design/multi-select-2/utils/types'
+import type { DropdownItem } from '@/components/design/multi-select/utils/types'
 
 interface ProjectSliderEditContainerProps {
   selectedProject: ProjectBoardTableItem | null

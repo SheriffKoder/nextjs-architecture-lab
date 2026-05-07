@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import GlassInput from '@/components/design/glass-input'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import GlassInput from '@/components/design/inputs/glass-input'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 import PrimaryButton from '@/components/design/primary-button'
 import { Tag, Check } from 'lucide-react'
 import type { Role, User } from '@/lib/types'

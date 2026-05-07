@@ -7,6 +7,7 @@
 
 import React from "react"
 import type { DropdownOption } from "../../../types/dropdown"
+import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number"
 
 export interface TableColumn<T = unknown> {
   key: string
@@ -19,6 +20,7 @@ export interface TableColumn<T = unknown> {
   ) => React.ReactElement | null
   isDateField?: boolean
   isNumberField?: boolean
+  editableGroupedNumber?: EditableGroupedNumberConfig
   isTimeField?: boolean
   decimalPlaces?: number
   width?: string

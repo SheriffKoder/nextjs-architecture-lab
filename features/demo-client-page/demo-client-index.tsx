@@ -25,9 +25,9 @@ import { useUrlPagination } from '@/features/ui/filters/feature-pagination/hooks
 import ActionButtons from '@/features/demo-rsc-page/components/action-buttons'
 
 // Toast Notifications
-import ToastContainer from '@/components/design/toast-success/toast-container'
-import { ToastPosition, ToastStacking } from '@/components/design/toast-success/toast'
-import { useToast } from '@/components/design/toast-success/use-toast'
+import ToastContainer from '@/components/design/toast/toast-container'
+import { ToastPosition, ToastStacking } from '@/components/design/toast/toast'
+import { useToast } from '@/components/design/toast/use-toast'
 
 import {
   rentalCarSearchConfig,

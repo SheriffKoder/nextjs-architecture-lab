@@ -16,7 +16,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import RightDrawer from '@/components/design/right-drawer'
-import { useToast } from '@/components/design/toast-success/use-toast'
+import { useToast } from '@/components/design/toast/use-toast'
 import CarSliderForm from './car-add-slider-form'
 import DemoClientCarViewDrawerContainer from './view-drawer-container'
 import EditSliderForm from './car-edit-slider-form'

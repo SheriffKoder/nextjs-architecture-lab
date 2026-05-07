@@ -18,7 +18,7 @@
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import ConfirmModal from '@/components/confirm-modal'
-import { useToast } from '@/components/design/toast-success/use-toast'
+import { useToast } from '@/components/design/toast/use-toast'
 import { useConfirmAction } from '@/features/ui/confirm'
 
 import { rentalCarKeys, type RentalCarsPageResponse, useDeleteRentalCar } from '@/features/demo-client-page/tanstack'

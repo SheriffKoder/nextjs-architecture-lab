@@ -13,6 +13,7 @@
 import React from "react";
 import { DropdownOption } from "../../../types/dropdown";
 import { FilterValue } from "../../../types/filter-types";
+import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number";
 
 /**
  * Interface defining the structure and behavior of a table column
@@ -48,6 +49,7 @@ export interface TableColumn<T = any> {
   isDateField?: boolean;
   // Enable number range filtering for this column
   isNumberField?: boolean;
+  editableGroupedNumber?: EditableGroupedNumberConfig;
   // Enable time range filtering for this column
   isTimeField?: boolean;
   // Number of decimal places for number formatting
