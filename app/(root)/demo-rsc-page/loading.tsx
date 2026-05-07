@@ -24,7 +24,7 @@ export default function DemoRscLoading() {
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-0 pt-2">
         <div className="flex h-full min-h-0 w-full flex-col space-y-6 p-2 pr-2 pt-2">
-          <FiltersSkeleton controlCount={2} />
+          <FiltersSkeleton buttonCount={2} />
 
           <div className="flex min-h-0 flex-1 flex-col">
             <TableSkeleton columnCount={9} rowCount={10} showHeader={true} />

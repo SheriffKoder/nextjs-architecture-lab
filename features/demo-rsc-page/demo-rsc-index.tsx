@@ -17,11 +17,13 @@ import FiltersSection from './components/layout-sections/filters-section'
 import TableAndPaginationSection from './components/layout-sections/table-and-pagination-section'
 import { exportForMailchimpAction } from './actions'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
+import FilterToolbarSkeleton from '@/components/layout/loading-skeletons/filter-toolbar-skeleton'
 
 function TableLoading() {
   return (
-    <div className="flex min-h-0 flex-1 flex-col p-2">
-      <TableSkeleton columnCount={10} rowCount={10} showHeader={true} />
+    <div className="flex min-h-0 flex-1 flex-col p-1 gap-2">
+      <FilterToolbarSkeleton />
+      <TableSkeleton columnCount={10} rowCount={10} showHeader={true}/>
     </div>
   )
 }
@@ -41,7 +43,7 @@ export default function DemoRscIndex({ params }: { params: DemoRscPageSearchPara
         <div className="flex min-h-0 min-w-0 flex-1 overflow-y-auto pb-0 pt-2">
           <div className="flex h-full min-h-0 w-full flex-col space-y-6 p-2 pr-2 pt-2">
             <div className="flex h-full min-h-0 w-full flex-1 flex-col gap-4">
-              <Suspense fallback={<FiltersSkeleton controlCount={2} />}>
+              <Suspense fallback={<FiltersSkeleton buttonCount={2} pillFilter={true} buttonWidthPx="md:w-[200px]" />}>
                 <FiltersSection params={params} />
               </Suspense>
 

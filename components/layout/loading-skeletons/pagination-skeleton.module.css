@@ -1,0 +1,42 @@
+/**
+ * Staggered opacity intro per control; delay from data-index (Tailwind: buttons).
+ */
+
+.item {
+  opacity: 0;
+  animation: paginationSkeletonFadeIn 0.45s ease-out forwards;
+  animation-delay: calc(0.4s + attr(data-index number, 0) * 0.25s);
+}
+
+.itemDim {
+  opacity: 0;
+  animation: paginationSkeletonFadeInDim 0.45s ease-out forwards;
+  animation-delay: calc(0.4s + attr(data-index number, 0) * 0.25s);
+}
+
+@keyframes paginationSkeletonFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes paginationSkeletonFadeInDim {
+  to {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .itemDim {
+    animation: none;
+  }
+
+  .item {
+    opacity: 1;
+  }
+
+  .itemDim {
+    opacity: 0.5;
+  }
+}

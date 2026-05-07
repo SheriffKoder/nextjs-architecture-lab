@@ -13,8 +13,8 @@ import type { ActionHandler } from '@/features/filtering-wrapper-multi-display-c
 const rowDeleteButtonStyle = {
   buttonPadding: 'p-2',
   buttonBackground: 'bg-foreground/5 dark:bg-transparent',
-  buttonHoverBackground: 'hover:bg-destructive/10 dark:hover:bg-destructive/15',
-  iconColor: 'text-destructive',
+  buttonHoverBackground: 'hover:bg-destructive/10 dark:hover:bg-destructive/15 group-hover:text-tertiary',
+  iconColor: 'text-destructive group-hover:text-tertiary',
   iconSize: 18,
   buttonBorderRadius: 'rounded-md',
   buttonBorder: '',

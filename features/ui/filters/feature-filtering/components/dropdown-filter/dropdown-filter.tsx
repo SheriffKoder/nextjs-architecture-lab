@@ -805,7 +805,7 @@ export function DropdownFilter({
       {isOpen && (
         <div
           ref={dropdownRef}
-          className={`absolute z-30 mt-1 flex max-h-[min(70vh,28rem)] min-h-0 w-64 flex-col overflow-hidden rounded border border-border bg-background/10 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-background/70 ${
+          className={`absolute z-30 mt-1 flex max-h-[min(70vh,28rem)] min-h-0 w-64 flex-col overflow-hidden rounded border border-border bg-background/90 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-background/70 ${
             isLastColumn ? 'right-0' : 'left-0'
           }`}
         >

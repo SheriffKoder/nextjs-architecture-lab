@@ -1,0 +1,40 @@
+/**
+ * Root: delayed fade-in. Body rows: staggered opacity via data-index (Tailwind: borders/bg).
+ */
+
+.rootAppear {
+  opacity: 0;
+  animation: tableSkeletonAppear 0.35s ease-out forwards;
+  animation-delay: 0.75s;
+}
+
+@keyframes tableSkeletonAppear {
+  to {
+    opacity: 1;
+  }
+}
+
+.rowAppear {
+  opacity: 0;
+  animation: tableSkeletonRowFadeIn 0.4s ease-out forwards;
+  /* Match .rootAppear delay so rows cascade as the shell appears */
+  animation-delay: calc(0.75s + attr(data-index number, 0) * 0.3s);
+}
+
+@keyframes tableSkeletonRowFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rootAppear {
+    animation: none;
+    opacity: 1;
+  }
+
+  .rowAppear {
+    animation: none;
+    opacity: 1;
+  }
+}

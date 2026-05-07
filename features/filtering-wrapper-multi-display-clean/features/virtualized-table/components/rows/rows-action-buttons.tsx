@@ -42,10 +42,10 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   iconSize = 16,
   buttonBorderRadius = 'rounded-md',
   buttonBorder = '',
-  dropdownBackground = 'bg-white',
-  dropdownBorder = 'border border-gray-200',
+  dropdownBackground = 'bg-background/90 backdrop-blur-sm',
+  dropdownBorder = 'border-border',
   dropdownShadow = 'shadow-lg',
-  dropdownItemHover = 'hover:bg-gray-50'
+  dropdownItemHover = 'hover:text-tertiary'
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -134,7 +134,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         }, [
           React.createElement('span', { 
             key: 'icon',
-            className: color
+            className: `${color}`
           }, React.createElement(IconComponent, { 
             size: size - 2
           })),
