@@ -1,45 +1,67 @@
 /**
  * DropdownContainer Component
- * 
- * Purpose: Provides absolute positioned container for dropdown
- * Used in: DropdownList for proper positioning and z-index management
- * Why: Ensures dropdown appears above other elements without affecting layout
+ *
+ * Purpose: Renders the dropdown in a portal (`document.body`) so it is not clipped
+ * by overflow/stacking in tables, and positions it detached below the trigger (with flip + clamp).
+ * Used in: DropdownList / EditableCell
  */
 
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DropdownContainerProps } from '../../types/dropdown';
 
-export function DropdownContainer({ 
-  isOpen, 
-  onClose, 
-  children, 
+/** Viewport / flip math — keep in sync with panel `max-h` below */
+const MENU_MAX_HEIGHT = 280;
+const GAP_PX = 6;
+const VIEWPORT_PAD = 8;
+
+export function DropdownContainer({
+  isOpen,
+  onClose,
+  children,
   className = '',
-  triggerElement
+  triggerElement,
 }: DropdownContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, width: 200 });
 
+  const calculatePosition = useCallback(() => {
+    if (!triggerElement) return;
+
+    const rect = triggerElement.getBoundingClientRect();
+    const width = Math.max(rect.width, 200);
+
+    let left = rect.left;
+    if (left + width > window.innerWidth - VIEWPORT_PAD) {
+      left = Math.max(VIEWPORT_PAD, window.innerWidth - width - VIEWPORT_PAD);
+    }
+
+    let top = rect.bottom + GAP_PX;
+    if (top + MENU_MAX_HEIGHT > window.innerHeight - VIEWPORT_PAD) {
+      top = rect.top - MENU_MAX_HEIGHT - GAP_PX;
+    }
+    top = Math.max(
+      VIEWPORT_PAD,
+      Math.min(top, window.innerHeight - MENU_MAX_HEIGHT - VIEWPORT_PAD),
+    );
+
+    setPosition({ top, left, width });
+  }, [triggerElement]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || !triggerElement) return;
+    calculatePosition();
+  }, [isOpen, triggerElement, calculatePosition]);
+
   useEffect(() => {
     if (!isOpen || !triggerElement) return;
 
-    const calculatePosition = () => {
-      const rect = triggerElement.getBoundingClientRect();
-      setPosition({
-        top: rect.top,
-        left: rect.left,
-        width: Math.max(rect.width, 200)
-      });
-    };
-
-    calculatePosition();
-
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        onClose();
-      }
+      const target = event.target as Node;
+      if (containerRef.current?.contains(target)) return;
+      onClose();
     };
 
     const handleEscape = (event: KeyboardEvent) => {
@@ -67,26 +89,23 @@ export function DropdownContainer({
       window.removeEventListener('scroll', handleScroll, true);
       window.removeEventListener('resize', handleResize);
     };
-  }, [isOpen, onClose, triggerElement]);
+  }, [isOpen, onClose, triggerElement, calculatePosition]);
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === 'undefined') return null;
 
   const dropdownContent = (
     <div
       ref={containerRef}
-      className={`fixed z-[10] bg-background/80 backdrop-blur-sm border border-border rounded-md shadow-lg ${className}`}
+      className={`fixed z-50 flex min-h-0 max-h-[min(280px,calc(100dvh-2rem))] flex-col overflow-hidden rounded-md border border-border bg-background/80 p-1.5 shadow-lg backdrop-blur-sm ${className}`}
       style={{
         top: position.top,
         left: position.left,
         width: position.width,
-        maxHeight: '200px',
-        overflow: 'hidden'
       }}
     >
       {children}
     </div>
   );
 
-  // Use portal to render outside the table's DOM hierarchy
   return createPortal(dropdownContent, document.body);
 }

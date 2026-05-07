@@ -8,6 +8,7 @@
 
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 import type { TableConfig, HeaderFilterConfig } from '@/features/filtering-wrapper-multi-display-clean/types'
+import { demoRscEditableColumnKeys } from '../cells/rental-car-location-options'
 import type { GroupConfig } from '@/features/filtering-wrapper-multi-display-clean/features/virtualized-list/utils/grouping-utils'
 import type { SortConfig } from '@/features/ui/filters/feature-sorting/types'
 
@@ -41,7 +42,7 @@ export const listDisplayConfig: TableConfig<RentalCarTableItem> = {
   actionMode: 'inline',              // 'inline' | 'dropdown' for row actions
   
   // Selection and editing
-  editableColumns: [],               // No inline editing for this demo
+  editableColumns: [...demoRscEditableColumnKeys],
   
   // Styling configuration
   groupStylerConfig: undefined,     // No custom group styling

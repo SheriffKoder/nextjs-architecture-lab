@@ -11,9 +11,9 @@
  * It should only describe columns, cell renderers, and which props they expect.
  */
 
-import React from "react";
 import type { TableConfig } from "@/features/filtering-wrapper-multi-display-clean/types";
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
+import { demoRscEditableColumnKeys } from '../cells/rental-car-location-options'
 
 ////////////////////////////////////
 // Table Configuration - Split into Display and Header Configs
@@ -40,11 +40,11 @@ export const tableDisplayConfig: TableConfig<RentalCarTableItem> = {
   // Row expansion configuration
   rowExpansion: undefined,           // No row expansion for this demo
   
-  // Action configuration
+  // Action configuration — row delete (drawer-header-style); view/edit row shortcuts commented in `demo-rsc-row-action-configs`.
   actionMode: 'inline',              // 'inline' | 'dropdown' for row actions
   
   // Selection and editing
-  editableColumns: [],               // No inline editing for this demo
+  editableColumns: [...demoRscEditableColumnKeys,'mileage'],
   
   // Styling configuration
   groupStylerConfig: undefined,     // No custom group styling

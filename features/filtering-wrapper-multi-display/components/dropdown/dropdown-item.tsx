@@ -33,10 +33,10 @@ export function DropdownItem({
   };
 
   const baseClasses = `
-    px-3 py-2 text-sm cursor-pointer transition-colors duration-150
-    ${option.disabled ? 'opacity-50 cursor-not-allowed' : ''}
-    ${isHighlighted ? 'bg-tertiary/60 text-white' : 'hover:bg-muted'}
-    ${isSelected ? 'bg-tertiary/60 text-white font-medium' : 'text-foreground'}
+    shrink-0 rounded-md px-3 py-2 text-sm cursor-pointer transition-colors duration-150
+    ${option.disabled ? 'cursor-not-allowed opacity-50' : ''}
+    ${isHighlighted ? 'bg-tertiary/60 text-foreground' : 'hover:bg-muted'}
+    ${isSelected ? 'bg-tertiary/60 font-medium text-foreground' : 'text-foreground'}
   `;
 
   const content = formatter ? formatter(option) : option.label;

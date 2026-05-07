@@ -15,7 +15,7 @@
 
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { DropdownOption } from '../../../../types/dropdown';
 import { DropdownContainer, DropdownList } from '../../../../components/dropdown';
 
@@ -107,6 +107,18 @@ export function EditableCell<T = any>({
     }
   }, [isEditing]);
 
+  useLayoutEffect(() => {
+    if (!isEditing || type !== "number") return;
+    const el = inputRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [isEditing, type]);
+
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click from triggering
     if (!disabled) {
@@ -148,6 +160,7 @@ export function EditableCell<T = any>({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    e.stopPropagation();
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSave();
@@ -167,6 +180,8 @@ export function EditableCell<T = any>({
         ref={inputRef}
         type={type}
         value={editValue}
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
         onChange={(e) => setEditValue(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}

@@ -8,6 +8,7 @@
 
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 import type { TableConfig, HeaderFilterConfig } from '@/features/filtering-wrapper-multi-display-clean/types'
+import { demoRscEditableColumnKeys } from '../cells/rental-car-location-options'
 
 ////////////////////////////////////
 // Subheadings Display Configuration
@@ -22,6 +23,9 @@ export const subheadingsDisplayConfig: TableConfig<RentalCarTableItem> = {
   // Row height configuration
   rowHeight: 40,                     // Fixed row height in pixels (different from table)
   minRowHeight: 40,                  // Minimum row height for dynamic rows
+
+  /** When true, subheadings data rows render without drag grip (see SubHeadingsContainer + DraggableRow). */
+  subheadingsDisableRowDrag: false,
   
   // Display configuration
   dynamicRowHeight: true,            // Enable variable row heights for subheadings
@@ -39,7 +43,7 @@ export const subheadingsDisplayConfig: TableConfig<RentalCarTableItem> = {
   actionMode: 'inline',              // 'inline' | 'dropdown' for row actions
   
   // Selection and editing
-  editableColumns: [],               // No inline editing for this demo
+  editableColumns: [...demoRscEditableColumnKeys],
   
   // Styling configuration
   groupStylerConfig: undefined,     // No custom group styling
@@ -91,6 +95,7 @@ export const subheadingsGroupingConfig = {
   // },
   nestedGrouping: undefined, // No nested grouping for this demo
 
+  /** Per-row drop zones + reducer-driven order; requires `manual_sorting` on rows (see data-source). */
   manualSorting: true,
 }
 

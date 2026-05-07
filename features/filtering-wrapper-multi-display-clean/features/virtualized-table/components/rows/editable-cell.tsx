@@ -15,7 +15,8 @@
 
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { DropdownOption } from '../../../../types/dropdown';
 import { DropdownContainer, DropdownList } from '../../../../components/dropdown';
 
@@ -107,6 +108,20 @@ export function EditableCell<T = any>({
     }
   }, [isEditing]);
 
+  // `<input type="number">` steps on wheel; React's `onWheel` is passive — attach
+  // a non-passive listener on the real DOM node (after layout so ref is set).
+  useLayoutEffect(() => {
+    if (!isEditing || type !== "number") return;
+    const el = inputRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [isEditing, type]);
+
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click from triggering
     if (!disabled) {
@@ -148,6 +163,7 @@ export function EditableCell<T = any>({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    e.stopPropagation();
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSave();
@@ -167,10 +183,12 @@ export function EditableCell<T = any>({
         ref={inputRef}
         type={type}
         value={editValue}
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
         onChange={(e) => setEditValue(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
-        className={`w-full bg-transparent border border-blue-500 rounded px-1 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[32px] ${className}`}
+        className={`w-full min-h-[32px] rounded-md border border-border bg-transparent px-2 py-0.5 text-sm shadow-sm backdrop-blur-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring dark:shadow-[0_1px_1px_0_rgb(255_255_255_/_0.02),0_3px_10px_-2px_rgb(255_255_255_/_0.03)] ${className}`}
         placeholder={placeholder}
       />
     );
@@ -194,20 +212,35 @@ export function EditableCell<T = any>({
       : (isNumberField ? formatNumberForDisplay(value) : (value || placeholder));
   }
 
-  // Check if cellRenderer has background styling
-  const hasBackgroundStyling = cellRenderer && cellRendererResult && 
-    React.isValidElement(cellRendererResult) && 
-    (cellRendererResult.props as any)?.className?.includes('bg-');
+  const shellClassName = [
+    'w-full min-w-0 cursor-pointer rounded-md border border-border bg-transparent px-2 py-0.5 text-sm text-inherit shadow-sm backdrop-blur-sm',
+    'flex min-h-[32px] items-center gap-1.5 transition-shadow hover:shadow-md',
+    // 'dark:shadow-[0_1px_1px_0_rgb(255_255_255_/_0.02),0_3px_10px_-2px_rgb(255_255_255_/_0.03)]',
+    'dark:hover:shadow-[0_1px_2px_0_rgb(255_255_255_/_0.025),0_4px_14px_-2px_rgb(255_255_255_/_0.04)]',
+    disabled ? 'cursor-not-allowed opacity-50' : '',
+    className,
+  ]
+    .join(' ')
+    .trim();
+
+  const labelContent =
+    displayValue || <span className="text-muted-foreground italic">Click to edit</span>;
 
   return (
-    <div ref={cellRef} className="relative w-full" onClick={handleClick}>
+    <div ref={cellRef} className="relative w-full min-w-0" onClick={handleClick}>
       <div
-        className={`w-full cursor-pointer border-2 border-transparent hover:border-primary/50 px-1 py-0.5 text-sm rounded text-inherit min-h-[32px] flex items-center ${!hasBackgroundStyling ? 'bg-primary/10' : ''} ${className}`}
+        className={shellClassName}
         onDoubleClick={handleDoubleClick}
         onClick={handleClick}
         title={disabled ? 'This field is not editable' : 'Double-click to edit'}
       >
-        {displayValue || <span className="text-gray-400 italic">Click to edit</span>}
+        <div className="min-w-0 flex-1 truncate">{labelContent}</div>
+        {isDropdown && dropdownOptions.length > 0 ? (
+          <ChevronDown
+            className="pointer-events-none h-4 w-4 shrink-0 text-muted-foreground"
+            aria-hidden
+          />
+        ) : null}
       </div>
       
       {isDropdown && dropdownOptions.length > 0 && (

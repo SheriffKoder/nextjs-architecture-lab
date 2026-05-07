@@ -90,7 +90,7 @@ export function DropdownList({
 
   if (reorderedOptions.length === 0) {
     return (
-      <div className="px-3 py-2 text-sm text-muted-foreground italic">
+      <div className="px-2 py-3 text-sm italic text-muted-foreground">
         No options available
       </div>
     );
@@ -99,7 +99,7 @@ export function DropdownList({
   return (
     <div
       ref={listRef}
-      className={`max-h-48 overflow-y-auto ${className}`}
+      className={`flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain px-0.5 py-0.5 ${className}`}
       onKeyDown={handleKeyDown}
       role="listbox"
       tabIndex={0}
