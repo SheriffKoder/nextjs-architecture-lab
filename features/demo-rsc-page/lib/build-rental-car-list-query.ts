@@ -8,8 +8,17 @@
 import type { SortSpec } from '@/features/ui/filters/feature-sorting/types'
 import { parseSorts } from '@/features/ui/filters/feature-sorting/utils'
 import { parsePagination } from '@/features/ui/filters/feature-pagination/utils'
+import {
+  decodeUrlParamListWithKnownMultiSelect,
+  encodeUrlParamList,
+} from '@/features/ui/filters/feature-filtering/utils/url-param-list-codec'
 import type { RentalCarListQuery, RentalCarNumberRange } from '@/features/demo-rsc-page/types/rental-car-list-query'
-import { rentalCarPaginationConfig } from '@/features/demo-rsc-page/config/header-filters-config'
+import type { RentalCarTableItem } from '@/features/demo-rsc-page/types/rental-car-table-item'
+import {
+  rentalCarFieldMap,
+  rentalCarPaginationConfig,
+} from '@/features/demo-rsc-page/config/header-filters-config'
+import { rentalCars } from '@/features/demo-rsc-page/utils/server/data-source'
 
 /** Flat search-param bag (same shape as Next `searchParams` after `await`). */
 type PageSearchParams = Record<string, string | string[] | undefined>
@@ -34,7 +43,24 @@ function searchParamsRecordToURLSearchParams(params: PageSearchParams): URLSearc
 
 function getList(params: PageSearchParams, key: string): string[] {
   const raw = toScalarString(params[key])
-  return raw ? raw.split(',').map((x) => x.trim()).filter(Boolean) : []
+  if (!raw) return []
+
+  const field = rentalCarFieldMap[key]
+  const known =
+    field !== undefined &&
+    (key === 'status' ||
+      key === 'make' ||
+      key === 'location' ||
+      key === 'model' ||
+      key === 'licensePlate')
+      ? new Set(
+          rentalCars.map((c) =>
+            String(c[field as keyof RentalCarTableItem]),
+          ),
+        )
+      : undefined
+
+  return decodeUrlParamListWithKnownMultiSelect(raw, known)
 }
 
 function getSingle(params: PageSearchParams, key: string): string | null {
@@ -75,6 +101,8 @@ export function buildRentalCarListQuery(params: PageSearchParams): RentalCarList
     status: getList(params, 'status'),
     make: getList(params, 'make'),
     location: getList(params, 'location'),
+    model: getList(params, 'model'),
+    licensePlate: getList(params, 'licensePlate'),
     ...(year && (year.min !== undefined || year.max !== undefined) ? { year } : {}),
     ...(pricePerDay &&
     (pricePerDay.min !== undefined || pricePerDay.max !== undefined)
@@ -110,9 +138,12 @@ export function rentalCarListQueryToSearchParams(
 ): PageSearchParams {
   const out: PageSearchParams = {}
 
-  if (query.status?.length) out.status = query.status.join(',')
-  if (query.make?.length) out.make = query.make.join(',')
-  if (query.location?.length) out.location = query.location.join(',')
+  if (query.status?.length) out.status = encodeUrlParamList(query.status)
+  if (query.make?.length) out.make = encodeUrlParamList(query.make)
+  if (query.location?.length) out.location = encodeUrlParamList(query.location)
+  if (query.model?.length) out.model = encodeUrlParamList(query.model)
+  if (query.licensePlate?.length)
+    out.licensePlate = encodeUrlParamList(query.licensePlate)
 
   appendRange(out, 'year', query.year)
   appendRange(out, 'pricePerDay', query.pricePerDay)

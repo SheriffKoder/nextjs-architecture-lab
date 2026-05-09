@@ -7,8 +7,12 @@
  */
 
 import type { RentalCarTableItem } from '../../../types/rental-car-table-item'
+import { decodeUrlParamListWithKnownMultiSelect } from '@/features/ui/filters/feature-filtering/utils/url-param-list-codec'
 import { filterBySearch } from "./filter-by-search"
-import { rentalCarSearchConfig } from "../../../config/header-filters-config"
+import {
+  rentalCarFieldMap,
+  rentalCarSearchConfig,
+} from "../../../config/header-filters-config"
 
 //////////////////////////////////
 // Type Definitions
@@ -28,18 +32,34 @@ type SearchParams = {
 //////////////////////////////////
 
 /**
- * Parse comma-separated list from search params
- * WHY: Multi-select filters use comma-separated values
- * HOW: Extract value, split by comma, filter out empty strings
+ * Parse multi-select list from search params (comma-separated encodeURIComponent segments,
+ * plus legacy single-value strings that contain commas but match one known facet value).
  */
-function parseList(params: SearchParams, key: string): string[] {
+function parseList(
+  params: SearchParams,
+  key: string,
+  cars: RentalCarTableItem[],
+): string[] {
   const value = params[key]
   if (!value) return []
-  
+
   const stringValue = Array.isArray(value) ? value[0] : value
   if (!stringValue) return []
-  
-  return stringValue.split(',').filter((v) => v.trim() !== '')
+
+  const field = rentalCarFieldMap[key]
+  const known =
+    field !== undefined &&
+    (key === 'status' ||
+      key === 'make' ||
+      key === 'location' ||
+      key === 'model' ||
+      key === 'licensePlate')
+      ? new Set(
+          cars.map((c) => String(c[field as keyof RentalCarTableItem])),
+        )
+      : undefined
+
+  return decodeUrlParamListWithKnownMultiSelect(stringValue, known)
 }
 
 /**
@@ -105,21 +125,37 @@ export function filterRentalCars(
   let filtered = [...cars]
 
   // Filter by status (multi-select)
-  const statusFilter = parseList(searchParams, 'status')
+  const statusFilter = parseList(searchParams, 'status', cars)
   if (statusFilter.length > 0) {
     filtered = filtered.filter((car) => statusFilter.includes(car.status))
   }
 
   // Filter by make (multi-select)
-  const makeFilter = parseList(searchParams, 'make')
+  const makeFilter = parseList(searchParams, 'make', cars)
   if (makeFilter.length > 0) {
     filtered = filtered.filter((car) => makeFilter.includes(car.make))
   }
 
   // Filter by location (multi-select)
-  const locationFilter = parseList(searchParams, 'location')
+  const locationFilter = parseList(searchParams, 'location', cars)
   if (locationFilter.length > 0) {
     filtered = filtered.filter((car) => locationFilter.includes(car.location))
+  }
+
+  const modelFilter = parseList(searchParams, 'model', cars)
+  if (modelFilter.length > 0) {
+    filtered = filtered.filter((car) => modelFilter.includes(car.model))
+  }
+
+  const licensePlateFilter = parseList(
+    searchParams,
+    'licensePlate',
+    cars,
+  )
+  if (licensePlateFilter.length > 0) {
+    filtered = filtered.filter((car) =>
+      licensePlateFilter.includes(car.licensePlate),
+    )
   }
 
   // Filter by year range (number range)
@@ -187,7 +223,7 @@ export function filterRentalCarsExcludingColumn(
 
   // Filter by status (if not excluded)
   if (excludeColumn !== 'status') {
-    const statusFilter = parseList(searchParams, 'status')
+    const statusFilter = parseList(searchParams, 'status', cars)
     if (statusFilter.length > 0) {
       filtered = filtered.filter((car) => statusFilter.includes(car.status))
     }
@@ -195,7 +231,7 @@ export function filterRentalCarsExcludingColumn(
 
   // Filter by make (if not excluded)
   if (excludeColumn !== 'make') {
-    const makeFilter = parseList(searchParams, 'make')
+    const makeFilter = parseList(searchParams, 'make', cars)
     if (makeFilter.length > 0) {
       filtered = filtered.filter((car) => makeFilter.includes(car.make))
     }
@@ -203,9 +239,29 @@ export function filterRentalCarsExcludingColumn(
 
   // Filter by location (if not excluded)
   if (excludeColumn !== 'location') {
-    const locationFilter = parseList(searchParams, 'location')
+    const locationFilter = parseList(searchParams, 'location', cars)
     if (locationFilter.length > 0) {
       filtered = filtered.filter((car) => locationFilter.includes(car.location))
+    }
+  }
+
+  if (excludeColumn !== 'model') {
+    const modelFilter = parseList(searchParams, 'model', cars)
+    if (modelFilter.length > 0) {
+      filtered = filtered.filter((car) => modelFilter.includes(car.model))
+    }
+  }
+
+  if (excludeColumn !== 'licensePlate') {
+    const licensePlateFilter = parseList(
+      searchParams,
+      'licensePlate',
+      cars,
+    )
+    if (licensePlateFilter.length > 0) {
+      filtered = filtered.filter((car) =>
+        licensePlateFilter.includes(car.licensePlate),
+      )
     }
   }
 
