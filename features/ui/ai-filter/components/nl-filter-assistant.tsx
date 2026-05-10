@@ -8,6 +8,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import { useToast } from '@/components/design/toast/use-toast'
+import MaskImage from '@/components/mask-image'
 import { Input } from '@/components/ui/input'
 import { applyNlFilterPatchToSearchParams } from '@/features/ui/ai-filter/lib/apply-nl-filter-patch-to-search-params'
 import { buildNlCurrentParamsReference } from '@/features/ui/ai-filter/lib/build-nl-current-params-reference'
@@ -18,15 +19,16 @@ import {
   resetNlApplyPaginationPage,
   stripNlResetKeys,
 } from '@/features/ui/ai-filter/lib/nl-filter-clear-helpers'
+import { useApplyTextSearchFromNlAssistant } from '@/features/ui/ai-filter/hooks/use-apply-text-search-from-nl-assistant'
 import type {
   NlFilterAssistantRuntimeConfig,
   NlFilterCatalogEntry,
 } from '@/features/ui/ai-filter/types/nl-filter-assistant'
 import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
 import { cn } from '@/lib/utils'
-import { Loader2, Search, Sparkles } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
-// import { NlFilterFeedback } from './nl-filter-feedback'
+import { NlFilterTextSearchSubmitButton } from './nl-filter-text-search-submit-button'
 
 function searchParamsToPlainRecord(sp: URLSearchParams): Record<string, string> {
   const out: Record<string, string> = {}
@@ -49,6 +51,12 @@ export type NlFilterAssistantProps = {
 
 const DEFAULT_PLACEHOLDER = 'e.g search to filter and sort results"'
 
+const NL_FILTER_SPARKLES_MASK_SRC = '/icons/nl-filter-sparkles.svg'
+const NL_FILTER_SPARKLES_GRADIENT = {
+  direction: 'to bottom right',
+  colors: ['#12c2e9 0%', '#c471ed 100%'],
+}
+
 export function NlFilterAssistant({
   catalog,
   assistantConfig,
@@ -62,8 +70,13 @@ export function NlFilterAssistant({
   const { wrapNavigation } = useNavigationTransitionOptional()
   const { showError, showInfo, showSuccess } = useToast()
 
+  const { applyTextSearch, clearTextSearch } = useApplyTextSearchFromNlAssistant(
+    assistantConfig.paginationPageParamKey ?? 'page',
+  )
+
+  const hasUrlSearch = Boolean(searchParams.get('q')?.trim())
+
   const [text, setText] = useState('')
-  // const [feedback, setFeedback] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
 
   const currentParamsReference = useMemo(
@@ -76,7 +89,6 @@ export function NlFilterAssistant({
     if (!trimmed || isPending) return
 
     setIsPending(true)
-    // setFeedback(null)
 
     try {
       const clearIntent = isClearAllFiltersIntent(trimmed)
@@ -101,7 +113,6 @@ export function NlFilterAssistant({
           })
         }
         showSuccess('Cleared all filters.', 'Filters')
-        // setFeedback('Cleared all filters.')
         return
       }
 
@@ -127,13 +138,11 @@ export function NlFilterAssistant({
 
       if (!res.ok) {
         showError(data.error ?? `Request failed (${res.status})`, 'AI filter')
-        // setFeedback(data.error ?? `Request failed (${res.status})`)
         return
       }
 
       if (typeof data.feedback !== 'string') {
         showError('Unexpected response from assistant.', 'AI filter')
-        // setFeedback('Unexpected response from assistant.')
         return
       }
 
@@ -165,10 +174,8 @@ export function NlFilterAssistant({
       }
 
       showInfo(data.feedback, 'AI filter')
-      // setFeedback(data.feedback)
     } catch {
       showError('Network error — try again.', 'AI filter')
-      // setFeedback('Network error — try again.')
     } finally {
       setIsPending(false)
     }
@@ -190,19 +197,13 @@ export function NlFilterAssistant({
 
   return (
     <div className={className}>
-      {/* <label htmlFor="nl-filter-assistant-input" className="text-sm font-medium text-foreground">
-        Describe filters or sorting
-      </label> */}
       <div
         className={cn(
-          'flex py-1 w-full items-center gap-2 rounded-full bg-tertiary/10 pl-3 pr-2 backdrop-blur-sm',
+          'flex py-1 w-full items-center gap-2 rounded-full bg-tertiary/10 pl-4 pr-2 backdrop-blur-sm',
           'ring-1 ring-border/30 transition-[box-shadow] focus-within:ring-tertiary/40',
         )}
       >
-        <Search
-          className="size-4 shrink-0 text-muted-foreground"
-          aria-hidden
-        />
+        <span className="text-muted-foreground border-r border-border pr-2 text-sm">Search</span>
         <Input
           id="nl-filter-assistant-input"
           type="text"
@@ -216,33 +217,55 @@ export function NlFilterAssistant({
           }}
           placeholder={placeholder}
           disabled={isPending}
+          autoComplete="off"
           className={cn(
-            'h-9 min-w-0 flex-1 border-0 bg-transparent py-0 text-sm text-foreground shadow-none px-2',
+            'h-9 min-w-0 flex-1 border-0 bg-transparent px-2 py-0 text-sm text-foreground shadow-none',
             'placeholder:text-muted-foreground',
             'focus-visible:ring-0 focus-visible:ring-offset-0',
             'disabled:cursor-not-allowed disabled:opacity-50',
           )}
         />
+
         <button
           type="button"
           disabled={isPending || !text.trim()}
           aria-label={isPending ? 'Applying…' : 'Apply with AI'}
           onClick={() => void submit()}
           className={cn(
-            'inline-flex size-8 shrink-0 items-center justify-center rounded-full',
-            'bg-tertiary dark:bg-tertiary/80 text-white dark:text-white/80 hover:bg-tertiary/15 dark:hover:bg-tertiary/100',
+            'inline-flex gap-1 shrink-0 items-center justify-center group',
+            'text-foreground/70 hover:text-foreground hover:bg-tertiary/15 dark:hover:bg-tertiary/10',
             'disabled:pointer-events-none disabled:opacity-40',
             'transition-colors',
           )}
         >
+          <span className="text-sm text-foreground/70 group-hover:text-foreground">Search with AI</span>
           {isPending ? (
             <Loader2 className="size-4 animate-spin" aria-hidden />
           ) : (
-            <Sparkles className="size-4" aria-hidden />
+            <span className="inline-flex group-hover:opacity-100 opacity-80" aria-hidden>
+              <MaskImage
+                width={16}
+                height={16}
+                image={NL_FILTER_SPARKLES_MASK_SRC}
+                maskSize="100%"
+                gradient={NL_FILTER_SPARKLES_GRADIENT}
+              />
+            </span>
           )}
         </button>
+
+        <NlFilterTextSearchSubmitButton
+          hasUrlSearch={hasUrlSearch}
+          disabled={hasUrlSearch ? isPending : isPending || !text.trim()}
+          onApply={() => {
+            applyTextSearch(text)
+          }}
+          onClear={() => {
+            clearTextSearch()
+            setText('')
+          }}
+        />
       </div>
-      {/* {feedback ? <NlFilterFeedback text={feedback} /> : null} */}
     </div>
   )
 }
