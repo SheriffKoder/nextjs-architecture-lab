@@ -158,7 +158,7 @@ export function RscCarDrawerEditHeader({ id }: { id: string }) {
           </RscCarDrawerToolbarButton>
           <button
             type="button"
-            onClick={() => triggerDelete(id)}
+            onClick={() => triggerDelete()}
             className={deleteToolbarBtnClass}
             aria-label="Delete car"
             title="Delete"
