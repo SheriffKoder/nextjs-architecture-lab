@@ -25,6 +25,10 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
+import {
+  decodeUrlParamList,
+  encodeUrlParamList,
+} from '@/features/ui/filters/feature-filtering/utils/url-param-list-codec'
 
 /**
  * Custom hook for managing URL-based filter state
@@ -103,8 +107,7 @@ export function useUrlFilters() {
    */
   const getList = (key: string): string[] => {
     const value = searchParams.get(key)
-    // Split comma-separated values into array, return empty array if no value exists
-    return value ? value.split(',') : []
+    return decodeUrlParamList(value)
   }
 
   /**
@@ -173,8 +176,7 @@ export function useUrlFilters() {
     if (values.length === 0) {
       params.delete(key)
     } else {
-      // Join array values with commas for URL storage
-      params.set(key, values.join(','))
+      params.set(key, encodeUrlParamList(values))
     }
 
     updateUrl(params)

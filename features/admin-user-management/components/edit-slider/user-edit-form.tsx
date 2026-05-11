@@ -4,8 +4,8 @@ import React from 'react'
 import { AdminUserTableItem } from '../../config/table-config'
 import CollapsibleCard from '@/components/design/CollapsibleCard-sm'
 import { ChevronDownIcon, UserIcon } from 'lucide-react'
-import GlassInput from '@/components/design/glass-input'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import GlassInput from '@/components/design/inputs/glass-input'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 import type { Role } from '@/lib/types'
 
 interface DropdownItem {

@@ -1,0 +1,155 @@
+/**
+ * Minimal folder-tab silhouette (skewed side wings).
+ *
+ * Purpose: Geometry + fill + optional outline only; self-contained under this route folder.
+ * Used in: app/development/folder-tab-shape/page.tsx, folder-tab-flush-row-preview.tsx
+ *
+ * Markup:
+ *   <div className={styles.folderTab}>
+ *     <span className={styles.folderTabFace}>Label</span>
+ *   </div>
+ *
+ * Modifiers:
+ *   folderTabBordered — outline on wings + face (uses --folder-tab-edge).
+ *   folderTabNoLeadingWing — hide left wing; flush-left tab (face gets left border).
+ *   folderTabNoTrailingWing — hide right wing; end-cap tab (face gets right border).
+ *
+ * Customization (optional inline style or wrapper class):
+ *   --folder-tab-fill, --folder-tab-edge
+ */
+
+.folderTab {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+}
+
+/* Unselected: light */
+.folderTab:not(.folderTabActive) {
+  --folder-tab-fill: #f1f1f1;
+  --folder-tab-edge: #cfcfcf80;
+}
+
+/* Unselected: dark */
+:global(.dark) .folderTab:not(.folderTabActive) {
+  --folder-tab-fill: #131313;
+  --folder-tab-edge: #1b1e24;
+}
+
+/* Selected: theme tertiary fill + black label (wings follow --folder-tab-fill). */
+:global(.dark) .folderTab.folderTabActive {
+  --folder-tab-fill: hsl(var(--tertiary));
+  --folder-tab-edge: #252830;
+}
+
+/* Selected: light */
+.folderTab.folderTabActive {
+  /* --folder-tab-fill: #ebf2ff; */
+  --folder-tab-fill: hsl(var(--tertiary));
+  --folder-tab-edge: #ced6e8;
+}
+
+/* Selected: label color light */
+.folderTabActive .folderTabFace {
+  color: #ffffff;
+}
+
+/* Selected: label color dark */
+:global(.dark) .folderTabActive .folderTabFace {
+  color: hsl(var(--background));
+}
+
+.folderTab::before,
+.folderTab::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  z-index: 0;
+  width: 0.85rem;
+  height: 100%;
+  background-color: var(--folder-tab-fill);
+  border-style: solid;
+  border-width: 0;
+  pointer-events: none;
+}
+
+.folderTab::before {
+  left: -0.55rem;
+  transform: skewX(-12deg);
+  transform-origin: 100% 100%;
+  border-top-left-radius: 0.45rem;
+}
+
+.folderTab::after {
+  right: -0.55rem;
+  transform: skewX(12deg);
+  transform-origin: 0 100%;
+  border-top-right-radius: 0.45rem;
+}
+
+.folderTabFace {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  border-style: solid;
+  border-width: 0;
+  border-bottom: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+  padding: 0.5rem 1.35rem 0.55rem;
+  background-color: var(--folder-tab-fill);
+}
+
+.folderTabBordered::before {
+  border-top-width: 1px;
+  border-top-color: var(--folder-tab-edge);
+  border-left-width: 1px;
+  border-left-color: var(--folder-tab-edge);
+}
+
+.folderTabBordered::after {
+  border-top-width: 1px;
+  border-top-color: var(--folder-tab-edge);
+  border-right-width: 1px;
+  border-right-color: var(--folder-tab-edge);
+}
+
+.folderTabBordered .folderTabFace {
+  border-top-width: 1px;
+  border-top-color: var(--folder-tab-edge);
+}
+
+.folderTabNoLeadingWing::before {
+  display: none;
+}
+
+.folderTabNoLeadingWing.folderTabBordered .folderTabFace {
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-left-color: var(--folder-tab-edge);
+}
+
+.folderTabNoTrailingWing::after {
+  display: none;
+}
+
+.folderTabNoTrailingWing.folderTabBordered .folderTabFace {
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: var(--folder-tab-edge);
+}
+
+/* For stacking multiple tabs in one row (optional). */
+.folderTabOverlapNext {
+  margin-right: -0.65rem;
+}

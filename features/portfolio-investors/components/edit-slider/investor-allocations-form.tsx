@@ -5,8 +5,8 @@ import { InvestorTableItem } from '../../config/table-config'
 import { Allocation, Project } from '@/lib/types'
 import CollapsibleCard from '@/components/design/CollapsibleCard-sm'
 import { ChevronDownIcon, DollarSign, Plus, Trash2, FolderKanban } from 'lucide-react'
-import GlassInput from '@/components/design/glass-input'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import GlassInput from '@/components/design/inputs/glass-input'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 
 interface DropdownItem {
   id: string | number

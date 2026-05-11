@@ -8,6 +8,13 @@
 
 import { TableColumn } from "@/features/filtering-wrapper-multi-display-clean/types";
 import type { RentalCarTableItem } from "../types/rental-car-table-item";
+import { rentalCarStatusFormat } from "./cells/rental-car-status-format";
+import {
+  rentalCarLocationDropdownFormatter,
+  rentalCarLocationDropdownOptions,
+  rentalCarLocationFormat,
+} from "./cells/rental-car-location-options";
+import { formatGroupedInteger, formatGroupedNumber } from "@/utils/number-formatters/format-grouped-number";
 
 ////////////////////////////////////
 // Centralized Column Definitions: All columns defined once
@@ -31,39 +38,60 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
     key: 'year',
     name: 'Year',
     isNumberField: true, // Formatting
+    // YYYY
+    formatter: (value) => {
+      if (typeof value === 'number') {
+        return value.toString()
+      }
+      return String(value)
+    },
   },
   {
     key: 'status',
     name: 'Status',
-    formatter: (value) => {
-      const statusMap: Record<string, string> = {
-        'available': 'Available',
-        'rented': 'Rented',
-        'maintenance': 'Maintenance',
-        'reserved': 'Reserved',
-      }
-      return statusMap[value as string] || String(value)
-    },
+    formatter: rentalCarStatusFormat.text,
+    cellRenderer: rentalCarStatusFormat.cell,
   },
   {
     key: 'location',
     name: 'Location',
+    formatter: rentalCarLocationFormat.text,
+    cellRenderer: rentalCarLocationFormat.cell,
+    isDropdown: true,
+    dropdownOptions: rentalCarLocationDropdownOptions,
+    dropdownFormatter: rentalCarLocationDropdownFormatter,
   },
   {
     key: 'mileage',
     name: 'Mileage',
     isNumberField: true,
+    editableGroupedNumber: { suffix: ' mi' },
     formatter: (value) => {
-      return typeof value === 'number' ? `${value.toLocaleString()} mi` : String(value)
+      return typeof value === 'number'
+        ? formatGroupedInteger(value, { suffix: ' mi' })
+        : String(value);
     },
   },
   {
     key: 'pricePerDay',
     name: 'Price/Day',
     isNumberField: true,
+    editableGroupedNumber: {
+      prefix: '$',
+      allowDecimals: true,
+      maxDecimalPlaces: 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    },
     formatter: (value) => {
-      return typeof value === 'number' ? `$${value.toFixed(2)}` : String(value)
-    },  
+      return typeof value === 'number'
+        ? formatGroupedNumber(value, {
+            prefix: '$',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        : String(value);
+    },
   },
   {
     key: 'color',
@@ -96,6 +124,13 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
       }
       return String(value)
     },
+  },
+  /** Reserved key: row actions when `FilteringWrapper` gets `onActionClick` + `actionConfigs` (demo: delete only). */
+  {
+    key: 'actions',
+    name: 'Actions',
+    width: '72px',
+    cellRenderer: () => null,
   },
 ]
 
@@ -136,6 +171,7 @@ export const tableColumns = createColumnArray([
   'pricePerDay',
   'color',
   'licensePlate',
+  'actions',
   // 'rentalStartDate',
   // 'rentalEndDate',
 ]);

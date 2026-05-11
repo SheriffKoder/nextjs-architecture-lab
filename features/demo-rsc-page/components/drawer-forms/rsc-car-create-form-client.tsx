@@ -35,10 +35,10 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Car, Calendar, DollarSign, Gauge, Hash, MapPin, Tag } from 'lucide-react'
 
-import { useToast } from '@/components/design/toast-success/use-toast'
-import GlassInput from '@/components/design/glass-input'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
-import type { DropdownItem } from '@/components/design/multi-select-2/utils/types'
+import { useToast } from '@/components/design/toast/use-toast'
+import GlassInput from '@/components/design/inputs/glass-input'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
+import type { DropdownItem } from '@/components/design/multi-select/utils/types'
 
 import { useDrawerActions } from '@/features/ui/drawer-2'
 

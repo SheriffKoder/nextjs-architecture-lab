@@ -11,24 +11,27 @@ import type { MouseEvent } from 'react'
 import { Eye, Pencil } from 'lucide-react'
 import type { ActionHandler } from '@/features/filtering-wrapper-multi-display-clean/constants/actions'
 
-const rowViewButtonStyle = {
-  buttonPadding: 'p-2',
-  buttonBackground: 'bg-foreground/5 dark:bg-transparent',
-  buttonHoverBackground: 'hover:bg-info/10 dark:hover:bg-info/15',
-  iconColor: 'text-info',
+/** Named `group` so icon hover uses `group-hover/row-action-button:` — not the table row `group-hover`. */
+const rowActionMenuButtonClassName =
+  'group/row-action-button flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-tertiary/20'
+
+/** Light: blue icon; dark: foreground; hover (this action button only): foreground. */
+const rowActionMenuIconClassNameEdit =
+  'text-blue-500 transition-colors group-hover/row-action-button:text-foreground dark:text-foreground'
+
+const rowActionMenuIconClassNameView =
+  'text-blue-500 transition-colors group-hover/row-action-button:text-foreground dark:text-foreground'
+
+const rowActionMenuItemStyleEdit = {
+  buttonClassName: rowActionMenuButtonClassName,
+  iconClassName: rowActionMenuIconClassNameEdit,
   iconSize: 16,
-  buttonBorderRadius: 'rounded-md',
-  buttonBorder: '',
 } as const
 
-const rowEditButtonStyle = {
-  buttonPadding: 'p-2',
-  buttonBackground: 'bg-foreground/5 dark:bg-transparent',
-  buttonHoverBackground: 'hover:bg-success/10 dark:hover:bg-success/15',
-  iconColor: 'text-success',
+const rowActionMenuItemStyleView = {
+  buttonClassName: rowActionMenuButtonClassName,
+  iconClassName: rowActionMenuIconClassNameView,
   iconSize: 16,
-  buttonBorderRadius: 'rounded-md',
-  buttonBorder: '',
 } as const
 
 export function demoRscRowActionConfigs<T>(
@@ -41,14 +44,14 @@ export function demoRscRowActionConfigs<T>(
       icon: Eye,
       label: 'View',
       onClick: (_e: MouseEvent) => onActionClick('view', rowData),
-      ...rowViewButtonStyle,
+      ...rowActionMenuItemStyleView,
     },
     {
       key: 'edit',
       icon: Pencil,
       label: 'Edit',
       onClick: (_e: MouseEvent) => onActionClick('edit', rowData),
-      ...rowEditButtonStyle,
+      ...rowActionMenuItemStyleEdit,
     },
   ]
 }

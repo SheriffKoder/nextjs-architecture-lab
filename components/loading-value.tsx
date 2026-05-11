@@ -17,6 +17,6 @@ interface LoadingValueProps {
 
 export default function LoadingValue({ className = '' }: LoadingValueProps) {
   return (
-    <div className={`rounded shimmer ${className}`} />
+    <div className={`rounded shimmer ${className}`}/>
   )
 }

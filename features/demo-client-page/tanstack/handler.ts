@@ -17,6 +17,7 @@ import type { RentalCarTableItem } from '../types/rental-car-table-item'
 import type { RentalCarEditFormValues } from '../validation/rental-car-edit-form-schema'
 import type { RentalCarListQuery } from './key-factory'
 import type { FilterConfig } from '@/features/ui/filters/feature-filtering/components/filter-types'
+import { encodeUrlParamList } from '@/features/ui/filters/feature-filtering/utils/url-param-list-codec'
 
 const PAGE_CLIENT_PATH = '/api/demo-client-page/page-client'
 const OPTIONS_PATH = '/api/demo-client-page/options'
@@ -68,6 +69,12 @@ export function buildRentalCarSearchParams(
   appendCommaList(params, 'status', query.status)
   appendCommaList(params, 'make', query.make)
   appendCommaList(params, 'location', query.location)
+  if (query.model?.length) {
+    params.append('model', encodeUrlParamList(query.model))
+  }
+  if (query.licensePlate?.length) {
+    params.append('licensePlate', encodeUrlParamList(query.licensePlate))
+  }
 
   appendNumberRange(params, 'year', query.year)
   appendNumberRange(params, 'pricePerDay', query.pricePerDay)

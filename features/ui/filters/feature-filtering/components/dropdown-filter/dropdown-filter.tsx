@@ -21,6 +21,10 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { useSearchParams } from "next/navigation"
 import { ListFilter, X } from "lucide-react"
 import { useUrlFilters } from "../../hooks/useUrlFilters"
+import {
+  decodeUrlParamListWithKnownMultiSelect,
+  encodeUrlParamList,
+} from '@/features/ui/filters/feature-filtering/utils/url-param-list-codec'
 import type { DropdownFilterProps, DropdownFilterOption } from "./types"
 import type { FilterConfig } from "../filter-types"
 import { DropdownHeader } from "./components/dropdown-header"
@@ -102,8 +106,16 @@ export function DropdownFilter({
   const searchInputRef = useRef<HTMLInputElement>(null)
   
   // URL filters hook
-  const { getList, getRange, getNumberRange, setList, toggleListValue, setRange, setNumberRange, remove } = useUrlFilters()
+  const { getRange, getNumberRange, setList, setRange, setNumberRange, remove } = useUrlFilters()
   const searchParams = useSearchParams()
+
+  const selectKnownValues = useMemo(
+    () =>
+      filter.type === 'multi-select' || filter.type === 'single-select'
+        ? new Set((filter.options ?? []).map((o) => o.value))
+        : undefined,
+    [filter.type, filter.options],
+  )
   
   //////////////////////////////////
   // URL State Reading
@@ -132,9 +144,17 @@ export function DropdownFilter({
       if (range.max !== undefined && range.max !== range.min) values.push(String(range.max))
       return values.length > 0 ? values : ['range']
     } else {
-      return getList(filter.key)
+      const raw = searchParams.get(filter.key)
+      return decodeUrlParamListWithKnownMultiSelect(raw ?? '', selectKnownValues)
     }
-  }, [filter.key, filter.type, getList, getRange, getNumberRange])
+  }, [
+    filter.key,
+    filter.type,
+    getRange,
+    getNumberRange,
+    searchParams,
+    selectKnownValues,
+  ])
   
   const isFilterActive = activeFilters.length > 0
   const filterCount = activeFilters.length
@@ -154,7 +174,7 @@ export function DropdownFilter({
     Object.entries(allActiveFilterColumns || {}).forEach(([key, value]) => {
       if (key !== filter.key && value !== undefined && value !== null) {
         if (Array.isArray(value)) {
-          params.append(key, value.join(','))
+          params.append(key, encodeUrlParamList(value))
         } else {
           params.append(key, String(value))
         }
@@ -392,11 +412,13 @@ export function DropdownFilter({
   const currentActiveFiltersString = useMemo(() => {
     if (filter.type === "multi-select" || filter.type === "single-select") {
       const value = searchParams.get(filter.key)
-      const filters = value ? value.split(',').sort() : []
+      const filters = value
+        ? decodeUrlParamListWithKnownMultiSelect(value, selectKnownValues).sort()
+        : []
       return JSON.stringify(filters)
     }
     return ''
-  }, [filter.key, filter.type, searchParams])
+  }, [filter.key, filter.type, searchParams, selectKnownValues])
   
   // Track previous values with refs
   const prevIsOpenRef = useRef(isOpen)
@@ -411,7 +433,9 @@ export function DropdownFilter({
     if (isOpening || filtersChanged) {
       if (filter.type === "multi-select" || filter.type === "single-select") {
         const value = searchParams.get(filter.key)
-        const filters = value ? value.split(',') : []
+        const filters = value
+          ? decodeUrlParamListWithKnownMultiSelect(value, selectKnownValues)
+          : []
         setPendingSelections(filters)
       } else {
         setPendingSelections([])
@@ -805,7 +829,7 @@ export function DropdownFilter({
       {isOpen && (
         <div
           ref={dropdownRef}
-          className={`absolute z-30 mt-1 flex max-h-[min(70vh,28rem)] min-h-0 w-64 flex-col overflow-hidden rounded border border-border bg-background/10 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-background/70 ${
+          className={`absolute z-30 mt-1 flex max-h-[min(70vh,28rem)] min-h-0 w-64 flex-col overflow-hidden rounded border border-border bg-background/90 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-background/70 ${
             isLastColumn ? 'right-0' : 'left-0'
           }`}
         >

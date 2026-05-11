@@ -1,0 +1,22 @@
+/**
+ * Toolbar controls fade in one after another; delay from data-index (Tailwind: chrome).
+ */
+
+.item {
+  opacity: 0;
+  animation: filterToolbarSkeletonFadeIn 0.45s ease-out forwards;
+  animation-delay: calc(0.5s + attr(data-index number, 0) * 0.2s);
+}
+
+@keyframes filterToolbarSkeletonFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    animation: none;
+    opacity: 1;
+  }
+}

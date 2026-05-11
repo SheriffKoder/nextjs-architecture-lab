@@ -1,14 +1,14 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import GlassInput from '@/components/design/glass-input'
+import GlassInput from '@/components/design/inputs/glass-input'
 import PrimaryButton from '@/components/design/primary-button'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 import { Check, Building2, DollarSign, Handshake, Home, HardHat, FileCheck } from 'lucide-react'
 import { useCompanies, useOrgs, useProjects, useTitleCompanies } from '@/hooks'
 import { formatDDMMYYYY } from '@/lib/utils'
 import type { Project } from '@/lib/types'
-import type { DropdownItem } from '@/components/design/multi-select-2/utils/types'
+import type { DropdownItem } from '@/components/design/multi-select/utils/types'
 
 interface ProjectSliderAddContainerProps {
   onSuccess?: (project: Project) => void

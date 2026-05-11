@@ -122,6 +122,19 @@ export default function DemoRscContent({
     setTableData(cars)
   }, [cars])
 
+  const onCellValueChange = useCallback(
+    (rowIndex: number, columnKey: string, newValue: unknown) => {
+      setTableData((prev) => {
+        const row = prev[rowIndex]
+        if (!row) return prev
+        const next = [...prev]
+        next[rowIndex] = { ...row, [columnKey]: newValue } as RentalCarTableItem
+        return next
+      })
+    },
+    []
+  )
+
   const subheadingsDragEnd = (updatedData: RentalCarTableItem[]) => {
     if (onSubheadingsDragEnd) {
       onSubheadingsDragEnd(updatedData)
@@ -152,6 +165,7 @@ export default function DemoRscContent({
         columns={columnsForActiveView}
         filters={filters}
         onRowClick={handleRowClick}
+        onCellValueChange={onCellValueChange}
         onActionClick={onActionClick}
         actionConfigs={getRowActionConfigs}
         columnActions={{

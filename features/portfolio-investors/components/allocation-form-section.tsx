@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import GlassInput from '@/components/design/glass-input'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import GlassInput from '@/components/design/inputs/glass-input'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 import PrimaryButton from '@/components/design/primary-button'
 import { Plus, Trash2, DollarSign, Percent, FolderOpen, Tag, ChevronDownIcon } from 'lucide-react'
 import CollapsibleCard from '@/components/design/CollapsibleCard-sm'
@@ -12,7 +12,7 @@ import {
   AllocationInvestmentTypeEnum,
   AllocationPaymentTermEnum,
 } from '@/lib/constants'
-import type { DropdownItem } from '@/components/design/multi-select-2/utils/types'
+import type { DropdownItem } from '@/components/design/multi-select/utils/types'
 import { capitalizeAllFirstLetters } from '@/lib/utils'
 
 export interface AllocationDraft {

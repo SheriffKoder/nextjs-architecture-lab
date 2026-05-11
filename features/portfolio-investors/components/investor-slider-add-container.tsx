@@ -1,14 +1,14 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import GlassInput from '@/components/design/glass-input'
+import GlassInput from '@/components/design/inputs/glass-input'
 import PrimaryButton from '@/components/design/primary-button'
-import DropdownSelect from '@/components/design/multi-select-2/dropdown-select'
+import DropdownSelect from '@/components/design/multi-select/dropdown-select'
 import { Check, Building2 } from 'lucide-react'
 import { useOrgs, useCompanies, useAllocations } from '@/hooks'
 import { OrgTypeEnum } from '@/lib/constants'
 import { formatDDMMYYYY } from '@/lib/utils'
-import type { DropdownItem } from '@/components/design/multi-select-2/utils/types'
+import type { DropdownItem } from '@/components/design/multi-select/utils/types'
 import AllocationFormSection, { AllocationDraft } from './allocation-form-section'
 
 interface InvestorSliderAddContainerProps {

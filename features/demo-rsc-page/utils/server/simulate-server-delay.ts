@@ -4,7 +4,7 @@
  */
 
 /** Filter facet options (`getFilterOptionsServer` for rental cars). */
-export const DEMO_RSC_SIMULATE_FILTER_OPTIONS_MS = 450
+export const DEMO_RSC_SIMULATE_FILTER_OPTIONS_MS = 3000
 
 /** List payload (`getRentalCarsData`). */
 export const DEMO_RSC_SIMULATE_RENTAL_CARS_MS = 650
