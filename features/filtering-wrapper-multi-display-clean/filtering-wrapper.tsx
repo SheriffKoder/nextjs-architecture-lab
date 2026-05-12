@@ -62,6 +62,8 @@ interface FilteringWrapperProps<T extends Record<string, any> = Record<string, a
   columns: TableColumn<T>[];
   // Optional row click handler
   onRowClick?: (row: T) => void;
+  /** Fires when the pointer enters the row strip (e.g. prefetch row payload before click). */
+  onRowPointerEnter?: (row: T) => void;
   // Optional handler for action button clicks
   onActionClick?: (action: string, row: T) => void;
   // Action configurations for each row
@@ -219,6 +221,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
   data,
   columns,
   onRowClick,
+  onRowPointerEnter,
   onActionClick,
   actionConfigs,
   selectedItemId,
@@ -463,6 +466,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
             listRef={listRef}
             scrollContainerRef={scrollContainerRef}
             onRowClick={onRowClick}
+            onRowPointerEnter={onRowPointerEnter}
             onActionClick={onActionClick}
             actionConfigs={actionConfigs}
             selectedItemId={selectedItemId}
@@ -498,6 +502,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
               listRef={listRef}
               scrollContainerRef={scrollContainerRef}
               onRowClick={onRowClick}
+              onRowPointerEnter={onRowPointerEnter}
               onActionClick={onActionClick}
               actionConfigs={actionConfigs}
               selectedItemId={selectedItemId}
@@ -521,6 +526,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
               listRef={listRef}
               scrollContainerRef={scrollContainerRef}
               onRowClick={onRowClick}
+              onRowPointerEnter={onRowPointerEnter}
               onActionClick={onActionClick}
               actionConfigs={actionConfigs}
               selectedItemId={selectedItemId}

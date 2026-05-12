@@ -75,6 +75,7 @@ interface SubHeadingsContainerProps<T = any> {
   // Event Handlers
   // ============================================
   onRowClick?: (row: T) => void;
+  onRowPointerEnter?: (row: T) => void;
   onActionClick?: (action: string, row: T) => void;
   onCellValueChange?: (rowIndex: number, columnKey: string, newValue: any) => void;
   actionConfigs?: (row: T) => any[];
@@ -168,6 +169,7 @@ export function SubHeadingsContainer<T = any>({
   
   // Event Handlers
   onRowClick,
+  onRowPointerEnter,
   onActionClick,
   onCellValueChange,
   actionConfigs,
@@ -729,6 +731,7 @@ export function SubHeadingsContainer<T = any>({
         item={item}
         columns={visibleColumns}
         onRowClick={onRowClick}
+        onRowPointerEnter={onRowPointerEnter}
         style={style}
         isLastRow={index === displayData.length - 1}
         onActionClick={onActionClick}
@@ -754,7 +757,7 @@ export function SubHeadingsContainer<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [displayData, visibleColumns, onRowClick, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions]);
+  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED
@@ -780,6 +783,7 @@ export function SubHeadingsContainer<T = any>({
           columns={columns}
           onHeightCalculated={setCalculatedRowHeight}
           onRowClick={onRowClick}
+          onRowPointerEnter={onRowPointerEnter}
           onActionClick={onActionClick}
           actionMode={actionMode}
           actionConfigs={actionConfigs}
@@ -1004,6 +1008,7 @@ export function SubHeadingsContainer<T = any>({
                                                             item={item}
                                                             columns={visibleColumns}
                                                             onRowClick={onRowClick}
+                                                            onRowPointerEnter={onRowPointerEnter}
                                                             style={{ width: '100%' }}
                                                             isLastRow={index === groupItems.length - 1}
                                                             onActionClick={onActionClick}
@@ -1127,6 +1132,7 @@ export function SubHeadingsContainer<T = any>({
                                                         item={item}
                                                         columns={visibleColumns}
                                                         onRowClick={onRowClick}
+                                                        onRowPointerEnter={onRowPointerEnter}
                                                         style={{ width: '100%' }}
                                                         isLastRow={index === groupItems.length - 1}
                                                         onActionClick={onActionClick}
@@ -1336,6 +1342,7 @@ export function SubHeadingsContainer<T = any>({
                                               item={item}
                                               columns={visibleColumns}
                                               onRowClick={onRowClick}
+                                              onRowPointerEnter={onRowPointerEnter}
                                               style={{ width: "100%" }}
                                               isLastRow={index === groupItems.length - 1}
                                               onActionClick={onActionClick}
@@ -1516,6 +1523,7 @@ export function SubHeadingsContainer<T = any>({
                                           item={item}
                                           columns={visibleColumns}
                                           onRowClick={onRowClick}
+                                          onRowPointerEnter={onRowPointerEnter}
                                           style={{ width: "100%" }}
                                           isLastRow={index === groupItems.length - 1}
                                           onActionClick={onActionClick}

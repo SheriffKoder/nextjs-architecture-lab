@@ -1,35 +1,23 @@
 /**
  * DemoRscDrawerLayer
  *
- * Purpose: Mounts URL-driven `DrawerWrapper` and demo car drawer body for the RSC page
+ * Purpose: Server shell — mounts client `DrawerWrapper` + demo car drawer body; delete modal is a client island
  * Used in: `demo-rsc-index.tsx`
- * Used for: Right-hand panel when drawer query updates; `DeleteActionModal` when `action=delete`
- *
- * Steps:
- * 1. Render `DrawerWrapper` from drawer-2
- * 2. Delegate inner UI to `RscCarDrawerContent`
+ * Why: `params` flow from `page.tsx` so `RscCarDrawerContent` can stay server (no `useSearchParams` in content)
  */
 
-'use client'
-
-import { DeleteActionModal, DrawerWrapper, useDrawerActions } from '@/features/ui/drawer-2'
+import { DrawerWrapper } from '@/features/ui/drawer-2'
+import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 import RscCarDrawerContent from './rsc-car-drawer-content'
+import RscCarDrawerDeleteModal from './rsc-car-drawer-delete-modal'
 
-export default function DemoRscDrawerLayer() {
-  const { close } = useDrawerActions()
-
+export default function DemoRscDrawerLayer({ params }: { params: DemoRscPageSearchParams }) {
   return (
     <>
       <DrawerWrapper>
-        <RscCarDrawerContent />
+        <RscCarDrawerContent params={params} />
       </DrawerWrapper>
-      <DeleteActionModal
-        title="Delete this car?"
-        description="Demo only: no data is removed. Confirm closes the drawer; wire your DELETE mutation here."
-        onConfirm={async (_id) => {
-          close()
-        }}
-      />
+      <RscCarDrawerDeleteModal />
     </>
   )
 }

@@ -59,6 +59,7 @@ interface VirtualizedTableComponentProps<T = any> {
   // Event Handlers
   // ============================================
   onRowClick?: (row: T) => void;
+  onRowPointerEnter?: (row: T) => void;
   onActionClick?: (action: string, row: T) => void;
   onCellValueChange?: (rowIndex: number, columnKey: string, newValue: any) => void;
   actionConfigs?: (row: T) => any[];
@@ -123,6 +124,7 @@ export function VirtualizedTableComponent<T = any>({
   
   // Event Handlers
   onRowClick,
+  onRowPointerEnter,
   onActionClick,
   onCellValueChange,
   actionConfigs,
@@ -555,7 +557,8 @@ export function VirtualizedTableComponent<T = any>({
                 item={item as T}
                 columns={visibleColumns}
                 onRowClick={onRowClick}
-                  style={{ height: style.height, width: '100%' }}
+                onRowPointerEnter={onRowPointerEnter}
+                style={{ height: style.height, width: '100%' }}
                 isLastRow={index === flattenedRows.length - 1}
                 onActionClick={onActionClick}
                 actionMode={actionMode}
@@ -601,6 +604,7 @@ export function VirtualizedTableComponent<T = any>({
         item={item}
         columns={visibleColumns}
         onRowClick={onRowClick}
+        onRowPointerEnter={onRowPointerEnter}
         style={style}
         isLastRow={index === displayData.length - 1}
         onActionClick={onActionClick}
@@ -626,7 +630,7 @@ export function VirtualizedTableComponent<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [displayData, visibleColumns, onRowClick, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, flattenedRows, groupState, groupSortState, transparentHeader]);
+  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, flattenedRows, groupState, groupSortState, transparentHeader]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED
@@ -642,6 +646,7 @@ export function VirtualizedTableComponent<T = any>({
           columns={columns}
           onHeightCalculated={setCalculatedRowHeight}
           onRowClick={onRowClick}
+          onRowPointerEnter={onRowPointerEnter}
           onActionClick={onActionClick}
           actionMode={actionMode}
           actionConfigs={actionConfigs}

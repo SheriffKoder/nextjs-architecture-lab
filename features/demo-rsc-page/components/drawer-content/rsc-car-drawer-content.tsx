@@ -1,49 +1,36 @@
 /**
  * RscCarDrawerContent
  *
- * Purpose: Body for URL-driven car drawer on the demo RSC page (`?drawer=car&mode=…`)
- * Used in: `DemoRscDrawerLayer` inside `DrawerWrapper`
- * Used for: Delegates to mode-specific panels (`create` / `view` / `edit`)
- *
- * Steps:
- * 1. Read search params → `parseDrawerState`
- * 2. If drawer key is not `car`, render nothing (defensive)
- * 3. Branch by `mode` to dedicated components
+ * Purpose: Server body for URL-driven car drawer — branches create / view / edit from `params` (same contract as `parseDrawerState`)
+ * Used in: `demo-rsc-drawer-layer.tsx` inside `DrawerWrapper`
+ * Why: Drawer state comes from the RSC page `searchParams` prop; view mode suspends on **`getRentalCarByIdAction`**
  */
 
-'use client'
-
-import { useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { parseDrawerState } from '@/features/ui/drawer-2'
+import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './rsc-car-drawer-constants'
 import RscCarDrawerCreateContent from './rsc-car-drawer-create-content'
 import RscCarDrawerEditContent from './rsc-car-drawer-edit-content'
 import RscCarDrawerViewContent from './rsc-car-drawer-view-content'
+import { RscCarDrawerViewHeader } from './rsc-car-drawer-sticky-header'
 
 export { DEMO_RSC_CAR_DRAWER_KEY } from './rsc-car-drawer-constants'
 
-//////////////////////////////////
-// Build the same flat record shape as `DrawerWrapper` for consistent parsing.
-//////////////////////////////////
-function searchParamsToRecord(searchParams: ReturnType<typeof useSearchParams>) {
-  const acc: Record<string, string | undefined> = {}
-  searchParams.forEach((value, key) => {
-    if (acc[key] === undefined) acc[key] = value
-  })
-  return acc
+function RscCarDrawerViewSkeleton({ id }: { id: string }) {
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <RscCarDrawerViewHeader id={id} />
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+        <div className="h-48 animate-pulse rounded-lg border border-border bg-muted/30" aria-hidden />
+        <p className="text-xs text-muted-foreground">Loading car details…</p>
+      </div>
+    </div>
+  )
 }
 
-//////////////////////////////////
-// RscCarDrawerContent
-//////////////////////////////////
-export default function RscCarDrawerContent() {
-  const searchParams = useSearchParams()
-
-  const state = useMemo(
-    () => parseDrawerState(searchParamsToRecord(searchParams)),
-    [searchParams]
-  )
+export default function RscCarDrawerContent({ params }: { params: DemoRscPageSearchParams }) {
+  const state = parseDrawerState(params)
 
   if (state.drawer !== DEMO_RSC_CAR_DRAWER_KEY) {
     return (
@@ -53,6 +40,7 @@ export default function RscCarDrawerContent() {
     )
   }
 
+  // Client form with server action, RHF, Zod.
   if (state.mode === 'create') {
     return <RscCarDrawerCreateContent />
   }
@@ -67,7 +55,11 @@ export default function RscCarDrawerContent() {
   }
 
   if (state.mode === 'view') {
-    return <RscCarDrawerViewContent id={id} />
+    return (
+      <Suspense fallback={<RscCarDrawerViewSkeleton id={id} />}>
+        <RscCarDrawerViewContent key={id} id={id} />
+      </Suspense>
+    )
   }
 
   if (state.mode === 'edit') {

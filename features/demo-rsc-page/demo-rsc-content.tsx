@@ -35,6 +35,7 @@ import { timelineConfig } from './config/displays/timeline-config'
 import { subheadingsConfig } from './config/displays/subheadings-config'
 import { listViewConfig } from './config/displays/list-config'
 import { demoRscRowActionConfigs } from './config/demo-rsc-row-action-configs'
+import { getRentalCarByIdAction } from './actions/get-rental-car-by-id-action'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './components/drawer-content/rsc-car-drawer-content'
 
 /** Must stay aligned with `FilteringWrapper` `availableViews` default (`table` when `view` param absent). */
@@ -79,6 +80,10 @@ export default function DemoRscContent({
       ),
     [isTableSurface]
   )
+
+  const handleRowPointerEnter = useCallback((row: RentalCarTableItem) => {
+    // void getRentalCarByIdAction(row.id)
+  }, [])
 
   const handleRowClick = useCallback(
     (row: RentalCarTableItem) => {
@@ -165,6 +170,7 @@ export default function DemoRscContent({
         columns={columnsForActiveView}
         filters={filters}
         onRowClick={handleRowClick}
+        onRowPointerEnter={handleRowPointerEnter}
         onCellValueChange={onCellValueChange}
         onActionClick={onActionClick}
         actionConfigs={getRowActionConfigs}

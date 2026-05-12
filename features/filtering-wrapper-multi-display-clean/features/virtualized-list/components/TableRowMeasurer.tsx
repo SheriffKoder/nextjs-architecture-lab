@@ -31,6 +31,7 @@ interface TableRowMeasurerProps<T> {
   onHeightCalculated: (height: number) => void;
   // Optional row click handler (for consistency with main table)
   onRowClick?: (row: T) => void;
+  onRowPointerEnter?: (row: T) => void;
   // Optional action click handler (for consistency with main table)
   onActionClick?: (action: string, row: T) => void;
   // Action mode for consistency
@@ -69,6 +70,7 @@ export function TableRowMeasurer<T>({
   columns,
   onHeightCalculated,
   onRowClick,
+  onRowPointerEnter,
   onActionClick,
   actionMode = 'inline',
   actionConfigs,
@@ -146,6 +148,7 @@ export function TableRowMeasurer<T>({
             item={item}
             columns={columns}
             onRowClick={onRowClick}
+            onRowPointerEnter={onRowPointerEnter}
             style={{}} // Empty style for measurement
             isLastRow={index === data.length - 1}
             onActionClick={onActionClick}

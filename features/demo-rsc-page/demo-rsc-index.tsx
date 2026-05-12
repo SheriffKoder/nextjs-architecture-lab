@@ -61,7 +61,7 @@ export default function DemoRscIndex({ params }: { params: DemoRscPageSearchPara
           </div>
         </div>
 
-        <DemoRscDrawerLayer />
+        <DemoRscDrawerLayer params={params} />
       </div>
     </NavigationTransitionRoot>
   )

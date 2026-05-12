@@ -7,6 +7,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
+import { useToast } from '@/components/design/toast/use-toast'
 import { Input } from '@/components/ui/input'
 import { applyNlFilterPatchToSearchParams } from '@/features/ui/ai-filter/lib/apply-nl-filter-patch-to-search-params'
 import { buildNlCurrentParamsReference } from '@/features/ui/ai-filter/lib/build-nl-current-params-reference'
@@ -25,7 +26,7 @@ import { useNavigationTransitionOptional } from '@/features/ui/filters/navigatio
 import { cn } from '@/lib/utils'
 import { Loader2, Search, Sparkles } from 'lucide-react'
 
-import { NlFilterFeedback } from './nl-filter-feedback'
+// import { NlFilterFeedback } from './nl-filter-feedback'
 
 function searchParamsToPlainRecord(sp: URLSearchParams): Record<string, string> {
   const out: Record<string, string> = {}
@@ -59,9 +60,10 @@ export function NlFilterAssistant({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { wrapNavigation } = useNavigationTransitionOptional()
+  const { showError, showInfo, showSuccess } = useToast()
 
   const [text, setText] = useState('')
-  const [feedback, setFeedback] = useState<string | null>(null)
+  // const [feedback, setFeedback] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
 
   const currentParamsReference = useMemo(
@@ -74,7 +76,7 @@ export function NlFilterAssistant({
     if (!trimmed || isPending) return
 
     setIsPending(true)
-    setFeedback(null)
+    // setFeedback(null)
 
     try {
       const clearIntent = isClearAllFiltersIntent(trimmed)
@@ -98,7 +100,8 @@ export function NlFilterAssistant({
             router.replace(href, { scroll: false })
           })
         }
-        setFeedback('Cleared all filters.')
+        showSuccess('Cleared all filters.', 'Filters')
+        // setFeedback('Cleared all filters.')
         return
       }
 
@@ -123,12 +126,14 @@ export function NlFilterAssistant({
       }
 
       if (!res.ok) {
-        setFeedback(data.error ?? `Request failed (${res.status})`)
+        showError(data.error ?? `Request failed (${res.status})`, 'AI filter')
+        // setFeedback(data.error ?? `Request failed (${res.status})`)
         return
       }
 
       if (typeof data.feedback !== 'string') {
-        setFeedback('Unexpected response from assistant.')
+        showError('Unexpected response from assistant.', 'AI filter')
+        // setFeedback('Unexpected response from assistant.')
         return
       }
 
@@ -159,9 +164,11 @@ export function NlFilterAssistant({
         })
       }
 
-      setFeedback(data.feedback)
+      showInfo(data.feedback, 'AI filter')
+      // setFeedback(data.feedback)
     } catch {
-      setFeedback('Network error — try again.')
+      showError('Network error — try again.', 'AI filter')
+      // setFeedback('Network error — try again.')
     } finally {
       setIsPending(false)
     }
@@ -174,6 +181,9 @@ export function NlFilterAssistant({
     pathname,
     router,
     searchParams,
+    showError,
+    showInfo,
+    showSuccess,
     text,
     wrapNavigation,
   ])
@@ -207,7 +217,7 @@ export function NlFilterAssistant({
           placeholder={placeholder}
           disabled={isPending}
           className={cn(
-            'h-9 min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-sm text-foreground shadow-none',
+            'h-9 min-w-0 flex-1 border-0 bg-transparent py-0 text-sm text-foreground shadow-none px-2',
             'placeholder:text-muted-foreground',
             'focus-visible:ring-0 focus-visible:ring-offset-0',
             'disabled:cursor-not-allowed disabled:opacity-50',
@@ -232,7 +242,7 @@ export function NlFilterAssistant({
           )}
         </button>
       </div>
-      {feedback ? <NlFilterFeedback text={feedback} /> : null}
+      {/* {feedback ? <NlFilterFeedback text={feedback} /> : null} */}
     </div>
   )
 }

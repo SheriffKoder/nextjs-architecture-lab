@@ -155,6 +155,7 @@ interface VirtualizedTableRowProps<T = any> {
   columns: TableColumn<T>[];
   // Optional row click handler
   onRowClick?: (row: T) => void;
+  onRowPointerEnter?: (row: T) => void;
   // Optional action click handler
   onActionClick?: (action: string, row: T) => void;
   // Action configurations for the row
@@ -223,6 +224,7 @@ export function VirtualizedTableRow<T = any>({
   item,
   columns,
   onRowClick,
+  onRowPointerEnter,
   onActionClick,
   actionClickConfigs,
   actionMode,
@@ -343,6 +345,10 @@ export function VirtualizedTableRow<T = any>({
     }
   };
 
+  const handleRowPointerEnter = () => {
+    onRowPointerEnter?.(item);
+  };
+
   ////////////////////////////////////
   // Row Styling: Apply conditional styling based on row data
   ////////////////////////////////////
@@ -414,11 +420,12 @@ export function VirtualizedTableRow<T = any>({
           minWidth: totalMinWidth,
         }}
         className={`flex items-stretch group ${
-          onRowClick ? 'cursor-pointer hover:bg-tertiary/10 hover:text-tertiary' : ''
+          onRowClick || onRowPointerEnter ? 'cursor-pointer hover:bg-tertiary/10 hover:text-tertiary' : ''
         } ${isLastRow ? 'border-b border-tertiary/10' : 'border-b border-tertiary/10'} ${
           isSelected ? 'bg-tertiary/50' : ''
         } ${rowStylingClasses ? rowStylingClasses : 'bg-tertiary/5'}`}
         onClick={handleRowClick}
+        onPointerEnter={onRowPointerEnter ? handleRowPointerEnter : undefined}
       >
         {/* Map through each column to render cells */}
         {(() => {
@@ -638,6 +645,7 @@ export function VirtualizedTableRow<T = any>({
             renderContent={renderExpandedContent}
             height={expandedContentHeight}
             onRowClick={onRowClick}
+            onRowPointerEnter={onRowPointerEnter}
           />
         </div>
       )}

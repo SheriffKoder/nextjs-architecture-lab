@@ -13,9 +13,15 @@ interface ExpandedRowContentProps<T = any> {
   item: T;
   expandedChildren: any[];
   isLoading?: boolean;
-  renderContent?: (item: T, children: any[], onRowClick?: (row: T) => void) => React.ReactElement | null;
+  renderContent?: (
+    item: T,
+    children: any[],
+    onRowClick?: (row: T) => void,
+    onRowPointerEnter?: (row: T) => void
+  ) => React.ReactElement | null;
   height?: number;
   onRowClick?: (row: T) => void;
+  onRowPointerEnter?: (row: T) => void;
 }
 
 /**
@@ -30,7 +36,8 @@ export function ExpandedRowContent<T = any>({
   isLoading = false,
   renderContent,
   height = 200,
-  onRowClick
+  onRowClick,
+  onRowPointerEnter
 }: ExpandedRowContentProps<T>) {
   if (isLoading) {
     return (
@@ -54,7 +61,7 @@ export function ExpandedRowContent<T = any>({
   if (renderContent) {
     return (
       <div className="w-full bg-gray-50">
-        {renderContent(item, expandedChildren, onRowClick)}
+        {renderContent(item, expandedChildren, onRowClick, onRowPointerEnter)}
       </div>
     );
   }
