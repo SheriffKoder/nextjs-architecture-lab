@@ -2,8 +2,8 @@
  * getRentalCarById
  *
  * Purpose: Server loader for a single rental car by stable `id` (drawer detail, portable entry points)
- * Used in: `getRentalCarByIdAction` in `actions/get-rental-car-by-id-action.ts`
- * Why: `cache()` dedupes per request when the same id is read from layout + detail or retried
+ * Used in: `demo-rsc-cached-loaders.ts` (`getRentalCarByIdCached`); `getRentalCarByIdAction` calls the cached entry.
+ * Why: `cache()` dedupes per request when the same id is read from layout + detail or retried; cross-request caching lives in `demo-rsc-cached-loaders.ts` (`getRentalCarByIdCached`).
  */
 
 import { cache } from 'react'

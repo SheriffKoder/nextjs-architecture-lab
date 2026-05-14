@@ -1,8 +1,8 @@
 /**
  * FiltersSection
  *
- * Purpose: Async RSC boundary that loads filter facet options only (not list payload)
- * Used in: `demo-rsc-index.tsx` inside `<Suspense>`
+ * Purpose: Async RSC — loads facet config via `getFilters` (cached); wrapped in `<Suspense>` from `demo-rsc-index`.
+ * Why: Filter strip can stream independently of the table island.
  */
 
 import { FiltersHeader } from '@/features/ui/filters/components/filters-header'
@@ -15,17 +15,19 @@ import {
 import {
   rentalCarSearchConfig,
   rentalCarFiltersHeaderConfig,
-  rentalCarBaseFilters,
 } from '../../config/header-filters-config'
-import { getFilterOptionsServer } from '../../utils/server/get-filter-options-server'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
+import { getFilters } from '../../utils/server/demo-rsc-cached-loaders'
+import { demoRscDataParamsToCacheKey } from '../../utils/ui/demo-rsc-search-params-cache-key'
 
 export default async function FiltersSection({
   params,
 }: {
   params: DemoRscPageSearchParams
 }) {
-  const filters = await getFilterOptionsServer(rentalCarBaseFilters, params)
+
+  // remove UI keys from the cache key to avoid re-rendering when triggering the drawer or filters.
+  const filters = await getFilters(demoRscDataParamsToCacheKey(params))
   const nlCatalog = serializeFiltersForNlCatalog(filters)
 
   return (

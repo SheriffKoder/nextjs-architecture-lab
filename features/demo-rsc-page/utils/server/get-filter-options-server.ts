@@ -65,7 +65,11 @@ import {
  * @param {FilterConfig[]} [baseConfigs] - Optional base configs (defaults to rentalCarBaseFilters)
  * @param {Record<string, string | string[] | undefined>} [searchParams] - URL search parameters for filtering
  * @returns {Promise<FilterConfig[]>} Filter configs with populated options including initialCount
+ *
+ * Cross-request caching: use `getFilters` in `demo-rsc-cached-loaders.ts` (demo RSC page), not a second wrapper here.
  */
+
+
 export async function getFilterOptionsServer(
   baseConfigs: FilterConfig[] = rentalCarBaseFilters,
   searchParams: Record<string, string | string[] | undefined> = {}

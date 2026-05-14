@@ -2,7 +2,7 @@
  * Rental car list query types (RSC feature)
  *
  * Purpose: Serializable URL/list state for the demo RSC page — same field contract as the TanStack client
- * Used in: `build-rental-car-list-query.ts`, `get-rental-cars-page-data.ts`, table/pagination sections
+ * Used in: `build-rental-car-list-query.ts`, `demo-rsc-cached-loaders.ts` (`getCars`), table/pagination sections
  *
  * Keep in sync with `features/demo-client-page/tanstack/key-factory.ts` (`RentalCarListQuery`, `RentalCarNumberRange`) and `filter-rental-cars.ts` discrete keys.
  */

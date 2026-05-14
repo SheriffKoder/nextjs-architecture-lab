@@ -1,30 +1,37 @@
 /**
- * Table + pagination RSC island — one Suspense boundary; shares `getRentalCarsPageData` via `cache()`.
- * Client `NavigationPendingDimmer` dims this block during wrapped URL transitions (filters / pagination / drawer).
+ * Table + pagination RSC — loads `getCars` + `getFilters` (table needs both for `DemoRscContent`);
+ * wrapped in `<Suspense>` from `demo-rsc-index`. `unstable_cache` dedupes `getFilters` with `FiltersSection`.
  */
 
 import { NavigationPendingDimmer } from '@/features/ui/filters/navigation-transition-context'
-import { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 import { PaginationFooter } from '@/features/ui/filters/components/pagination-footer'
 import { rentalCarPaginationConfig } from '../../config/header-filters-config'
 import DemoRscContent from '../../demo-rsc-content'
-import { getRentalCarsPageData } from '../../utils/server/get-rental-cars-page-data'
+import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
+import { getCars, getFilters } from '../../utils/server/demo-rsc-cached-loaders'
+import { demoRscDataParamsToCacheKey } from '../../utils/ui/demo-rsc-search-params-cache-key'
 
 export default async function TableAndPaginationSection({
   params,
 }: {
   params: DemoRscPageSearchParams
 }) {
-  const { carsPayload, filtersPayload } = await getRentalCarsPageData(params)
+
+  // remove UI keys from the cache key to avoid re-rendering when triggering the drawer or filters.
+  const dataKey = demoRscDataParamsToCacheKey(params)
+  const [cars, filters] = await Promise.all([
+    getCars(dataKey),
+    getFilters(dataKey),
+  ])
 
   return (
     <NavigationPendingDimmer className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="flex min-h-0 flex-1 flex-col">
-        <DemoRscContent cars={carsPayload.cars} filters={filtersPayload} />
+        <DemoRscContent cars={cars.cars} filters={filters} />
       </div>
       <div className="shrink-0 mr-2">
         <PaginationFooter
-          totalItems={carsPayload.pagination.totalItems}
+          totalItems={cars.pagination.totalItems}
           config={rentalCarPaginationConfig}
           title="Pagination"
         />

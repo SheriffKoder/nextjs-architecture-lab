@@ -2,7 +2,7 @@
  * buildRentalCarListQuery + rentalCarListQueryToSearchParams
  *
  * Purpose: Same URL → `RentalCarListQuery` mapping as `demo-client-index.tsx` (useUrlFilters + useUrlSorting + useUrlPagination), without hooks — for RSC + future `/page-client` parity
- * Used in: `demo-rsc-index.tsx`, `get-rental-cars-page-data.ts`
+ * Used in: `demo-rsc-index.tsx`, `demo-rsc-cached-loaders.ts` (`getCars`)
  */
 
 import type { SortSpec } from '@/features/ui/filters/feature-sorting/types'
