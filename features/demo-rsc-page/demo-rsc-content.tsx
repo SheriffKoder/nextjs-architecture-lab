@@ -81,8 +81,9 @@ export default function DemoRscContent({
     [isTableSurface]
   )
 
+  /** Prefetch drawer payload; `getRentalCarByIdAction` → `getRentalCarByIdCached` (`unstable_cache` by id). */
   const handleRowPointerEnter = useCallback((row: RentalCarTableItem) => {
-    // void getRentalCarByIdAction(row.id)
+    void getRentalCarByIdAction(row.id)
   }, [])
 
   const handleRowClick = useCallback(
