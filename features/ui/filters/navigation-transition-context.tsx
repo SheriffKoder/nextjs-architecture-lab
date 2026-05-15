@@ -6,6 +6,8 @@
  *
  * Hooks call `useNavigationTransitionOptional().wrapNavigation(() => router.replace(...))`.
  * Without a provider, falls back to `startTransition` only (pending stays false here).
+ *
+ * `NavigationPendingDimmer` waits before dimming so instant/cached navigations do not flash opacity.
  */
 
 import {
@@ -13,6 +15,9 @@ import {
   startTransition,
   useCallback,
   useContext,
+  useEffect,
+  useRef,
+  useState,
   useTransition,
   type ReactNode,
 } from 'react'
@@ -51,21 +56,54 @@ export function useNavigationTransitionOptional(): NavigationTransitionContextVa
   }
 }
 
-/** Dims children while a wrapped navigation is in-flight (same transition as URL hooks). */
+const DEFAULT_DIM_DELAY_MS = 150
+
+/** Dims children while a wrapped navigation stays pending past `dimDelayMs` (avoids opacity flash on fast/cached updates). */
 export function NavigationPendingDimmer({
   children,
   className,
+  dimDelayMs = DEFAULT_DIM_DELAY_MS,
 }: {
   children: ReactNode
   className?: string
+  /** Only dim after `isNavigationPending` has been true for this many ms. */
+  dimDelayMs?: number
 }) {
   const { isNavigationPending } = useNavigationTransitionOptional()
+  const [showDim, setShowDim] = useState(false)
+  const dimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!isNavigationPending) {
+      if (dimTimerRef.current) {
+        clearTimeout(dimTimerRef.current)
+        dimTimerRef.current = null
+      }
+      setShowDim(false)
+      return
+    }
+
+    if (dimTimerRef.current) {
+      clearTimeout(dimTimerRef.current)
+    }
+    dimTimerRef.current = setTimeout(() => {
+      dimTimerRef.current = null
+      setShowDim(true)
+    }, dimDelayMs)
+
+    return () => {
+      if (dimTimerRef.current) {
+        clearTimeout(dimTimerRef.current)
+        dimTimerRef.current = null
+      }
+    }
+  }, [isNavigationPending, dimDelayMs])
 
   return (
     <div
       className={cn(
         'transition-opacity duration-200',
-        isNavigationPending && 'pointer-events-none opacity-60',
+        showDim && 'pointer-events-none opacity-60',
         className
       )}
     >

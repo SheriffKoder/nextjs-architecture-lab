@@ -22,7 +22,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 
 // localStorage key for persisting panel width across page refreshes
-const STORAGE_KEY = 'revilo-panel-width'
+export const RIGHT_DRAWER_WIDTH_STORAGE_KEY = 'revilo-panel-width'
 
 /**
  * Options for configuring the resizable width hook
@@ -130,7 +130,7 @@ export function useResizableWidth(options: UseResizableWidthOptions = {}): UseRe
 
     // Try to load saved width from localStorage
     try {
-      const savedWidth = localStorage.getItem(STORAGE_KEY)
+      const savedWidth = localStorage.getItem(RIGHT_DRAWER_WIDTH_STORAGE_KEY)
       if (savedWidth) {
         const parsedWidth = parseFloat(savedWidth)
         // Validate: Ensure it's a valid number and meets minimum constraint
@@ -174,7 +174,7 @@ export function useResizableWidth(options: UseResizableWidthOptions = {}): UseRe
     
     try {
       // Convert number to string for localStorage storage
-      localStorage.setItem(STORAGE_KEY, newWidth.toString())
+      localStorage.setItem(RIGHT_DRAWER_WIDTH_STORAGE_KEY, newWidth.toString())
     } catch (error) {
       // Handle localStorage errors (e.g., quota exceeded, private browsing)
       console.warn('Failed to save to localStorage:', error)
@@ -314,7 +314,7 @@ export function useResizableWidth(options: UseResizableWidthOptions = {}): UseRe
     // Clear localStorage to remove saved preference
     if (typeof window !== 'undefined') {
       try {
-        localStorage.removeItem(STORAGE_KEY)
+        localStorage.removeItem(RIGHT_DRAWER_WIDTH_STORAGE_KEY)
       } catch (error) {
         // Handle localStorage errors gracefully
         console.warn('Failed to remove from localStorage:', error)

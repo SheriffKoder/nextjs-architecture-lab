@@ -10,15 +10,17 @@
  * 2. Parse with `parseDrawerState` (Zod-backed)
  * 3. Keep `RightDrawer` mounted with `isOpen` so Framer exit animation can finish
  * 4. `onClose` clears URL drawer params via `useDrawerActions().close()`
+ * 5. Drawer chrome context — inner content can call `useDrawerChrome()` to toggle journey full-width (`expandToFullScreen`)
  */
 
 'use client'
 
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import RightDrawer from '@/components/design/right-drawer'
 import { parseDrawerState } from '../drawer-parser'
 import { useDrawerActions } from '../hooks/use-drawer-actions'
+import { DrawerChromeProvider, useDrawerChromeValue } from '../providers/drawer-chrome-context'
 
 export default function DrawerWrapper({
   children,
@@ -40,10 +42,46 @@ export default function DrawerWrapper({
 
   const state = parseDrawerState(raw)
 
+  /////////////////////////////////////////////////////////////////
+  // Drawer chrome (context) — `isJourneyPanelOpen` + provider value
+  /////////////////////////////////////////////////////////////////
+
+  const [isJourneyPanelOpen, setIsJourneyPanelOpen] = useState(false)
+  const drawerChrome = useDrawerChromeValue(isJourneyPanelOpen, setIsJourneyPanelOpen)
+
+  /////////////////////////////////////////////////////////////////
+  // Drawer chrome (context) — reset when URL closes the drawer
+  /////////////////////////////////////////////////////////////////
+
+  useEffect(() => {
+    if (!state.isOpen) {
+      setIsJourneyPanelOpen(false)
+    }
+  }, [state.isOpen])
+
+  /////////////////////////////////////////////////////////////////
+  // Drawer chrome (context) — close handler clears chrome then URL
+  /////////////////////////////////////////////////////////////////
+
+  const handleClose = useCallback(() => {
+    setIsJourneyPanelOpen(false)
+    close()
+  }, [close])
+
+  /////////////////////////////////////////////////////////////////
+  // Drawer chrome (context) — `RightDrawer.expandToFullScreen` + provider
+  /////////////////////////////////////////////////////////////////
+
   // Stay mounted while closed so `RightDrawer` + `AnimatePresence` can run exit transition.
   return (
-    <RightDrawer isOpen={state.isOpen} onClose={close}>
-      {state.isOpen ? children : null}
+    <RightDrawer
+      isOpen={state.isOpen}
+      onClose={handleClose}
+      expandToFullScreen={isJourneyPanelOpen}
+    >
+      {state.isOpen ? (
+        <DrawerChromeProvider value={drawerChrome}>{children}</DrawerChromeProvider>
+      ) : null}
     </RightDrawer>
   )
 }
