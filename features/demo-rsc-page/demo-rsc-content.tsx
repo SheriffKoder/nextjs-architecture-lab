@@ -13,7 +13,7 @@
 
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useDrawerActions } from '@/features/ui/drawer-2'
 import { FilteringWrapper } from '@/features/filtering-wrapper-multi-display-clean/filtering-wrapper'
@@ -37,6 +37,7 @@ import { listViewConfig } from './config/displays/list-config'
 import { demoRscRowActionConfigs } from './config/demo-rsc-row-action-configs'
 import { getRentalCarByIdAction } from './actions/get-rental-car-by-id-action'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './components/drawer-content/rsc-car-drawer-content'
+import { useDemoRscTableActivityToggle } from './hooks/use-demo-rsc-table-activity-toggle'
 
 /** Must stay aligned with `FilteringWrapper` `availableViews` default (`table` when `view` param absent). */
 const DEMO_RSC_TABLE_VIEW_KEYS = ['table'] as const
@@ -67,7 +68,9 @@ export default function DemoRscContent({
 }: DemoRscContentProps) {
   const searchParams = useSearchParams()
   const { openView, openEdit, openRowDeleteConfirm } = useDrawerActions()
-  const [tableData, setTableData] = useState<RentalCarTableItem[]>(cars)
+
+  const { setTableData, displayData, setActivityColumnAction } =
+    useDemoRscTableActivityToggle(cars)
 
   const viewParam = searchParams.get('view')
   const isTableSurface =
@@ -76,7 +79,9 @@ export default function DemoRscContent({
   const columnsForActiveView = useMemo(
     () =>
       tableColumns.map((col) =>
-        col.key === 'delete' ? { ...col, isHidden: !isTableSurface } : col
+        col.key === 'delete' || col.key === 'setActivity'
+          ? { ...col, isHidden: !isTableSurface }
+          : col
       ),
     [isTableSurface]
   )
@@ -124,10 +129,6 @@ export default function DemoRscContent({
     [onActionClick]
   )
 
-  useEffect(() => {
-    setTableData(cars)
-  }, [cars])
-
   const onCellValueChange = useCallback(
     (rowIndex: number, columnKey: string, newValue: unknown) => {
       setTableData((prev) => {
@@ -138,7 +139,7 @@ export default function DemoRscContent({
         return next
       })
     },
-    []
+    [setTableData]
   )
 
   const subheadingsDragEnd = (updatedData: RentalCarTableItem[]) => {
@@ -157,7 +158,7 @@ export default function DemoRscContent({
         setTableData(ctx.data)
       }
     },
-    [onSubheadingsDragEnd]
+    [onSubheadingsDragEnd, setTableData]
   )
 
   ////////////////////////////////////////////////////////////
@@ -167,7 +168,7 @@ export default function DemoRscContent({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <FilteringWrapper
-        data={tableData}
+        data={displayData}
         columns={columnsForActiveView}
         filters={filters}
         onRowClick={handleRowClick}
@@ -177,6 +178,7 @@ export default function DemoRscContent({
         actionConfigs={getRowActionConfigs}
         columnActions={{
           delete: (item) => handleDeleteColumnAction(item),
+          setActivity: setActivityColumnAction,
         }}
         minimalControlsConfig={minimalControlsConfig}
         availableViews={['table', 'kanban', 'calendar', 'map', 'timeline', 'subheadings', 'list']}

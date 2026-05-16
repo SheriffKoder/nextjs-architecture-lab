@@ -8,3 +8,4 @@
 
 export { parsePagination } from './parse-pagination'
 export { calculatePagination } from './calculate-pagination'
+export { resetPageInSearchParams } from './reset-page-in-params'

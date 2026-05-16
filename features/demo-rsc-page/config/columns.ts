@@ -17,6 +17,7 @@ import {
   rentalCarLocationFormat,
 } from "./cells/rental-car-location-options";
 import { formatGroupedInteger, formatGroupedNumber } from "@/utils/number-formatters/format-grouped-number";
+import { rentalCarSetActivityCell } from './cells/rental-car-set-activity-cell';
 
 ////////////////////////////////////
 // Centralized Column Definitions: All columns defined once
@@ -99,6 +100,14 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
     key: 'color',
     name: 'Color',
     groupId: 'vehicle-details', // Accordion group for vehicle details
+  },
+  /**
+   * Set activity (table only): toggles `available` ↔ `reserved` via `columnActions.setActivity`.
+   */
+  {
+    key: 'setActivity',
+    name: 'Set activity',
+    cellRenderer: rentalCarSetActivityCell,
   },
   {
     key: 'licensePlate',
@@ -212,6 +221,7 @@ export const tableColumns = createColumnArray([
   'mileage',
   'pricePerDay',
   'color',
+  'setActivity',
   'licensePlate',
   'delete',
   'actions',

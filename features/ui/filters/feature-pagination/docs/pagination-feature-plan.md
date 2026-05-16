@@ -493,7 +493,7 @@ Add pagination section explaining:
 1. **URL params**: `page` and `limit` (not `offset`/`skip`)
 2. **Default page size**: 20 (configurable)
 3. **Page numbers**: 1-indexed (not 0-indexed)
-4. **Reset on filter change**: Option to reset to page 1 when filters change
+4. **Reset on filter change**: Implemented — see [`reset-page-on-filter-sort.md`](./reset-page-on-filter-sort.md) (`resetPageInSearchParams` + `useUrlFilters` / `useUrlSorting`)
 5. **Scroll behavior**: `scroll: false` on page changes
 6. **Separation**: Pagination feature is self-contained like sorting
 7. **Reusability**: Components work standalone or with hook

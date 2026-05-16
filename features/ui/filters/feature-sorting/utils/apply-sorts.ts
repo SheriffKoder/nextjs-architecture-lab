@@ -56,6 +56,8 @@ export function applySorts<T extends Record<string, any>>(
       if (typeof aVal === 'string' && typeof bVal === 'string') {
         // String comparison (case-insensitive)
         comparison = aVal.toLowerCase().localeCompare(bVal.toLowerCase())
+      } else if (typeof aVal === 'boolean' && typeof bVal === 'boolean') {
+        comparison = Number(aVal) - Number(bVal)
       } else if (typeof aVal === 'number' && typeof bVal === 'number') {
         // Number comparison
         comparison = aVal - bVal

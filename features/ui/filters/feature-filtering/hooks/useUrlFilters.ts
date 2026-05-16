@@ -23,12 +23,14 @@
 
 'use client'
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
+import { useOptimisticUrlSearchParams } from '@/features/ui/filters/lib/use-optimistic-url-search-params'
 import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
 import {
   decodeUrlParamList,
   encodeUrlParamList,
 } from '@/features/ui/filters/feature-filtering/utils/url-param-list-codec'
+import { resetPageInSearchParams } from '@/features/ui/filters/feature-pagination/utils'
 
 /**
  * Custom hook for managing URL-based filter state
@@ -51,36 +53,43 @@ export function useUrlFilters() {
   // WHY: These hooks provide access to current URL params and ability to update them
   // HOW: searchParams reads current URL, router updates URL, pathname gets current route
   const router = useRouter()
-  const searchParams = useSearchParams()
   const pathname = usePathname()
   const { wrapNavigation } = useNavigationTransitionOptional()
+  const {
+    committedSnapshot,
+    effectiveParams,
+    buildParams,
+    applyPendingSnapshot,
+  } = useOptimisticUrlSearchParams()
 
   //////////////////////////////////
   // Helper Functions: Build and update URL parameters
   //////////////////////////////////
 
   /**
-   * Creates a new URLSearchParams object from current search params
-   * WHY: Need a mutable copy to modify without affecting original
-   * HOW: Creates new instance from string representation of current params
-   * @returns {URLSearchParams} Mutable copy of current URL search parameters
-   */
-  const buildParams = () => new URLSearchParams(searchParams.toString())
-
-  /**
    * Updates the URL with new search parameters
    * WHY: Use replace() instead of push() to prevent history spam when filters change frequently
-   * HOW: Replaces current URL with new params, preserving pathname but updating query string; returns early when the query string is unchanged
+   * HOW: Applies optimistic snapshot for instant control UI, then replace when committed URL differs
    * IMPACT: Better UX - back button doesn't go through every filter change, cleaner history
    * @param {URLSearchParams} params - The new search parameters to set in URL
    */
   const updateUrl = (params: URLSearchParams) => {
-    // Skip replace + wrapNavigation when nothing changed: same query string still schedules a transition
-    // (e.g. QueryBuilder calling clearFilter on mount when `filter` is already absent), which flashes dimmers.
-    if (params.toString() === searchParams.toString()) return
+    const next = params.toString()
+    applyPendingSnapshot(next)
+    // Skip replace when already committed (e.g. QueryBuilder clear on mount when param absent).
+    if (next === committedSnapshot) return
     wrapNavigation(() => {
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+      router.replace(`${pathname}?${next}`, { scroll: false })
     })
+  }
+
+  /**
+   * Filter / search / legacy sort updates reset pagination to page 1 (see `reset-page-on-filter-sort.md`).
+   * Do not use for `setPage` — pagination navigation must preserve the chosen page.
+   */
+  const updateUrlAfterDataChange = (params: URLSearchParams) => {
+    resetPageInSearchParams(params)
+    updateUrl(params)
   }
 
   //////////////////////////////////
@@ -95,7 +104,7 @@ export function useUrlFilters() {
    * @returns {string | null} The parameter value or null if not found
    */
   const get = (key: string): string | null => {
-    return searchParams.get(key)
+    return effectiveParams.get(key)
   }
 
   /**
@@ -106,7 +115,7 @@ export function useUrlFilters() {
    * @returns {string[]} Array of values, empty array if not found
    */
   const getList = (key: string): string[] => {
-    const value = searchParams.get(key)
+    const value = effectiveParams.get(key)
     return decodeUrlParamList(value)
   }
 
@@ -118,7 +127,7 @@ export function useUrlFilters() {
    * @returns {{ start: string, end: string } | null} Object with start and end dates, or null if not found
    */
   const getRange = (key: string) => {
-    const value = searchParams.get(key)
+    const value = effectiveParams.get(key)
     if (!value) return null
 
     // Split underscore-separated range into start and end values
@@ -134,7 +143,7 @@ export function useUrlFilters() {
    * @returns {{ min: number | undefined, max: number | undefined } | null} Object with min and max numbers, or null if not found
    */
   const getNumberRange = (key: string) => {
-    const value = searchParams.get(key)
+    const value = effectiveParams.get(key)
     if (!value) return null
 
     // Split underscore-separated range and convert to numbers
@@ -159,7 +168,7 @@ export function useUrlFilters() {
   const set = (key: string, value: string | number) => {
     const params = buildParams()
     params.set(key, String(value)) // Convert to string for URL compatibility
-    updateUrl(params)
+    updateUrlAfterDataChange(params)
   }
 
   /**
@@ -179,7 +188,7 @@ export function useUrlFilters() {
       params.set(key, encodeUrlParamList(values))
     }
 
-    updateUrl(params)
+    updateUrlAfterDataChange(params)
   }
 
   /**
@@ -222,7 +231,7 @@ export function useUrlFilters() {
       params.set(key, `${start ?? ''}_${end ?? ''}`)
     }
 
-    updateUrl(params)
+    updateUrlAfterDataChange(params)
   }
 
   /**
@@ -244,7 +253,7 @@ export function useUrlFilters() {
       params.set(key, `${min ?? ''}_${max ?? ''}`)
     }
 
-    updateUrl(params)
+    updateUrlAfterDataChange(params)
   }
 
   //////////////////////////////////
@@ -260,7 +269,7 @@ export function useUrlFilters() {
   const remove = (key: string) => {
     const params = buildParams()
     params.delete(key) // Remove only this key, keep all other params
-    updateUrl(params)
+    updateUrlAfterDataChange(params)
   }
 
   /**
@@ -269,6 +278,7 @@ export function useUrlFilters() {
    * HOW: Replaces entire URL with just pathname, removing all query parameters
    */
   const clearAll = () => {
+    applyPendingSnapshot('')
     wrapNavigation(() => {
       router.replace(pathname, { scroll: false }) // Navigate to pathname only, removing all query params
     })
@@ -285,7 +295,9 @@ export function useUrlFilters() {
    * @param {number} page - The page number to set
    */
   const setPage = (page: number) => {
-    set('page', page) // Reuse generic set() for consistency
+    const params = buildParams()
+    params.set('page', String(Math.max(1, page)))
+    updateUrl(params)
   }
 
   //////////////////////////////////
@@ -303,7 +315,7 @@ export function useUrlFilters() {
     const params = buildParams()
     params.set('sort', field)   // Set sort field
     params.set('order', order)  // Set sort order
-    updateUrl(params)            // Update URL with both params at once
+    updateUrlAfterDataChange(params)
   }
 
   //////////////////////////////////
@@ -317,7 +329,7 @@ export function useUrlFilters() {
    * @returns {string} Current search query or empty string
    */
   const getSearch = (): string => {
-    return searchParams.get('q') || ''
+    return effectiveParams.get('q') || ''
   }
 
   /**
@@ -334,7 +346,7 @@ export function useUrlFilters() {
     } else {
       params.delete('q') // Remove 'q' param if query is empty
     }
-    updateUrl(params)
+    updateUrlAfterDataChange(params)
   }
 
   // Return all functions as a single API for components to use

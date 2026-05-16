@@ -18,9 +18,11 @@
 
 'use client'
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
+import { useOptimisticUrlSearchParams } from '@/features/ui/filters/lib/use-optimistic-url-search-params'
 import { useNavigationTransitionOptional } from '@/features/ui/filters/navigation-transition-context'
 import { useMemo, useCallback } from 'react'
+import { resetPageInSearchParams } from '@/features/ui/filters/feature-pagination/utils'
 import type { SortSpec, SortDirection } from '../types'
 
 /**
@@ -44,40 +46,37 @@ export function useUrlSorting() {
   // WHY: These hooks provide access to current URL params and ability to update them
   // HOW: searchParams reads current URL, router updates URL, pathname gets current route
   const router = useRouter()
-  const searchParams = useSearchParams()
   const pathname = usePathname()
   const { wrapNavigation } = useNavigationTransitionOptional()
+  const {
+    committedSnapshot,
+    effectiveParams,
+    buildParams,
+    applyPendingSnapshot,
+  } = useOptimisticUrlSearchParams()
 
   //////////////////////////////////
   // Helper Functions: Build and update URL parameters
   //////////////////////////////////
 
   /**
-   * Creates a new URLSearchParams object from current search params
-   * WHY: Need a mutable copy to modify without affecting original
-   * HOW: Creates new instance from string representation of current params
-   * @returns {URLSearchParams} Mutable copy of current URL search parameters
-   */
-  const buildParams = useCallback(() => {
-    return new URLSearchParams(searchParams.toString())
-  }, [searchParams])
-
-  /**
    * Updates the URL with new search parameters
    * WHY: Use replace() instead of push() to prevent history spam when sorts change frequently
-   * HOW: Replaces current URL with new params, preserving pathname but updating query string; returns early when the query string is unchanged
+   * HOW: Optimistic snapshot for instant sort UI, then replace when committed URL differs
    * IMPACT: Better UX - back button doesn't go through every sort change, cleaner history
    * @param {URLSearchParams} params - The new search parameters to set in URL
    */
   const updateUrl = useCallback(
     (params: URLSearchParams) => {
-      // Avoid no-op navigations so useTransition (wrapNavigation) does not briefly show pending UI.
-      if (params.toString() === searchParams.toString()) return
+      resetPageInSearchParams(params)
+      const next = params.toString()
+      applyPendingSnapshot(next)
+      if (next === committedSnapshot) return
       wrapNavigation(() => {
-        router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+        router.replace(`${pathname}?${next}`, { scroll: false })
       })
     },
-    [router, pathname, searchParams, wrapNavigation]
+    [router, pathname, committedSnapshot, applyPendingSnapshot, wrapNavigation],
   )
 
   //////////////////////////////////
@@ -113,9 +112,9 @@ export function useUrlSorting() {
    * @returns {SortSpec[]} Array of sort specifications in priority order
    */
   const getSorts = useCallback((): SortSpec[] => {
-    const sortString = searchParams.get('sort') || ''
+    const sortString = effectiveParams.get('sort') || ''
     return parseSorts(sortString)
-  }, [searchParams, parseSorts])
+  }, [effectiveParams, parseSorts])
 
   /**
    * Get sort direction for a specific key
