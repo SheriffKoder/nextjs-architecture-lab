@@ -1,6 +1,6 @@
 /**
  * Accordion Toggle Button Component
- * 
+ *
  * Purpose: Provides expand/collapse buttons for accordion groups in virtualized table
  * Used in: VirtualizedTableHeader for group toggle functionality
  * Why: Separates accordion button logic from header component for better maintainability
@@ -18,56 +18,37 @@
  * 4. Apply proper styling and accessibility attributes
  */
 
-import React from 'react';
+import React from 'react'
+import { cn } from '@/lib/utils'
+import {
+  accordionColorClassesToBorderClasses,
+  accordionColorClassesToTextClasses,
+} from '../../../utils/accordion-utils'
 
-////////////////////////////////////
-// Type Definitions: Component props and interfaces
-////////////////////////////////////
-
-/**
- * Props for the AccordionToggleButton component
- * Provides all necessary data for rendering and handling accordion toggle buttons
- */
 interface AccordionToggleButtonProps {
-  // Whether the group is currently open
-  isGroupOpen: boolean;
-  // Whether this is the first column of the group (for expand button)
-  isFirstColumn: boolean;
-  // Whether this is the last column of the group (for collapse button)
-  isLastColumn: boolean;
-  // Handler for group toggle events
-  onToggle: () => void;
-  // Optional additional CSS classes
-  className?: string;
+  isGroupOpen: boolean
+  isFirstColumn: boolean
+  isLastColumn: boolean
+  onToggle: () => void
+  groupName?: string
+  groupColor?: string
+  groupTextColor?: string
+  groupBorderColor?: string
+  groupLabelColor?: string
+  className?: string
 }
 
-////////////////////////////////////
-// Component Implementation: Button rendering with proper styling
-////////////////////////////////////
-
-/**
- * Accordion toggle button component with expand/collapse functionality
- * Renders either a + (expand) or - (collapse) button based on group state and column position
- * 
- * @param {AccordionToggleButtonProps} props - Component props
- * @returns {JSX.Element | null} Toggle button or null if not applicable
- * 
- * @example
- * ```tsx
- * <AccordionToggleButton
- *   isGroupOpen={false}
- *   isFirstColumn={true}
- *   isLastColumn={false}
- *   onToggle={handleGroupToggle}
- * />
- * ```
- */
 export function AccordionToggleButton({
   isGroupOpen,
   isFirstColumn,
   isLastColumn,
   onToggle,
-  className = ''
+  groupName,
+  groupColor = 'bg-tertiary',
+  groupTextColor = 'text-white',
+  groupBorderColor,
+  groupLabelColor,
+  className = '',
 }: AccordionToggleButtonProps) {
   ////////////////////////////////////
   // Button Visibility Logic: Determine when to show which button
@@ -90,59 +71,75 @@ export function AccordionToggleButton({
     return null;
   }
 
-  ////////////////////////////////////
-  // Button Configuration: Set up button properties based on type
-  ////////////////////////////////////
-  
-  /**
-   * Get button configuration based on whether it's expand or collapse
-   * Returns appropriate icon, styling, and accessibility attributes
-   */
-  const getButtonConfig = () => {
-    if (shouldShowExpandButton) {
-      return {
-        icon: '+',
-        ariaLabel: 'Expand group',
-        title: 'Click to expand group',
-        buttonClasses: 'cursor-pointer bg-gray-600/80 text-white hover:bg-gray-700'
-      };
-    } else {
-      return {
-        icon: '-',
-        ariaLabel: 'Collapse group',
-        title: 'Click to collapse group',
-        buttonClasses: 'cursor-pointer bg-white text-black border border-gray-300 hover:bg-gray-50'
-      };
-    }
-  };
+  const isClosedExpand = shouldShowExpandButton
+  const borderClasses =
+    groupBorderColor ?? accordionColorClassesToBorderClasses(groupColor)
+  const nameTextClasses =
+    groupLabelColor ?? accordionColorClassesToTextClasses(groupColor)
 
-  const buttonConfig = getButtonConfig();
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onToggle()
+  }
 
-  ////////////////////////////////////
-  // Main Render: Button with proper styling and accessibility
-  ////////////////////////////////////
-  
+  if (isClosedExpand) {
+    return (
+      <button
+        type="button"
+        onClick={handleToggle}
+        className={cn(
+          'absolute -top-6 right-1/2 flex translate-x-[50%] cursor-pointer items-center gap-1.5',
+          'border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+          className,
+        )}
+        aria-label={`Expand ${groupName ?? 'group'}`}
+        title="Click to expand group"
+      >
+        <span
+          className={cn(
+            'flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border text-xs font-medium',
+            groupColor,
+            groupTextColor,
+            borderClasses,
+          )}
+        >
+          +
+        </span>
+        {groupName ? (
+          <span
+            className={cn(
+              'whitespace-nowrap text-xs font-medium',
+              nameTextClasses,
+            )}
+          >
+            {groupName}
+          </span>
+        ) : null}
+      </button>
+    )
+  }
+
   return (
     <button
-      onClick={(e) => {
-        e.stopPropagation();
-        onToggle();
-      }}
-      className={`
-        absolute -top-6 right-1/2 translate-x-[50%] w-5 h-5 flex items-center justify-center
-        text-xs font-medium rounded-[6px] transition-colors duration-200
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
-        ${buttonConfig.buttonClasses}
-        ${className}
-      `}
-      aria-label={buttonConfig.ariaLabel}
-      title={buttonConfig.title}
       type="button"
+      onClick={handleToggle}
+      className={cn(
+        'absolute -top-6 right-1/2 flex h-5 w-5 translate-x-[50%] items-center justify-center',
+        'rounded-[6px] border text-xs font-medium transition-colors duration-200',
+        'cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1',
+        groupColor,
+        groupTextColor,
+        borderClasses,
+        className,
+      )}
+      aria-label="Collapse group"
+      title="Click to collapse group"
     >
-      <span className="my-auto h-full w-full flex items-center justify-center pb-[2px] pl-[1px]">{buttonConfig.icon}</span>
+      <span className="my-auto flex h-full w-full items-center justify-center pb-[2px] pl-[1px]">
+        −
+      </span>
     </button>
-  );
+  )
 }
 
-// Export component with React.memo for performance optimization
-export default React.memo(AccordionToggleButton);
+export default React.memo(AccordionToggleButton)

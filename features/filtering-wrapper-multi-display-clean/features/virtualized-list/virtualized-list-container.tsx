@@ -21,7 +21,7 @@ import { LoadingSpinner } from "../../components/loading-spinner";
 import { LoadingRows } from "./components/rows/rows-loading-state";
 import { TableRowMeasurer } from "./components/TableRowMeasurer";
 import { useRowExpansion } from "./components/row-expand/useRowExpansion";
-import { TableColumn, TableConfig } from "../../types";
+import { TableColumn, TableConfig, type AccordionConfig } from "../../types";
 import type { FilterConfig } from "@/features/ui/filters/feature-filtering/components/filter-types";
 import type { SortConfig } from "@/features/ui/filters/feature-sorting/types";
 import { RowExpansionConfig } from "./components/row-expand/types";
@@ -32,6 +32,7 @@ import { flattenGroupedRows, FlattenedRow } from "./utils/flatten-grouped-rows";
 import { sortGroupedData } from "./utils/sort-grouped-data";
 import { GroupHeader } from "./components/group-header";
 import VirtualizedTableHeader from "./components/filtering-table-header";
+import { useContainerHeight } from "./hooks/ui/useContainerHeight";
 
 ////////////////////////////////////
 // Type Definitions: Component props and interfaces
@@ -67,14 +68,7 @@ interface VirtualizedTableComponentProps<T = any> {
   // ============================================
   // Accordion & Grouping Props
   // ============================================
-  accordionConfig?: {
-    groups: Array<{
-      id: string;
-      name: string;
-      color: string;
-      textColor: string;
-    }>;
-  };
+  accordionConfig?: AccordionConfig;
   handleGroupToggle: (groupId: string) => void;
   openGroups: Set<string>;
   
@@ -391,46 +385,26 @@ export function VirtualizedTableComponent<T = any>({
   }, [calculatedRowHeight, rowExpansionEnabled, displayData, isRowExpanded, getChildren, flattenedRows, tableConfig]);
 
 
-  ////////////////////////////////////
-  // Dynamic Height Calculation: Calculate height based on visible rows
-  ////////////////////////////////////
-  
-  /**
-   * Calculate table height based on the number of visible rows
-   * Uses either fixed height or calculates based on row count
-   * For variable list: sums individual row heights (including expanded children) up to itemsPerPage
-   */
-  const bodyHeight = useMemo(() => {
-    // If fixed height is provided, use it
-    if (tableHeight && tableHeight > 0) {
-      return tableHeight;
-    }
-    
-    // Calculate height based on visible rows
-    // For variable list: sum individual row heights (including expanded children)
-    const rowCount = displayData.length;
-    const baseRowHeight = rowHeight || calculatedRowHeight || 40;
-    
-    let calculatedHeight: number;
-    
-    if (rowExpansionEnabled && dynamicRowHeight) {
-      // Sum up all individual row heights (including expanded children)
-      calculatedHeight = 0;
-      for (let i = 0; i < rowCount; i++) {
-        calculatedHeight += calculateRowHeight(i);
+  const { containerRef: bodyMeasureRef, height: measuredBodyHeight } =
+    useContainerHeight({
+      fixedHeight: tableHeight && tableHeight > 0 ? tableHeight : undefined,
+      minHeight: 200,
+    });
+
+  const assignBodyScrollRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      bodyMeasureRef.current = node;
+      if (scrollContainerRef) {
+        (
+          scrollContainerRef as React.MutableRefObject<HTMLDivElement | null>
+        ).current = node;
       }
-    } else {
-      // Simple calculation: row count * row height
-      calculatedHeight = rowCount * baseRowHeight;
-    }
-    
-    // Ensure minimum height (but don't cap maximum - let it grow as needed)
-    const minHeight = 200;
-    
-    return Math.max(minHeight, calculatedHeight);
-  }, [tableHeight, displayData.length, rowHeight, calculatedRowHeight, rowExpansionEnabled, dynamicRowHeight, calculateRowHeight]);
+    },
+    [scrollContainerRef, bodyMeasureRef],
+  );
 
-
+  const listViewportHeight =
+    tableHeight && tableHeight > 0 ? tableHeight : measuredBodyHeight;
 
   ////////////////////////////////////
   // Row Renderer: Render individual table rows
@@ -638,7 +612,7 @@ export function VirtualizedTableComponent<T = any>({
 
 
   return (
-    <div className="flex flex-col h-full gap-0 p-0 relative">
+    <div className="relative flex h-full min-h-0 flex-col gap-0 p-0">
       {/* Hidden measurement component for accurate row height calculation (only when dynamic height is enabled) */}
       {dynamicRowHeight && displayData.length > 0 && (
         <TableRowMeasurer
@@ -660,9 +634,10 @@ export function VirtualizedTableComponent<T = any>({
       this allows the table header to be away from the scroll container, being visible all the time.
       */}
       
-      <div className="flex flex-col flex-1 w-full overflow-auto">
-        <div className={`sticky top-0 z-10 w-full ${accordionConfig?.groups && accordionConfig?.groups?.length > 0 ? 'pt-[40px]' : ''}`}>
-          {/* Table header */}
+      <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
+        <div
+          className={`shrink-0 z-10 w-full ${accordionConfig?.groups && accordionConfig?.groups?.length > 0 ? 'pt-[40px]' : ''}`}
+        >
           <VirtualizedTableHeader
             columns={visibleColumns}
             accordionConfig={accordionConfig}
@@ -675,24 +650,17 @@ export function VirtualizedTableComponent<T = any>({
           />
         </div>
 
-        {/* #3 Table container - takes remaining space, and the absolute will overflow the component
-        will leave overflow here as this div has width not allowing sticky to work till the end. better UX */}
-        <div className="relative flex-1 w-full" ref={scrollContainerRef}>
-          <div className={` top-0 left-0 h-full min-w-full  border-gray-200`}>
-          {/* Table container with proper flex layout */}
-            <div className={`h-full flex flex-col flex-1 min-h-0 rounded
-              ${!isItemLoading ? '' : 'opacity-20 pointer-events-none'}`}>
-
-
-              
-              {/* Table body with virtualization - this is the key container */}
-              <div className="flex-1 min-h-0 overflow">
+        <div
+          ref={assignBodyScrollRef}
+          className={`relative min-h-0 flex-1 w-full overflow-hidden ${!isItemLoading ? '' : 'opacity-20 pointer-events-none'}`}
+        >
+          <div className="h-full w-full min-w-full">
                 {loading ? (
                   loadingStateShimmer ? (
                     <LoadingRows
                       columns={columns}
                       rowHeight={rowHeight}
-                      containerHeight={bodyHeight}
+                      containerHeight={listViewportHeight}
                       showActions={!!onActionClick}
                       actionMode={actionMode}
                     />
@@ -719,26 +687,22 @@ export function VirtualizedTableComponent<T = any>({
                             setListRef(ref);
                           }
                         }}
-                        height={bodyHeight}
+                        height={listViewportHeight}
                         width="100%"
                         itemCount={displayData.length}
                         itemSize={calculateRowHeight}
-                        style={{
-                          overflow: 'visible' // for sticky columns
-                        }}
+                        className="tertiary-scrollbar"
                       >
                         {rowRenderer}
                       </VariableSizeList>
                     ) : (
                       <FixedSizeList
                         ref={listRef as React.RefObject<FixedSizeList>}
-                        height={rowHeight * displayData.length}
+                        height={listViewportHeight}
                         width="100%"
                         itemCount={displayData.length}
                         itemSize={rowHeight}
-                        style={{
-                          overflow: 'visible' // for sticky columns
-                        }}
+                        className="tertiary-scrollbar"
                       >
                         {rowRenderer}
                       </FixedSizeList>
@@ -749,8 +713,6 @@ export function VirtualizedTableComponent<T = any>({
                     {emptyMessage}
                   </div>
                 )}
-              </div>
-            </div>
           </div>
         </div>
       </div>

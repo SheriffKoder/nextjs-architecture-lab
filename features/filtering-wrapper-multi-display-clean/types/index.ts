@@ -21,3 +21,5 @@ export type { TableConfig } from '../features/virtualized-table/types/table-conf
 
 // Import header filter configuration type definitions
 export type { HeaderFilterConfig } from './header-filter-config';
+
+export type { AccordionConfig, AccordionGroupConfig } from './accordion-config';

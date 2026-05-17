@@ -58,6 +58,7 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
   {
     key: 'location',
     name: 'Location',
+    groupId: 'updates',
     formatter: rentalCarLocationFormat.text,
     cellRenderer: rentalCarLocationFormat.cell,
     isDropdown: true,
@@ -67,6 +68,7 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
   {
     key: 'mileage',
     name: 'Mileage',
+    groupId: 'updates',
     isNumberField: true,
     editableGroupedNumber: { suffix: ' mi' },
     formatter: (value) => {
@@ -78,6 +80,7 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
   {
     key: 'pricePerDay',
     name: 'Price/Day',
+    groupId: 'updates',
     isNumberField: true,
     editableGroupedNumber: {
       prefix: '$',
@@ -99,7 +102,6 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
   {
     key: 'color',
     name: 'Color',
-    groupId: 'vehicle-details', // Accordion group for vehicle details
   },
   /**
    * Set activity (table only): toggles `available` ↔ `reserved` via `columnActions.setActivity`.
@@ -107,12 +109,12 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
   {
     key: 'setActivity',
     name: 'Set activity',
+    groupId: 'updates',
     cellRenderer: rentalCarSetActivityCell,
   },
   {
     key: 'licensePlate',
     name: 'License Plate',
-    groupId: 'vehicle-details', // Accordion group for vehicle details
   },
   {
     key: 'rentalStartDate',
@@ -217,12 +219,12 @@ export const tableColumns = createColumnArray([
   'make',
   'year',
   'status',
+  'color',
+  'licensePlate',
   'location',
   'mileage',
   'pricePerDay',
-  'color',
   'setActivity',
-  'licensePlate',
   'delete',
   'actions',
   // 'rentalStartDate',

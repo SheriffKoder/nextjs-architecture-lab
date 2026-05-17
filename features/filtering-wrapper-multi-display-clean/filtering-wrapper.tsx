@@ -19,7 +19,12 @@ import React, { useState, useRef, useEffect, Suspense } from "react";
 import { VariableSizeList, FixedSizeList } from "react-window";
 import { usePathname } from "next/navigation";
 import { LoadingSpinner } from "./components/loading-spinner";
-import { TableColumn, TableConfig, HeaderFilterConfig } from "./types";
+import {
+  TableColumn,
+  TableConfig,
+  HeaderFilterConfig,
+  type AccordionConfig,
+} from "./types";
 import type { FilterConfig } from "@/features/ui/filters/feature-filtering/components/filter-types";
 import type { SortConfig } from "@/features/ui/filters/feature-sorting/types";
 import { useViewSwitcher } from "./hooks/useViewSwitcher";
@@ -74,15 +79,7 @@ interface FilteringWrapperProps<T extends Record<string, any> = Record<string, a
   onCellValueChange?: (rowIndex: number, columnKey: string, newValue: any) => void;
   // Whether the table is in item loading state
   isItemLoading?: boolean;
-  // Accordion configuration for column grouping
-  accordionConfig?: {
-    groups: Array<{
-      id: string;
-      name: string;
-      color: string;
-      textColor: string;
-    }>;
-  }
+  accordionConfig?: AccordionConfig;
   // Table configuration object containing all table-related config options
   tableConfig?: TableConfig<T>;
   // List view configuration for grouped table view
@@ -300,11 +297,13 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
   const isListView = currentView === 'list' && listViewConfig !== undefined
   const isTableView = currentView === 'table' || (!isKanbanView && !isCalendarView && !isMapView && !isSubHeadingsView && !isTimelineView && !isListView)
 
+  const isScrollableDataView = isTableView || isListView || isSubHeadingsView
+
   // Calculate enabled state from config presence
   const isMinimalControlsEnabled = minimalControlsConfig !== undefined;
 
   return (
-    <div className="flex flex-col h-full gap-0 p-0 relative">
+    <div className="flex flex-col h-full min-h-0 gap-0 p-0 relative">
       {/* Grouping Control Row */}
       {isMinimalControlsEnabled && (
       <div className="w-full flex items-center justify-end px-2 py-2 mb-2 border-b border-tertiary/10">
@@ -371,12 +370,12 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
 
       {/* Group Indicators - for accordion grouping */}
       <div className="flex flex-row gap-2 items-center justify-between px-2">
-        <GroupIndicators
+        {/* <GroupIndicators
           groups={accordionConfig?.groups || []}
           openGroups={openGroups}
           onGroupToggle={handleGroupToggle}
           scrollContainer={scrollContainerRef.current || undefined}
-        />
+        /> */}
       </div>
       
 
@@ -391,7 +390,9 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
         className={
           isTimelineView
             ? "flex-1 min-h-0 overflow-x-hidden overflow-y-hidden tertiary-scrollbar"
-            : "flex-1 overflow-y-auto overflow-x-hidden tertiary-scrollbar"
+            : isScrollableDataView
+              ? "flex min-h-0 flex-1 flex-col overflow-hidden"
+              : "flex-1 overflow-y-auto overflow-x-hidden tertiary-scrollbar"
         }
       >
         {/* If noTableDisplay is true and route is /dashboard, render DashboardContent */}

@@ -13,8 +13,7 @@
 
 'use client'
 
-import { useCallback, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useCallback } from 'react'
 import { useDrawerActions } from '@/features/ui/drawer-2'
 import { FilteringWrapper } from '@/features/filtering-wrapper-multi-display-clean/filtering-wrapper'
 import type { SubheadingsUpdateContext } from '@/features/filtering-wrapper-multi-display-clean/features/subheadings/dnd'
@@ -27,6 +26,7 @@ import { minimalControlsConfig } from './config/minimal-controls-config'
 // Individual Display configs (different types of UI layouts)
 import { tableConfig } from './config/displays/table-config'
 import type { RentalCarTableItem } from './types/rental-car-table-item'
+import { accordionConfig } from './config/accordion-config'
 import { tableColumns } from './config/columns'
 import { kanbanConfig } from './config/displays/kanban-config'
 import { calendarConfig } from './config/displays/calendar-config'
@@ -38,9 +38,6 @@ import { demoRscRowActionConfigs } from './config/demo-rsc-row-action-configs'
 import { getRentalCarByIdAction } from './actions/get-rental-car-by-id-action'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './components/drawer-content/rsc-car-drawer-content'
 import { useDemoRscTableActivityToggle } from './hooks/use-demo-rsc-table-activity-toggle'
-
-/** Must stay aligned with `FilteringWrapper` `availableViews` default (`table` when `view` param absent). */
-const DEMO_RSC_TABLE_VIEW_KEYS = ['table'] as const
 
 ////////////////////////////////////////////////////////////
 // Filter Configs Types
@@ -66,25 +63,10 @@ export default function DemoRscContent({
   filters,
   onSubheadingsDragEnd,
 }: DemoRscContentProps) {
-  const searchParams = useSearchParams()
   const { openView, openEdit, openRowDeleteConfirm } = useDrawerActions()
 
   const { setTableData, displayData, setActivityColumnAction } =
     useDemoRscTableActivityToggle(cars)
-
-  const viewParam = searchParams.get('view')
-  const isTableSurface =
-    !viewParam || (DEMO_RSC_TABLE_VIEW_KEYS as readonly string[]).includes(viewParam)
-
-  const columnsForActiveView = useMemo(
-    () =>
-      tableColumns.map((col) =>
-        col.key === 'delete' || col.key === 'setActivity'
-          ? { ...col, isHidden: !isTableSurface }
-          : col
-      ),
-    [isTableSurface]
-  )
 
   /** Prefetch drawer payload; `getRentalCarByIdAction` → `getRentalCarByIdCached` (`unstable_cache` by id). */
   const handleRowPointerEnter = useCallback((row: RentalCarTableItem) => {
@@ -169,7 +151,8 @@ export default function DemoRscContent({
     <div className="flex min-h-0 flex-1 flex-col">
       <FilteringWrapper
         data={displayData}
-        columns={columnsForActiveView}
+        columns={tableColumns}
+        accordionConfig={accordionConfig}
         filters={filters}
         onRowClick={handleRowClick}
         onRowPointerEnter={handleRowPointerEnter}

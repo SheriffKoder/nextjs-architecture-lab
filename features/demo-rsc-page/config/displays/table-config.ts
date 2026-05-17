@@ -119,9 +119,6 @@ export const tableHeaderConfig = {
     { key: 'rentalEndDate', label: 'Rental End Date' },
     { key: 'licensePlate', label: 'License Plate' },
     { key: 'color', label: 'Color' },
-    { key: 'licensePlate', label: 'License Plate' },
-    { key: 'color', label: 'Color' },
-    { key: 'licensePlate', label: 'License Plate' },
   ],
 }
 

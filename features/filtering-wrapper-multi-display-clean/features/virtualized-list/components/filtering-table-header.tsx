@@ -15,7 +15,7 @@
 
 import React, { useState, useEffect } from "react";
 // Import types from new types folder structure
-import { TableColumn } from "../../../types";
+import { TableColumn, type AccordionConfig } from "../../../types";
 // Import Lucide icons for better maintainability
 import { ArrowUp, ArrowDown, MoveUp, MoveDown } from "lucide-react";
 // Import width calculation utility
@@ -57,17 +57,7 @@ interface VirtualizedTableHeaderProps<T = any> {
   showFilterTitle?: boolean;
   // Columns to hide visually but keep functional
   hiddenColumns?: string[];
-  // Optional accordion configuration for column grouping
-  accordionConfig?: {
-    groups: Array<{
-      id: string;
-      name: string;
-      color: string;
-      textColor: string;
-    }>;
-    allowMultipleOpen?: boolean;
-    defaultOpenGroup?: string;
-  };
+  accordionConfig?: AccordionConfig;
   // Handler for group toggle
   handleGroupToggle?: (groupId: string) => void;
   // Currently open groups (for accordion state)
@@ -492,11 +482,11 @@ function VirtualizedTableHeader<T>({
         // Check if group is closed (only first column visible)
         const isGroupClosed = isGroupedColumn && groupConfig;
         
-        // Apply group colors if this column belongs to a group
         const isLastColumn = index === columns.length - 1;
-        const groupStyling = groupConfig 
-          ? `${groupConfig.color} ${groupConfig.textColor} ${isLastColumn ? 'rounded-tr-lg' : ''}`
-          : '';
+        const groupCellRounding = groupConfig && isLastColumn ? 'rounded-tr-lg' : '';
+        const headerTintClass = groupConfig?.color ?? '';
+        const toggleButtonColor =
+          groupConfig?.buttonColor ?? groupConfig?.color ?? 'bg-tertiary';
 
         ////////////////////////////////////
         // Accordion Toggle Button Logic: Determine button visibility and position
@@ -527,8 +517,8 @@ function VirtualizedTableHeader<T>({
                 ? (isScrolled ? 'bg-[#f1f1f1] dark:bg-[#131313]' : 'bg-transparent')
                 : 'bg-[#f1f1f1] dark:bg-[#131313]'
             } ${
-              isGroupedColumn ? 'cursor-pointer hover:opacity-80' : ''
-            } ${groupStyling} ${useEqualWidths ? 'flex-1 min-w-0' : ''}
+              isGroupedColumn ? 'cursor-pointer group' : ''
+            } ${groupCellRounding} ${useEqualWidths ? 'flex-1 min-w-0' : ''}
             ${index === columns.length - 1 ? 'border-r rounded-tr' : ''}
             ${!column.sticky ? '' : ''}
             ${index === 0 ? 'border-l rounded-tl' : ''}
@@ -546,11 +536,17 @@ function VirtualizedTableHeader<T>({
             data-group-id={isGroupedColumn ? (column.groupId || undefined) : undefined}
             onClick={isGroupedColumn ? handleColumnGroupToggle : undefined}
           >
+          {isGroupedColumn && headerTintClass ? (
+            <div
+              className={`pointer-events-none absolute inset-0 z-0 group-hover:opacity-80 transition-opacity duration-200 ${headerTintClass}`}
+              aria-hidden
+            />
+          ) : null}
           {/* Column header content with name and controls */}
-          <div className={`flex items-center ${useEqualWidths ? 'w-full min-w-0' : ''}`}>
+          <div className={`relative z-10 flex items-center ${useEqualWidths ? 'w-full min-w-0' : ''}`}>
             {/* Column name display */}
             {showFilterTitle ? (
-              <span className="text-xs font-normal text-foreground/70">{column.name}</span>
+              <span className="px-2 text-xs font-normal text-foreground/70">{column.name}</span>
             ) : null}
             
 
@@ -575,6 +571,11 @@ function VirtualizedTableHeader<T>({
               isFirstColumn={isFirstInGroup}
               isLastColumn={isLastInGroup}
               onToggle={handleColumnGroupToggle}
+              groupName={groupConfig?.name}
+              groupColor={toggleButtonColor}
+              groupTextColor={groupConfig?.textColor}
+              groupBorderColor={groupConfig?.borderColor}
+              groupLabelColor={groupConfig?.labelColor}
             />
           )}
 
@@ -583,6 +584,7 @@ function VirtualizedTableHeader<T>({
             <AccordionLine
               isFirstColumn={isFirstInGroup}
               isLastColumn={isLastInGroup}
+              groupBorderColor={groupConfig?.borderColor}
             />
           )}
 

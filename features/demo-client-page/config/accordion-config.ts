@@ -20,6 +20,7 @@ export const accordionConfig = {
       name: 'Vehicle Details',
       color: 'bg-tertiary',
       textColor: 'text-white',
+      borderColor: 'border-tertiary',
     },
   ],
   allowMultipleOpen: true, // Allow multiple groups to be open at once

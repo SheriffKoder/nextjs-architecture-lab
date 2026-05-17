@@ -107,18 +107,26 @@ export function useContainerHeight({
       }
     };
 
-    // Calculate initial height
     updateHeight();
 
-    // Set up resize listener if enabled
+    const el = containerRef.current;
+    let resizeObserver: ResizeObserver | undefined;
+
+    if (el && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => updateHeight());
+      resizeObserver.observe(el);
+    }
+
     if (enableResizeListener) {
       window.addEventListener('resize', updateHeight);
-      
-      // Cleanup function
-      return () => {
-        window.removeEventListener('resize', updateHeight);
-      };
     }
+
+    return () => {
+      resizeObserver?.disconnect();
+      if (enableResizeListener) {
+        window.removeEventListener('resize', updateHeight);
+      }
+    };
   }, [fixedHeight, minHeight, enableResizeListener]);
 
   ////////////////////////////////////

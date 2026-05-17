@@ -12,7 +12,8 @@ export const accordionConfig = {
       id: 'group1',
       name: 'Group 1',
       color: 'bg-blue-500',
-      textColor: 'text-white'
+      textColor: 'text-white',
+      borderColor: 'border-blue-500',
     }
   ]
 };

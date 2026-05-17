@@ -118,6 +118,26 @@ export const getColumnGroupPosition = <T = any>(
  * @param allColumns - All columns array for comparison
  * @returns Group styling information or null if not in a group
  */
+/**
+ * Maps accordion `color` classes (e.g. `bg-tertiary`) to border utilities for lines (`border-tertiary`).
+ */
+export function accordionColorClassesToBorderClasses(colorClasses: string): string {
+  return colorClasses
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((c) => (c.startsWith('bg-') ? c.replace(/^bg-/, 'border-') : c))
+    .join(' ')
+}
+
+/** Maps accordion `color` classes (e.g. `bg-emerald-800`) to text utilities for closed-group label (`text-emerald-800`). */
+export function accordionColorClassesToTextClasses(colorClasses: string): string {
+  return colorClasses
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((c) => (c.startsWith('bg-') ? c.replace(/^bg-/, 'text-') : c))
+    .join(' ')
+}
+
 export const getGroupStylingInfo = <T = any>(
   column: TableColumn<T>,
   allColumns: TableColumn<T>[]

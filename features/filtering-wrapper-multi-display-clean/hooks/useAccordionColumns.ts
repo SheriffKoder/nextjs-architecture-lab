@@ -13,18 +13,9 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { TableColumn } from '@/features/filtering-wrapper-multi-display-clean/types';
+import { TableColumn, type AccordionConfig } from '@/features/filtering-wrapper-multi-display-clean/types';
 
-export interface AccordionConfig {
-  groups: Array<{
-    id: string;
-    name: string;
-    color: string;
-    textColor: string;
-  }>;
-  allowMultipleOpen?: boolean;
-  defaultOpenGroup?: string;
-}
+export type { AccordionConfig } from '@/features/filtering-wrapper-multi-display-clean/types';
 
 /**
  * Hook for managing accordion column visibility and group toggling
