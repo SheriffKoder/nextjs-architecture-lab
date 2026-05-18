@@ -12,23 +12,19 @@
  */
 
 import { useCallback } from 'react'
-import { ToastType } from './toast'
+import { type AddToastPayload, ToastType } from './toast'
 
 /**
  * Toast methods interface
  * @interface ToastMethods
  */
-interface ToastMethods {
+export interface ToastMethods {
   showSuccess: (message: string, title?: string, duration?: number) => void
   showError: (message: string, title?: string, duration?: number) => void
   showWarning: (message: string, title?: string, duration?: number) => void
   showInfo: (message: string, title?: string, duration?: number) => void
-  addToast: (toast: {
-    type: ToastType
-    title?: string
-    message: string
-    duration?: number
-  }) => void
+  addToast: (toast: AddToastPayload) => void
+  clearToastsByGroup: (group: string) => void
 }
 
 /**
@@ -79,15 +75,20 @@ export function useToast(): ToastMethods {
     }
   }, [getToastMethods])
 
-  const addToast = useCallback((toast: {
-    type: ToastType
-    title?: string
-    message: string
-    duration?: number
-  }) => {
+  const addToast = useCallback((toast: AddToastPayload) => {
     const methods = getToastMethods()
     if (methods) {
       methods.addToast(toast)
+    } else {
+      console.warn('Toast container not available')
+    }
+  }, [getToastMethods])
+
+  // clear toasts that are tagged with a specific group, like `connectivity`
+  const clearToastsByGroup = useCallback((group: string) => {
+    const methods = getToastMethods()
+    if (methods) {
+      methods.clearToastsByGroup(group)
     } else {
       console.warn('Toast container not available')
     }
@@ -98,6 +99,7 @@ export function useToast(): ToastMethods {
     showError,
     showWarning,
     showInfo,
-    addToast
+    addToast,
+    clearToastsByGroup,
   }
 } 

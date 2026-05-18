@@ -76,6 +76,12 @@ export default function ToastContainer({
   }, [])
 
   ///////////////////////
+  // Remove all toasts in a group (e.g. connectivity status before showing the next)
+  const clearToastsByGroup = useCallback((group: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.group !== group))
+  }, [])
+
+  ///////////////////////
   // Convenience methods for different toast types
   const showSuccess = useCallback((message: string, title?: string, duration?: number) => {
     addToast({
@@ -121,22 +127,26 @@ export default function ToastContainer({
       showError,
       showWarning,
       showInfo,
-      addToast
+      addToast,
+      clearToastsByGroup,
     }
   }
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[100]">
-      {toasts.map((toast, index) => (
-        <Toast
-          gap={gap}
-          key={toast.id}
-          {...toast}
-          index={index}
-          zIndex={100 + toasts.length - index}
-          onClose={removeToast}
-        />
-      ))}
+      {toasts.map((toast, index) => {
+        const { group: _group, ...toastProps } = toast
+        return (
+          <Toast
+            gap={gap}
+            key={toast.id}
+            {...toastProps}
+            index={index}
+            zIndex={100 + toasts.length - index}
+            onClose={removeToast}
+          />
+        )
+      })}
     </div>
   )
 } 

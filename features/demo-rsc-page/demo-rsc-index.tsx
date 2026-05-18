@@ -11,6 +11,7 @@ import FiltersSkeleton from '@/components/layout/loading-skeletons/filters-skele
 import TableSkeleton from '@/components/layout/loading-skeletons/table-skeleton'
 import FilterToolbarSkeleton from '@/components/layout/loading-skeletons/filter-toolbar-skeleton'
 import PageHeader from '@/components/layout/page-header'
+import OfflineDetector from '@/components/design/offline/offline-detector'
 import ToastContainer from '@/components/design/toast/toast-container'
 import { ToastPosition, ToastStacking } from '@/components/design/toast/toast'
 import { NavigationTransitionRoot } from '@/features/ui/filters/navigation-transition-context'
@@ -33,6 +34,7 @@ export default function DemoRscIndex({
         position={ToastPosition.BOTTOM_RIGHT}
         stacking={ToastStacking.PUSH_DOWN}
       />
+      <OfflineDetector />
       <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
         <header className="flex shrink-0 flex-col items-center justify-between gap-4 border-b border-tertiary/10 p-4 md:flex-row">
           <PageHeader subTitle="Demo RSC page with server-side data fetching, filtering, and pagination" />

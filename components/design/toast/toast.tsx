@@ -73,6 +73,8 @@ export interface ToastProps {
   title?: string
   message: string
   duration?: number // in milliseconds, 0 = no auto-dismiss
+  /** Optional bucket for bulk dismiss (e.g. `connectivity`) via `clearToastsByGroup` */
+  group?: string
   position?: ToastPosition
   stacking?: ToastStacking
   onClose?: (id?: string) => void
@@ -82,6 +84,12 @@ export interface ToastProps {
   zIndex?: number // Custom z-index
   gap?: number
 }
+
+/** Payload for `addToast` / `useToast().addToast` */
+export type AddToastPayload = Pick<
+  ToastProps,
+  'type' | 'title' | 'message' | 'duration' | 'group'
+>
 
 /**
  * Toast icon mapping
