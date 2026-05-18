@@ -7,6 +7,7 @@
  */
 
 
+import type { ReactNode } from 'react'
 import { RowExpansionConfig } from '../components/row-expand/types';
 
 /**
@@ -39,4 +40,5 @@ export interface TableConfig<T = any> {
   // Styling configuration
   groupStylerConfig?: { [groupId: string]: (rowData: T, isFirstColumn: boolean, isLastColumn: boolean) => string };
   rowStyler?: (rowData: T) => string;
+  rowHighlighting?: (rowData: T) => ReactNode;
 }

@@ -9,6 +9,7 @@
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 import type { TableConfig, HeaderFilterConfig } from '@/features/filtering-wrapper-multi-display-clean/types'
 import { demoRscEditableColumnKeys } from '../cells/rental-car-location-options'
+import { demoRscRowHighlighting, demoRscRowStyler } from '../row-highlighting'
 import type { GroupConfig } from '@/features/filtering-wrapper-multi-display-clean/features/virtualized-list/utils/grouping-utils'
 import type { SortConfig } from '@/features/ui/filters/feature-sorting/types'
 
@@ -46,7 +47,8 @@ export const listDisplayConfig: TableConfig<RentalCarTableItem> = {
   
   // Styling configuration
   groupStylerConfig: undefined,     // No custom group styling
-  rowStyler: undefined,              // No custom row styling
+  rowStyler: demoRscRowStyler,
+  rowHighlighting: demoRscRowHighlighting,
   
   // Header configuration
   transparentHeader: false,          // Header does not become transparent on scroll

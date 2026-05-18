@@ -180,6 +180,7 @@ interface VirtualizedTableRowProps<T = any> {
   rowIndex?: number;
   // Optional function to apply conditional row styling based on row data
   rowStyler?: (rowData: T) => string;
+  rowHighlighting?: (rowData: T) => React.ReactNode;
   // Optional group styler configuration for highlighting groups based on data
   groupStylerConfig?: { [groupId: string]: (rowData: T, isFirstColumn: boolean, isLastColumn: boolean) => string };
   // CSS class name for search highlight styling
@@ -237,6 +238,7 @@ export function VirtualizedTableRow<T = any>({
   onCellValueChange,
   rowIndex,
   rowStyler,
+  rowHighlighting,
   groupStylerConfig,
   searchHighlightStyle,
   rowExpansionEnabled = false,
@@ -334,6 +336,8 @@ export function VirtualizedTableRow<T = any>({
     return rowStyler ? rowStyler(item) : '';
   };
 
+  const rowHighlightLayer = rowHighlighting ? rowHighlighting(item) : null;
+
   ////////////////////////////////////
   // Main Render: Complete row structure with cells
   ////////////////////////////////////
@@ -392,7 +396,7 @@ export function VirtualizedTableRow<T = any>({
           minHeight: `${baseRowHeight}px`,
           minWidth: totalMinWidth,
         }}
-        className={`flex items-stretch group ${
+        className={`relative flex items-stretch group ${
           onRowClick || onRowPointerEnter ? 'cursor-pointer hover:bg-tertiary/10 hover:text-tertiary' : ''
         } ${isLastRow ? 'border-b border-transparent' : 'border-b border-transparent'} ${
           isSelected ? 'bg-tertiary/50' : ''
@@ -400,7 +404,18 @@ export function VirtualizedTableRow<T = any>({
         onClick={handleRowClick}
         onPointerEnter={onRowPointerEnter ? handleRowPointerEnter : undefined}
       >
-        {/* Map through each column to render cells */}
+        {/* Row highlight layer */}
+        {rowHighlightLayer ? (
+          <div
+            className="pointer-events-none absolute inset-0 z-0"
+            aria-hidden
+          >
+            {rowHighlightLayer}
+          </div>
+        ) : null}
+        <div className="relative z-10 flex w-full min-w-full items-stretch">
+          
+        {/* Map through each column to render cells - Content above the background */}
         {(() => {
           // Get visible columns (non-hidden) to determine last column index
           const visibleColumns = columns.filter(col => !col.isHidden);
@@ -608,6 +623,7 @@ export function VirtualizedTableRow<T = any>({
         );
           });
         })()}
+        </div>
       </div>
       
       {/* Expanded content below the row */}

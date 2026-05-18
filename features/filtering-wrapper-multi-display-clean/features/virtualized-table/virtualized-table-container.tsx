@@ -158,6 +158,7 @@ export function VirtualizedTableComponent<T = any>({
     editableColumns,
     groupStylerConfig,
     rowStyler,
+    rowHighlighting,
     transparentHeader = false,
     // Grouping config
     groupBy,
@@ -517,6 +518,7 @@ export function VirtualizedTableComponent<T = any>({
                 calculatedRowHeight={calculatedRowHeight}
                 groupStylerConfig={groupStylerConfig}
                 rowStyler={rowStyler}
+                rowHighlighting={rowHighlighting}
                 rowExpansionEnabled={rowExpansionEnabled}
                 isRowExpanded={rowId ? isRowExpanded(rowId) : false}
                 onToggleRow={handleToggleRow}
@@ -565,6 +567,7 @@ export function VirtualizedTableComponent<T = any>({
         calculatedRowHeight={calculatedRowHeight}
         groupStylerConfig={groupStylerConfig}
         rowStyler={rowStyler}
+        rowHighlighting={rowHighlighting}
         searchHighlightStyle={undefined}
         rowExpansionEnabled={rowExpansionEnabled}
         isRowExpanded={rowId ? isRowExpanded(rowId) : false}
@@ -576,7 +579,7 @@ export function VirtualizedTableComponent<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [flattenedRows, groupState, displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, effectiveGroupBy, effectiveSubGroupBy]);
+  }, [flattenedRows, groupState, displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, effectiveGroupBy, effectiveSubGroupBy]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED

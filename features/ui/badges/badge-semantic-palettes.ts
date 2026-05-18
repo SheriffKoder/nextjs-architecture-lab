@@ -24,9 +24,9 @@ export const badgeSemanticPalettes: Record<BadgeSemantic, BadgePalette> = {
   low: {
     bg: "bg-red-100 dark:bg-red-900/30",
     border: "border border-red-300/40 dark:border-red-700/50",
-    text: "text-red-800 dark:text-red-400",
+    text: "text-red-800 dark:text-[#ff6369]",
     icon: "text-red-600 dark:text-red-400 fill-red-600 dark:fill-red-400",
-    dotFill: "bg-red-600 dark:bg-red-400",
+    dotFill: "bg-red-600 dark:bg-[#ff6369]",
   },
   ultra: {
     bg: "bg-purple-100 dark:bg-purple-900/30",

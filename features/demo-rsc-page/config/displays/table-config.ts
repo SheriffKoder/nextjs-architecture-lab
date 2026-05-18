@@ -14,6 +14,7 @@
 import type { TableConfig } from "@/features/filtering-wrapper-multi-display-clean/types";
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 import { demoRscEditableColumnKeys } from '../cells/rental-car-location-options'
+import { demoRscRowHighlighting, demoRscRowStyler } from '../row-highlighting'
 
 ////////////////////////////////////
 // Table Configuration - Split into Display and Header Configs
@@ -48,7 +49,8 @@ export const tableDisplayConfig: TableConfig<RentalCarTableItem> = {
   
   // Styling configuration
   groupStylerConfig: undefined,     // No custom group styling
-  rowStyler: undefined,              // No custom row styling
+  rowStyler: demoRscRowStyler,
+  rowHighlighting: demoRscRowHighlighting,
   
   // Header configuration
   transparentHeader: false,          // Header does not become transparent on scroll

@@ -7,6 +7,7 @@
  */
 
 
+import type { ReactNode } from 'react'
 import { RowExpansionConfig } from '../components/row-expand/types';
 import type { HeaderFilterConfig } from '../../../types';
 import type { SortConfig } from '@/features/ui/filters/feature-sorting/types';
@@ -41,6 +42,8 @@ export interface TableConfig<T = any> {
   // Styling configuration
   groupStylerConfig?: { [groupId: string]: (rowData: T, isFirstColumn: boolean, isLastColumn: boolean) => string };
   rowStyler?: (rowData: T) => string;
+  /** Full-row layer behind cell content (`absolute inset-0` in row component). */
+  rowHighlighting?: (rowData: T) => ReactNode;
   
   // Header configuration
   transparentHeader?: boolean; // When true, header is transparent until scrolled

@@ -24,6 +24,7 @@ import {
   accordionColorClassesToBorderClasses,
   accordionColorClassesToTextClasses,
 } from '../../../utils/accordion-utils'
+import { MinusIcon, PlusIcon } from 'lucide-react'
 
 interface AccordionToggleButtonProps {
   isGroupOpen: boolean
@@ -103,7 +104,7 @@ export function AccordionToggleButton({
             borderClasses,
           )}
         >
-          +
+          <PlusIcon className="w-3 h-3 stroke-2" />
         </span>
         {groupName ? (
           <span
@@ -135,8 +136,8 @@ export function AccordionToggleButton({
       aria-label="Collapse group"
       title="Click to collapse group"
     >
-      <span className="my-auto flex h-full w-full items-center justify-center pb-[2px] pl-[1px]">
-        −
+      <span className="my-auto flex h-full w-full items-center justify-center">
+        <MinusIcon className="w-3 h-3 stroke-2" />
       </span>
     </button>
   )

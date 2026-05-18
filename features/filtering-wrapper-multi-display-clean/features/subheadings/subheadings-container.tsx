@@ -222,6 +222,7 @@ export function SubHeadingsContainer<T = any>({
     editableColumns,
     groupStylerConfig,
     rowStyler,
+    rowHighlighting,
     subheadingsDisableRowDrag = false,
   } = tableConfig || {};
 
@@ -724,6 +725,7 @@ export function SubHeadingsContainer<T = any>({
         calculatedRowHeight={calculatedRowHeight}
         groupStylerConfig={groupStylerConfig}
         rowStyler={rowStyler}
+        rowHighlighting={rowHighlighting}
         searchHighlightStyle={undefined}
         // Row expansion props
         rowExpansionEnabled={rowExpansionEnabled}
@@ -736,7 +738,7 @@ export function SubHeadingsContainer<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions]);
+  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED
@@ -997,6 +999,7 @@ export function SubHeadingsContainer<T = any>({
                                                             calculatedRowHeight={calculatedRowHeight}
                                                             groupStylerConfig={groupStylerConfig}
                                                             rowStyler={rowStyler}
+                                                            rowHighlighting={rowHighlighting}
                                                             searchHighlightStyle={undefined}
                                                             rowExpansionEnabled={rowExpansionEnabled}
                                                             isRowExpanded={
@@ -1122,6 +1125,7 @@ export function SubHeadingsContainer<T = any>({
                                                         calculatedRowHeight={calculatedRowHeight}
                                                         groupStylerConfig={groupStylerConfig}
                                                         rowStyler={rowStyler}
+                                                        rowHighlighting={rowHighlighting}
                                                         searchHighlightStyle={undefined}
                                                         rowExpansionEnabled={rowExpansionEnabled}
                                                         isRowExpanded={
@@ -1333,6 +1337,7 @@ export function SubHeadingsContainer<T = any>({
                                               calculatedRowHeight={calculatedRowHeight}
                                               groupStylerConfig={groupStylerConfig}
                                               rowStyler={rowStyler}
+                                              rowHighlighting={rowHighlighting}
                                               searchHighlightStyle={undefined}
                                               rowExpansionEnabled={rowExpansionEnabled}
                                               isRowExpanded={
@@ -1515,6 +1520,7 @@ export function SubHeadingsContainer<T = any>({
                                           calculatedRowHeight={calculatedRowHeight}
                                           groupStylerConfig={groupStylerConfig}
                                           rowStyler={rowStyler}
+                                          rowHighlighting={rowHighlighting}
                                           searchHighlightStyle={undefined}
                                           rowExpansionEnabled={rowExpansionEnabled}
                                           isRowExpanded={
@@ -1583,6 +1589,7 @@ export function SubHeadingsContainer<T = any>({
               calculatedRowHeight={calculatedRowHeight}
               groupStylerConfig={groupStylerConfig}
               rowStyler={rowStyler}
+              rowHighlighting={rowHighlighting}
               searchHighlightStyle={undefined}
             />
           </div>
