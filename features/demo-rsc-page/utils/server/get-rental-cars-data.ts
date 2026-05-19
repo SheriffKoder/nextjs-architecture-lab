@@ -20,11 +20,6 @@ import { parseSorts, applySorts } from '../../../ui/filters/feature-sorting/util
 import { parsePagination } from '../../../ui/filters/feature-pagination/utils'
 import { rentalCarPaginationConfig } from '../../config/header-filters-config'
 import { decodeFilters } from '../../../ui/filters/feature-query-builder-filter/utils'
-import {
-  DEMO_RSC_SIMULATE_RENTAL_CARS_MS,
-  simulateServerDelay,
-} from './simulate-server-delay'
-
 /**
  * Get mock rental cars data with optional filtering, sorting, and pagination
  * WHY: List loader accepts the same `RentalCarListQuery` shape as TanStack / `buildRentalCarListQuery`
@@ -40,7 +35,11 @@ export async function getRentalCarsData(
     limit: number
   }
 }> {
-  await simulateServerDelay(DEMO_RSC_SIMULATE_RENTAL_CARS_MS)
+
+  // 25% error rate
+  if (Math.random() < 0.25) {
+    throw new Error('Simulated error - could not load rental cars')
+  }
 
   const searchParams = rentalCarListQueryToSearchParams(query)
 

@@ -12,6 +12,8 @@ import styles from './pagination-skeleton.module.css'
 
 interface PaginationSkeletonProps {
   className?: string
+  /** Staggered fade-in (off for static backdrops e.g. error fallback) */
+  animated?: boolean
 }
 
 const navBtn =
@@ -34,12 +36,12 @@ const slots: Slot[] = [
   { kind: 'icon', Icon: ChevronsRight },
 ]
 
-export default function PaginationSkeleton({ className }: PaginationSkeletonProps) {
+export default function PaginationSkeleton({ className, animated = true }: PaginationSkeletonProps) {
   return (
     <div className={['shrink-0 pb-2 mr-2', className].filter(Boolean).join(' ')}>
       <div className="flex items-center justify-center gap-1 blur-sm" aria-hidden>
         {slots.map((slot, index) => {
-          const appearClass = slot.kind === 'icon' && slot.dim ? styles.itemDim : styles.item
+          const appearClass = slot.kind === 'icon' && slot.dim ? styles.itemDim : animated ? styles.item : ''
 
           if (slot.kind === 'icon') {
             const { Icon } = slot

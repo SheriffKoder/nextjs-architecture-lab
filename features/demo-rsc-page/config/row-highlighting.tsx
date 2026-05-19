@@ -7,7 +7,7 @@ import { RentalCarStatus, type RentalCarStatusValue } from '../types/rental-car-
 ////////////////////////////////////
 
 const rowStylerBaseClasses =
-  'relative pl-4 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-[17px] before:rounded'
+  'relative pl-5 before:absolute before:left-2 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-[17px] before:rounded cursor-pointer hover:bg-tertiary/10 hover:text-tertiary border-b border-tertiary/10  bg-tertiary/5'
 
 
 function getStatusBorderColor(status: string): string {

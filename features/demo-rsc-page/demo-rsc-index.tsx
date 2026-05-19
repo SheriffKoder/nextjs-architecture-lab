@@ -2,7 +2,7 @@
  * Demo RSC Index Component
  *
  * Purpose: Page shell — header/toast immediate; each section (`FiltersSection`, `TableAndPaginationSection`)
- * fetches via `getFilters` / `getCars` inside its own `<Suspense>` boundary.
+ * fetches via `getFilters` / `getCars` inside `<Suspense>`; table island uses `TablePaginationErrorBoundary`.
  * Used in: `app/(root)/demo-rsc-page/page.tsx`
  */
 
@@ -19,6 +19,7 @@ import ActionButtons from './components/action-buttons'
 import DemoRscDrawerLayer from './components/drawer-content/demo-rsc-drawer-layer'
 import FiltersSection from './components/layout-sections/filters-section'
 import TableAndPaginationSection from './components/layout-sections/table-and-pagination-section'
+import TablePaginationErrorBoundary from './components/layout-sections/table-pagination-error-boundary'
 import { exportForMailchimpAction } from './actions'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 
@@ -49,9 +50,12 @@ export default function DemoRscIndex({
             <Suspense fallback={<FiltersSkeleton buttonCount={2} pillFilter={true} buttonWidthPx="md:w-[200px]" />}>
               <FiltersSection params={params} />
             </Suspense>
-            <Suspense fallback={<TableSkeleton columnCount={10} rowCount={8} showHeader={true} />}>
-              <TableAndPaginationSection params={params} />
-            </Suspense>
+            {/* Table and pagination section is wrapped in an island error boundary and suspense for loading state*/}
+            <TablePaginationErrorBoundary>
+              <Suspense fallback={<TableSkeleton columnCount={10} rowCount={8} showHeader={true} />}>
+                <TableAndPaginationSection params={params} />
+              </Suspense>
+            </TablePaginationErrorBoundary>
           </div>
         </div>
 

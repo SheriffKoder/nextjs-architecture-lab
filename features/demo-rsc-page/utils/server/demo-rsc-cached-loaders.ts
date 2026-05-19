@@ -79,7 +79,7 @@ export const getFilters = unstable_cache(
 // 2. Build `RentalCarListQuery` from URL-shaped record.
 // 3. Delegate to `getRentalCarsData` (filter → sort → paginate + simulated delay in that module).
 //////////////////////////////////
-export const getCars = unstable_cache(
+export const getCars =
   async (dataParamsKey: string): Promise<RentalCarsPagePayload> => {
     // 1. Deserialize cache key so list logic never sees drawer/mode/id chrome
     const params = JSON.parse(dataParamsKey) as DemoRscPageSearchParams
@@ -89,10 +89,24 @@ export const getCars = unstable_cache(
 
     // 3. Produce `{ cars, pagination }` for `DemoRscContent` + footer
     return getRentalCarsData(query)
-  },
-  ['demo-rsc-cars'],
-  { revalidate: 60 }
-)
+  }
+
+  // export const getCars = unstable_cache(
+  //   async (dataParamsKey: string): Promise<RentalCarsPagePayload> => {
+  //     // 1. Deserialize cache key so list logic never sees drawer/mode/id chrome
+  //     const params = JSON.parse(dataParamsKey) as DemoRscPageSearchParams
+  
+  //     // 2. Same URL → query mapping as client parity (`buildRentalCarListQuery`)
+  //     const query = buildRentalCarListQuery(params)
+  
+  //     // 3. Produce `{ cars, pagination }` for `DemoRscContent` + footer
+  //     return getRentalCarsData(query)
+  //   },
+  //   ['demo-rsc-cars'],
+  //   { revalidate: 60 }
+  // )
+
+
 
 /////////////////////////////////////////////////////////////
 // Cached loader: single rental car by id (drawer detail, prefetch)

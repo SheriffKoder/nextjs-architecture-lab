@@ -25,6 +25,8 @@ interface TableSkeletonProps {
   columnMinWidth?: string
   /** Whether to show header row */
   showHeader?: boolean
+  /** Staggered fade-in (off for static backdrops e.g. error fallback) */
+  animated?: boolean
 }
 
 /**
@@ -41,12 +43,13 @@ export default function TableSkeleton({
   columnCount = 5,
   rowCount = 10,
   columnMinWidth = '200px',
-  showHeader = true
+  showHeader = true,
+  animated = true,
 }: TableSkeletonProps) {
   return (
     <div className="h-full w-full flex flex-col">
       <div
-        className={[styles.rootAppear, 'blur-sm  overflow-hidden rounded-sm  border-border/50'].join(
+        className={[animated ? styles.rootAppear : '', 'blur-sm  overflow-hidden rounded-sm  border-border/50'].join(
           ' '
         )}
       >
@@ -84,14 +87,14 @@ export default function TableSkeleton({
         {/* Table body skeleton rows */}
         {/* Why: Match table row structure */}
         {/* How: Multiple rows with LoadingValue components for each column */}
-        <div>
+        <div className='flex-1'>
           {Array.from({ length: rowCount }).map((_, rowIndex) => {
             return (
             <div
               key={`row-${rowIndex}`}
               data-index={rowIndex}
               className={[
-                styles.rowAppear,
+                animated ? styles.rowAppear : '',
                 'flex items-stretch border-b border-tertiary/10 bg-tertiary/5',
               ].join(' ')}
             >
@@ -114,8 +117,8 @@ export default function TableSkeleton({
         </div>
       </div>
 
-      <div className='mt-auto flex items-center justify-end'>
-        <PaginationSkeleton />
+      <div className='mt-auto flex items-center justify-end pt-8'>
+        <PaginationSkeleton animated={animated} />
       </div>
     </div>
   )

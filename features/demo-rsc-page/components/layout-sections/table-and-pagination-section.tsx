@@ -10,6 +10,7 @@ import DemoRscContent from '../../demo-rsc-content'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 import { getCars, getFilters } from '../../utils/server/demo-rsc-cached-loaders'
 import { demoRscDataParamsToCacheKey } from '../../utils/ui/demo-rsc-search-params-cache-key'
+import TablePaginationErrorRethrow from './table-pagination-error-rethrow'
 
 export default async function TableAndPaginationSection({
   params,
@@ -17,12 +18,18 @@ export default async function TableAndPaginationSection({
   params: DemoRscPageSearchParams
 }) {
 
-  // remove UI keys from the cache key to avoid re-rendering when triggering the drawer or filters.
   const dataKey = demoRscDataParamsToCacheKey(params)
-  const [cars, filters] = await Promise.all([
-    getCars(dataKey),
-    getFilters(dataKey),
-  ])
+
+  let cars: Awaited<ReturnType<typeof getCars>>
+  let filters: Awaited<ReturnType<typeof getFilters>>
+  try {
+    ;[cars, filters] = await Promise.all([
+      getCars(dataKey),
+      getFilters(dataKey),
+    ])
+  } catch (error) {
+    return <TablePaginationErrorRethrow error={error} />
+  }
 
   return (
     <NavigationPendingDimmer className="flex min-h-0 flex-1 flex-col gap-4">
