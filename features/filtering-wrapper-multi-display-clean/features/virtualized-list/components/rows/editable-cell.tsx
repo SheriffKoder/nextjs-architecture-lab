@@ -24,7 +24,7 @@ import {
   commitPlainNumericInput,
   formatGroupedFieldValue,
   useGroupedNumberInput,
-} from '@/components/grouped-number-input';
+} from '@/components/design/inputs/grouped-number-input';
 import type { EditableGroupedNumberConfig } from '@/utils/number-formatters/format-grouped-number';
 
 /**

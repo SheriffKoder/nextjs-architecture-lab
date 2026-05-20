@@ -10,7 +10,7 @@
  * 2. Render multiple skeleton data rows
  */
 
-import LoadingValue from '@/components/loading-value'
+import LoadingValue from '@/components/design/inputs/loading-value'
 
 import styles from './table-skeleton.module.css'
 import { ArrowUpDownIcon, ListFilterIcon } from 'lucide-react'

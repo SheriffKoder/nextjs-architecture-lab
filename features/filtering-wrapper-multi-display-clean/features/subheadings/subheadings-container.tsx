@@ -38,7 +38,6 @@ import {
 import type { FilterConfig } from "@/features/ui/filters/feature-filtering/components/filter-types";
 import { RowExpansionConfig } from "./components/row-expand/types";
 import { ChevronDown } from "lucide-react";
-import { getProjectStatusDisplayName } from "@/utils/projects/project-status-utils";
 import { calculateGroupSums } from "./utils/calculate-group-sums";
 import { GroupSummaryRow } from "./components/rows/group-summary-row";
 // DnD imports
@@ -487,10 +486,6 @@ export function SubHeadingsContainer<T = any>({
       }
     }
     
-    // Fallback to original formatting logic
-    if (groupByKey === 'status') {
-      return getProjectStatusDisplayName(key);
-    }
     // Default: capitalize and replace underscores
     return key
       .replace(/_/g, ' ')

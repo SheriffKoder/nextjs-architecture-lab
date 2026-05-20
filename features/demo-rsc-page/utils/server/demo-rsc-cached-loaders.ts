@@ -58,17 +58,14 @@ export type RentalCarsPagePayload = Awaited<ReturnType<typeof getRentalCarsData>
 // 1. Parse `dataParamsKey` back to the data-only search-param record.
 // 2. Merge base filter configs with URL via `getFilterOptionsServer`.
 //////////////////////////////////
-export const getFilters = unstable_cache(
+export const getFilters = 
   async (dataParamsKey: string): Promise<FilterConfig[]> => {
     // 1. Deserialize stable cache key → same shape `getFilterOptionsServer` expects for URL-driven counts
     const params = JSON.parse(dataParamsKey) as DemoRscPageSearchParams
 
     // 2. Run facet pipeline (per-column counts, options, etc.)
     return getFilterOptionsServer(rentalCarBaseFilters, params)
-  },
-  ['demo-rsc-filters'],
-  { revalidate: 3600 }
-)
+  }
 
 //////////////////////////////////
 // getCars — cross-request cache for filtered, sorted, paginated list payload.
@@ -119,11 +116,8 @@ export const getCars =
 // Steps (inside cached callback):
 // 1. Delegate to `getRentalCarById` (React `cache()` + mock `rentalCars` + simulated delay live there).
 //////////////////////////////////
-export const getRentalCarByIdCached = unstable_cache(
+export const getRentalCarByIdCached = 
   async (id: string): Promise<RentalCarTableItem | null> => {
     // 1. Underlying loader keeps per-request dedupe and delay semantics unchanged
     return getRentalCarById(id)
-  },
-  ['demo-rsc-rental-car-by-id'],
-  { revalidate: 60 }
-)
+  }

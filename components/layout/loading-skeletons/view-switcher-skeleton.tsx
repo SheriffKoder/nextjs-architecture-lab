@@ -6,7 +6,7 @@
  * Why: Provides consistent loading UI that matches view switcher layout
  */
 
-import LoadingValue from '@/components/loading-value'
+import LoadingValue from '@/components/design/inputs/loading-value'
 
 interface ViewSwitcherSkeletonProps {
   /** Number of options to display (default: 3) */

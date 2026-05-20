@@ -8,7 +8,7 @@
  * Single Responsibility: Only handles notification cards skeleton layout
  */
 
-import LoadingValue from '@/components/loading-value'
+import LoadingValue from '@/components/design/inputs/loading-value'
 
 interface NotificationCardsSkeletonProps {
   /** Number of cards to display (default: 3) */

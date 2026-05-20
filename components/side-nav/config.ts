@@ -165,6 +165,7 @@
         subtext: 'Demo pages',
         icon: Briefcase,
         expandable: true,
+        defaultOpen: true,
         children: [
           {
             href: '/demo-rsc-page',
@@ -204,99 +205,6 @@
           },
         ]
       },
-      {
-        href: '/portfolio-management',
-        text: 'Portfolio',
-        subtext: 'Group',
-        icon: Briefcase,
-        expandable: true,
-        children: [
-          {
-            href: '/portfolio-management/project-board',
-            text: 'Project Board',
-            subtext: 'All projects + Lifecycle tabs',
-            icon: FolderKanban,
-            expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          },
-          {
-            href: '/portfolio-management/investors',
-            text: 'Investors',
-            subtext: 'List of investors + Total positions',
-            icon: Users,
-            expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          }
-        ]
-      },
-      {
-        href: '/financial-reports',
-        text: 'Financial Reports',
-        subtext: 'Group',
-        icon: FileText,
-        expandable: true,
-        children: [
-          {
-            href: '/financial-reports/monthly-distributions',
-            text: 'Monthly Distributions',
-            subtext: 'Payout tracker',
-            icon: DollarSign,
-            expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          },
-          {
-            href: '/financial-reports/note-expirations',
-            text: 'Note Expirations',
-            subtext: 'Maturity tracking + Calendar',
-            icon: Calendar,
-            expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          },
-          {
-            href: '/financial-reports/newsletter-tracker',
-            text: 'Newsletter Tracker',
-            subtext: 'Exportable mailing list',
-            icon: Mail,
-            expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          }
-        ]
-      },
-      {
-        href: '/admin-settings',
-        text: 'Admin Settings',
-        subtext: 'Group',
-        icon: Settings,
-        expandable: true,
-        children: [
-          {
-            href: '/admin-settings/configuration',
-            text: 'Configuration',
-            subtext: 'Lenders, Contractors, Agents, etc.',
-            icon: Wrench,
-            expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          },
-          {
-            href: '/admin-settings/user-management',
-            text: 'User Management',
-            subtext: 'Admin only',
-            icon: UserCog,
-            expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          }
-        ]
-      },
-
-
-
       {
         href: '/external-links',
         text: 'External Links',

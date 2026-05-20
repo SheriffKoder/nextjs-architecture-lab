@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { ScoreData } from '../../../features/portfolio-project-board/types'
-import LoadingValue from '../../loading-value'
+import LoadingValue from '../inputs/loading-value'
 
 interface ScoreCardProps {
   data: ScoreData

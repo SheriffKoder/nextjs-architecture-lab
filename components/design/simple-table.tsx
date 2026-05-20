@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import LoadingValue from '@/components/loading-value'
+import LoadingValue from '@/components/design/inputs/loading-value'
 
 export interface SimpleTableColumn<T = any> {
   key: string
