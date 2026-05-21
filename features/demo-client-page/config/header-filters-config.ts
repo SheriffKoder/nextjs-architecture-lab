@@ -22,10 +22,10 @@
 
 import { rentalCars } from "./lib/data-source"
 import type { RentalCarTableItem } from '../types/rental-car-table-item'
-import type { FilterConfig } from "../../ui/filters/feature-filtering/components/filter-types"
-import type { SearchConfig } from "../../ui/filters/feature-filtering/components/search-types"
-import type { PaginationConfig } from "../../ui/filters/feature-pagination/types"
-import type { FiltersHeaderConfig } from "../../ui/filters/components/filters-header-config"
+import type { FilterConfig } from "../../url-kit/filters/feature-filtering/components/filter-types"
+import type { SearchConfig } from "../../url-kit/filters/feature-filtering/components/search-types"
+import type { PaginationConfig } from "../../url-kit/filters/feature-pagination/types"
+import type { FiltersHeaderConfig } from "../../url-kit/filters/components/filters-header-config"
 import { 
   Car, 
   MapPin, 
@@ -229,4 +229,4 @@ export const rentalCarFiltersHeaderConfig: FiltersHeaderConfig = {
  */
 // In production you’d drop that re-export and keep data behind APIs only.
 export { rentalCars }
-export type { RentalCarTableItem } from '../types/rental-car-table-item'
+export type { RentalCarTableItem } from '@/features/cars-rsc/types/rental-car-table-item'

@@ -5,7 +5,7 @@
  * Used in: Route `loading.tsx` and Suspense fallbacks for filter-heavy pages
  */
 
-import LoadingValue from '@/components/design/inputs/loading-value'
+import LoadingValue from '@/features/ui-kit/layout/loading-value'
 import styles from './filters-skeleton.module.css'
 import { CalendarIcon, ChevronDownIcon, FilterIcon, SearchIcon } from 'lucide-react'
 

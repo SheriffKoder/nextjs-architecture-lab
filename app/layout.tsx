@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { ReduxProvider } from "@/lib/store/ReduxProvider";
-import DevelopmentToggle from "@/components/layout/development-toggle/development-toggle";
+import DevelopmentToggle from "@/components/development-toggle/development-toggle";
 import { SessionRestorer } from "@/components/session-restorer";
 import { RolesLoader } from "@/components/roles-loader";
 import "./globals.css";

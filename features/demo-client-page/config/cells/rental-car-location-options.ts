@@ -8,9 +8,9 @@
 
 import * as React from "react";
 import { MapPin } from "lucide-react";
-import type { DropdownOption } from "@/features/filtering-wrapper-multi-display-clean/types/dropdown";
-import type { BadgePalette } from "@/features/ui/badges/badge-palette";
-import { RoundedIconBadge } from "@/features/ui/badges/rounded-icon-badge";
+import type { DropdownOption } from "@/features/multi-view/types/dropdown";
+import type { BadgePalette } from "@/features/ui-kit/badges/badge-palette";
+import { RoundedIconBadge } from "@/features/ui-kit/badges/rounded-icon-badge";
 
 export type RentalCarLocationOption = {
   value: string;

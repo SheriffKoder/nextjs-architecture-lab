@@ -19,8 +19,8 @@
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 import { rentalCars } from '../../config/lib/data-source'
 import { filterRentalCars } from './backend-simulate/filter-rental-cars'
-import { parseSorts, applySorts } from '@/features/ui/filters/feature-sorting/utils'
-import { parsePagination } from '@/features/ui/filters/feature-pagination/utils'
+import { parseSorts, applySorts } from '@/features/url-kit/filters/feature-sorting/utils'
+import { parsePagination } from '@/features/url-kit/filters/feature-pagination/utils'
 import { rentalCarPaginationConfig } from '../../config/header-filters-config'
 
 /**

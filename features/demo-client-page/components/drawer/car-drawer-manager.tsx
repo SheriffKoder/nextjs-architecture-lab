@@ -15,12 +15,12 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import RightDrawer from '@/components/design/right-drawer'
-import { useToast } from '@/components/design/toast/use-toast'
+import RightDrawer from '@/features/ui-kit/layout/right-drawer'
+import { useToast } from '@/features/ui-kit/feeback/toast/use-toast'
 import CarSliderForm from './car-add-slider-form'
 import DemoClientCarViewDrawerContainer from './view-drawer-container'
 import EditSliderForm from './car-edit-slider-form'
-import { useDrawerParams } from '@/features/ui/drawer'
+import { useDrawerParams } from '@/features/url-kit/drawer'
 import {
   useCreateRentalCar,
   useRentalCarDetail,

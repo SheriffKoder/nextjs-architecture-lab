@@ -43,19 +43,19 @@ export default function SidebarHeader({ user, isScrollable = false }: SidebarHea
   const [collapseAllSignal, setCollapseAllSignal] = useState(0)
 
   const sliceUser = useAppSelector((state) => state.user.user)
-  const memberships = useAppSelector((state) => state.user.memberships)
-  const userWithMemberships = useMemo(
-    () => (sliceUser ? { ...sliceUser, org_memberships: memberships } : null),
-    [sliceUser, memberships]
+  const role = useAppSelector((state) => state.user.role)
+  const userWithRole = useMemo(
+    () => (sliceUser ? { ...sliceUser, role } : null),
+    [sliceUser, role]
   )
 
   const style = config.style || 'light'
 
   const navItems = useMemo(() => {
-    const adminOnly = isInternalAdmin(userWithMemberships)
+    const adminOnly = isInternalAdmin(userWithRole)
     if (adminOnly) return config.items
     return config.items.filter((item) => item.href !== '/admin-settings')
-  }, [userWithMemberships])
+  }, [userWithRole])
 
   // Handle Expand All and Collapse All
   const hasExpandableGroups = useMemo(

@@ -5,7 +5,7 @@ import { SidebarProvider, useSidebar } from '@/components/side-nav/contexts/side
 import { User } from '@/lib/types'
 import React, { Suspense, useEffect, useState } from 'react'
 import { useAppSelector } from '@/lib/store/hooks'
-import '@/features/login/styles/main-background.css'
+import '@/pages/login/styles/main-background.css'
 
 function SidebarHeaderFallback() {
   return (

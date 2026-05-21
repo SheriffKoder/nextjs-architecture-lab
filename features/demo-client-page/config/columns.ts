@@ -6,7 +6,7 @@
  * Why: Centralizes column definitions for consistency and reusability
  */
 
-import { TableColumn } from "@/features/filtering-wrapper-multi-display-clean/types";
+import { TableColumn } from "@/features/multi-view/types";
 import type { RentalCarTableItem } from "../types/rental-car-table-item";
 import { rentalCarStatusFormat } from "./cells/rental-car-status-format";
 import {

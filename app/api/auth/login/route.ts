@@ -1,9 +1,10 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { NextResponse, type NextRequest } from "next/server";
+import { DEFAULT_INTERNAL_ORG_ID } from "@/lib/constants";
+import { roleFromMembershipRow } from "@/lib/utils-server";
 
 /**
  * POST /api/auth/login
- * Login with email and password, then set user data in auth metadata
  * Body: { email, password }
  */
 export async function POST(request: NextRequest) {
@@ -11,7 +12,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = body;
 
-    // Validate required fields
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password are required" },
@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Sign in with email and password
     const { data: authData, error: authError } =
       await supabase.auth.signInWithPassword({
         email,
@@ -29,10 +28,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (authError) {
-      return NextResponse.json(
-        { error: authError.message },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: authError.message }, { status: 401 });
     }
 
     if (!authData.user) {
@@ -47,7 +43,7 @@ export async function POST(request: NextRequest) {
     const db = await createAdminClient();
     const { data: userRow, error: userError } = await db
       .from("users")
-      .select("id, email, name, created_at, updated_at")
+      .select("id, email, name, created_at, updated_at, phone")
       .eq("id", userId)
       .single();
 
@@ -60,24 +56,21 @@ export async function POST(request: NextRequest) {
 
     const { data: memberships } = await db
       .from("org_members")
-      .select("org_id, user_id, role_id, created_at, orgs(id, name, org_types), roles(id, name, key)")
-      .eq("user_id", userId);
-    const org_memberships = (memberships ?? []).map((m: any) => ({
-      ...m,
-      org: m.orgs,
-      role: m.roles,
-    }));
-    const user = { ...userRow, org_memberships };
+      .select("role_id, roles(id, name, key)")
+      .eq("user_id", userId)
+      .eq("org_id", DEFAULT_INTERNAL_ORG_ID)
+      .limit(1);
 
-    // Prepare user metadata for Supabase JWT
-    const userMetadata: Record<string, any> = {
-      email: user.email,
-      name: user.name,
-      // We store the primary membership info if available, or just the fact that metadata was synced
+    const role = memberships?.[0]
+      ? roleFromMembershipRow(memberships[0] as Parameters<typeof roleFromMembershipRow>[0])
+      : null;
+
+    const userMetadata: Record<string, unknown> = {
+      email: userRow.email,
+      name: userRow.name,
       synced_at: new Date().toISOString(),
     };
 
-    // Update auth user metadata with user profile data
     const { error: updateError } = await supabase.auth.updateUser({
       data: userMetadata,
     });
@@ -86,27 +79,16 @@ export async function POST(request: NextRequest) {
       console.error("Error updating user metadata:", updateError);
     }
 
-    // Prepare response data
-    const responseData = {
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-      },
-      memberships: user.org_memberships,
-      session: authData.session,
-    };
-
-    // Return user data and memberships
-    return NextResponse.json(responseData, { status: 200 });
-  } catch (error: any) {
-    console.error("Error during login:", error);
     return NextResponse.json(
-      { error: "Failed to login" },
-      { status: 500 }
+      {
+        user: userRow,
+        role,
+        session: authData.session,
+      },
+      { status: 200 }
     );
+  } catch (error: unknown) {
+    console.error("Error during login:", error);
+    return NextResponse.json({ error: "Failed to login" }, { status: 500 });
   }
 }
-

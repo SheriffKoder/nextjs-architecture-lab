@@ -6,7 +6,7 @@
  * Why: Groups rental cars by status in a kanban board layout
  */
 
-import type { ColumnConfig } from '@/features/filtering-wrapper-multi-display-clean/features/kanban/types/kanban-types'
+import type { ColumnConfig } from '@/features/multi-view/features/kanban/types/kanban-types'
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 
 /**

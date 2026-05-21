@@ -6,7 +6,7 @@
  * Why: Await `searchParams` once here, normalize to a plain object, then pass into the feature (no `Promise` in children)
  */
 
-import DemoRscIndex from '@/features/demo-rsc-page/demo-rsc-index'
+import DemoRscIndex from '@/pages/demo-rsc-page/demo-rsc-index'
 
 /**
  * Canonical shape for this route’s query string after `await searchParams` (Next App Router).

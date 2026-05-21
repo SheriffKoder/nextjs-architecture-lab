@@ -1,7 +1,7 @@
 'use client'
 
-import CollapsibleCard from '@/components/design/CollapsibleCard-sm'
-import DetailRow from '@/components/design/slider/detail-row'
+import CollapsibleCard from '@/features/ui-kit/layout/CollapsibleCard-sm'
+import DetailRow from '@/features/ui-kit/layout/detail-row'
 import { ChevronDownIcon } from 'lucide-react'
 import type { RentalCarTableItem } from '../../../types/rental-car-table-item'
 

@@ -11,7 +11,7 @@
  * 3. Render skeleton placeholder for subtitle (if exists)
  */
 
-import LoadingValue from '@/components/design/inputs/loading-value'
+import LoadingValue from '@/features/ui-kit/layout/loading-value'
 
 interface PageHeaderSkeletonProps {
   /** Whether to show parent route skeleton */

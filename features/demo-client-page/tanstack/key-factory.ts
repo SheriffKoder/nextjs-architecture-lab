@@ -13,7 +13,7 @@
  * - rentalCarKeys.optionsAll — prefix key for invalidating every cached options query
  */
 
-import type { SortSpec } from '@/features/ui/filters/feature-sorting/types'
+import type { SortSpec } from '@/features/url-kit/filters/feature-sorting/types'
 
 /** Inclusive numeric range for URL params encoded as `min_max` (see server `parseNumberRange`). */
 export interface RentalCarNumberRange {

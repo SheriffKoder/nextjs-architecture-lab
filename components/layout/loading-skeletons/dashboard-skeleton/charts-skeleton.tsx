@@ -8,7 +8,7 @@
  * Single Responsibility: Only handles charts skeleton layout
  */
 
-import LoadingValue from '@/components/design/inputs/loading-value'
+import LoadingValue from '@/features/ui-kit/layout/loading-value'
 
 /**
  * Charts skeleton component

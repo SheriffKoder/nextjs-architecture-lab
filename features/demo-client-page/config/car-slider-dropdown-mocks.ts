@@ -5,7 +5,7 @@
  * Used in: `components/car-slider-form.tsx`
  */
 
-import type { DropdownItem } from '@/components/design/multi-select/utils/types'
+import type { DropdownItem } from '@/features/ui-kit/forms/multi-select/utils/types'
 
 export const MOCK_CAR_STATUS_ITEMS: DropdownItem[] = [
   { id: 'available', label: 'Available', value: 'available' },

@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { User } from '@/lib/types';
 import { buildQueryParams } from '@/lib/utils';
-import type { FilterUniqueValuesMap } from '@/features/filtering-wrapper-multi-display/types';
+type RoleUniqueValue = {
+  id: string;
+  title: string;
+  available: number;
+  total: number;
+};
 
 interface GetUsersParams {
   page?: number;
@@ -15,14 +20,12 @@ interface GetUsersParams {
   phone_search?: string;
   /** Comma-separated or array of role IDs */
   role_ids?: string[] | string;
-  /** Only return users who are members of this org */
-  org_id?: string;
 }
 
 interface GetUsersResponse {
   data: User[];
   total: number;
-  uniqueValues?: FilterUniqueValuesMap;
+  uniqueValues?: { role_unique_values?: RoleUniqueValue[] };
   page: number;
   limit: number;
   totalPages: number;
@@ -34,7 +37,6 @@ interface CreateUserData {
   name?: string;
   phone?: string;
   role_id: string;
-  org_id?: string;
 }
 
 export function useUsers() {

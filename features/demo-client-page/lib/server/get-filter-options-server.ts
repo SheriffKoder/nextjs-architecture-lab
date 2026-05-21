@@ -15,7 +15,7 @@
  * 3. Return configs in the same order as `baseConfigs`.
  */
 
-import type { FilterConfig } from '../../../ui/filters/feature-filtering/components/filter-types'
+import type { FilterConfig } from '../../../url-kit/filters/feature-filtering/components/filter-types'
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 import {
   rentalCarBaseFilters,

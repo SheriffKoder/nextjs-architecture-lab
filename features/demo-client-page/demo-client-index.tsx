@@ -16,18 +16,18 @@
 
 import { useCallback } from 'react'
 import PageHeader from '@/components/layout/page-header'
-import { FiltersHeader } from '@/features/ui/filters/components/filters-header'
-import { PaginationFooter } from '@/features/ui/filters/components/pagination-footer'
-import { LoadingFiltersBar } from '@/features/ui/filters/feature-filtering/components'
-import { useUrlFilters } from '@/features/ui/filters/feature-filtering/hooks/useUrlFilters'
-import { useUrlSorting } from '@/features/ui/filters/feature-sorting/hooks/useUrlSorting'
-import { useUrlPagination } from '@/features/ui/filters/feature-pagination/hooks'
-import ActionButtons from '@/features/demo-rsc-page/components/action-buttons'
+import { FiltersHeader } from '@/features/url-kit/filters/components/filters-header'
+import { PaginationFooter } from '@/features/url-kit/filters/components/pagination-footer'
+import { LoadingFiltersBar } from '@/features/url-kit/filters/feature-filtering/components'
+import { useUrlFilters } from '@/features/url-kit/filters/feature-filtering/hooks/useUrlFilters'
+import { useUrlSorting } from '@/features/url-kit/filters/feature-sorting/hooks/useUrlSorting'
+import { useUrlPagination } from '@/features/url-kit/filters/feature-pagination/hooks'
+import ActionButtons from '@/pages/demo-rsc-page/components/action-buttons'
 
 // Toast Notifications
-import ToastContainer from '@/components/design/toast/toast-container'
-import { ToastPosition, ToastStacking } from '@/components/design/toast/toast'
-import { useToast } from '@/components/design/toast/use-toast'
+import ToastContainer from '@/features/ui-kit/feeback/toast/toast-container'
+import { ToastPosition, ToastStacking } from '@/features/ui-kit/feeback/toast/toast'
+import { useToast } from '@/features/ui-kit/feeback/toast/use-toast'
 
 import {
   rentalCarSearchConfig,

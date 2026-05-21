@@ -1,13 +1,13 @@
 'use client'
-import GlassLoginForm from '@/features/login/components/glass-login-form'
-import '@/features/login/styles/login-background.css'
-import BlurGrid from '@/features/login/components/blur-grid'
+import GlassLoginForm from '@/pages/login/components/glass-login-form'
+import '@/pages/login/styles/login-background.css'
+import BlurGrid from '@/pages/login/components/blur-grid'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks'
 // import '../features/login/styles/login-background.css'
 // import '../features/login/styles/login-background-light.css'
-import '../features/login/styles/main-background.css'
+import '../pages/login/styles/main-background.css'
 
 const page = () => {
   const router = useRouter()

@@ -39,10 +39,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Save, Car, Calendar, DollarSign, Gauge, Hash, MapPin, Tag } from 'lucide-react'
 
 // Components
-import { useToast } from '@/components/design/toast/use-toast'
-import GlassInput from '@/components/design/inputs/glass-input'
-import DropdownSelect from '@/components/design/multi-select/dropdown-select'
-import type { DropdownItem } from '@/components/design/multi-select/utils/types'
+import { useToast } from '@/features/ui-kit/feeback/toast/use-toast'
+import GlassInput from '@/features/ui-kit/inputs/glass-input'
+import DropdownSelect from '@/features/ui-kit/forms/multi-select/dropdown-select'
+import type { DropdownItem } from '@/features/ui-kit/forms/multi-select/utils/types'
 
 // Types
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'

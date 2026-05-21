@@ -1,12 +1,11 @@
-import { INTERNAL_ORG_ID } from "@/lib/constants";
+import { DEFAULT_INTERNAL_ORG_ID } from "@/lib/constants";
 import { createAdminClient } from "@/lib/supabase/server";
-import { getUserData, createUserWithOrgMembership } from "@/lib/utils-server";
+import { getUserData, createUserWithRole, roleFromMembershipRow } from "@/lib/utils-server";
 import { isInternalAdminOrUser } from "@/lib/utils";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * GET /api/users
- * Get all users with optional filters and pagination
+ * GET /api/users — list users with optional filters (role filter only; no org scope).
  */
 export async function GET(request: NextRequest) {
   try {
@@ -20,36 +19,40 @@ export async function GET(request: NextRequest) {
     const nameSearch = searchParams.get("name_search");
     const phoneSearch = searchParams.get("phone_search");
     const roleIdsRaw = searchParams.get("role_ids");
-    const roleIds = roleIdsRaw?.split(",").map((s) => s.trim()).filter(Boolean) ?? null;
-    const orgId = searchParams.get("org_id")?.trim() || null;
+    const roleIds =
+      roleIdsRaw?.split(",").map((s) => s.trim()).filter(Boolean) ?? null;
     const sortParam = searchParams.get("sort");
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10", 10)));
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(searchParams.get("limit") || "10", 10))
+    );
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
     const db = await createAdminClient();
 
-    // Roles with counts (from org_members)
-    let rolesQuery = db.from("roles").select("id, name, key");
-    const { data: allRoles } = await rolesQuery;
+    const { data: allRoles } = await db.from("roles").select("id, name, key");
     const roleCounts: Record<string, number> = {};
-    const countQuery = orgId
-      ? db.from("org_members").select("role_id", { count: "exact", head: false }).eq("org_id", orgId)
-      : db.from("org_members").select("role_id", { count: "exact", head: false });
-    const { data: roleRows } = await countQuery;
+    const { data: roleRows } = await db
+      .from("org_members")
+      .select("role_id")
+      .eq("org_id", DEFAULT_INTERNAL_ORG_ID);
     for (const r of roleRows ?? []) {
       roleCounts[r.role_id] = (roleCounts[r.role_id] ?? 0) + 1;
     }
-    const role_unique_values = (allRoles ?? []).map((r: { id: string; name: string; key: string }) => ({
-      id: r.id,
-      title: r.name || r.key,
-      available: roleCounts[r.id] ?? 0,
-      total: roleCounts[r.id] ?? 0,
-    }));
+    const role_unique_values = (allRoles ?? []).map(
+      (r: { id: string; name: string; key: string }) => ({
+        id: r.id,
+        title: r.name || r.key,
+        available: roleCounts[r.id] ?? 0,
+        total: roleCounts[r.id] ?? 0,
+      })
+    );
 
-    // Build query for users
-    let query = db.from("users").select("id, email, name, phone, created_at, updated_at", { count: "exact" });
+    let query = db
+      .from("users")
+      .select("id, email, name, phone, created_at, updated_at", { count: "exact" });
 
     if (emailSearch) query = query.ilike("email", `%${emailSearch}%`);
     if (nameSearch) query = query.ilike("name", `%${nameSearch}%`);
@@ -57,15 +60,14 @@ export async function GET(request: NextRequest) {
 
     const sortDir = sortParam?.toLowerCase().includes("desc") ? "desc" : "asc";
     const sortCol = sortParam?.toLowerCase().split(":")[0]?.trim() ?? "name";
-    const sortByRole = sortCol === "role" || sortCol === "role_name";
+    query = query.order(sortCol === "name" ? "name" : "created_at", {
+      ascending: sortDir === "asc",
+    });
 
-    if (sortByRole) {
-      query = query.order("id", { ascending: sortDir === "asc" });
-    } else {
-      query = query.order(sortCol === "name" ? "name" : "created_at", { ascending: sortDir === "asc" });
-    }
-
-    const { data: userRows, error: listError, count } = await query.range(from, to);
+    const { data: userRows, error: listError, count } = await query.range(
+      from,
+      to
+    );
 
     if (listError) {
       return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
@@ -74,69 +76,65 @@ export async function GET(request: NextRequest) {
     let users = userRows ?? [];
     let total = count ?? 0;
 
-    if (orgId || (roleIds && roleIds.length > 0)) {
-      const userIds = users.map((u: any) => u.id);
-      let memQuery = db.from("org_members").select("user_id, org_id, role_id, orgs(*), roles(*)");
-      memQuery = memQuery.in("user_id", userIds.length ? userIds : ["00000000-0000-0000-0000-000000000000"]);
-      if (orgId) memQuery = memQuery.eq("org_id", orgId);
-      if (roleIds && roleIds.length > 0) memQuery = memQuery.in("role_id", roleIds);
-      const { data: mems } = await memQuery;
-      const allowedUserIds = new Set((mems ?? []).map((m: any) => m.user_id));
-      users = users.filter((u: any) => allowedUserIds.has(u.id));
-      if (!sortByRole) {
-        const countQuery2 = db.from("users").select("id", { count: "exact", head: true });
-        if (emailSearch) countQuery2.ilike("email", `%${emailSearch}%`);
-        if (nameSearch) countQuery2.ilike("name", `%${nameSearch}%`);
-        if (phoneSearch) countQuery2.ilike("phone", `%${phoneSearch}%`);
-        const { count: totalCount } = await countQuery2;
-        total = totalCount ?? 0;
-      }
+    if (roleIds && roleIds.length > 0) {
+      const userIds = users.map((u: { id: string }) => u.id);
+      const { data: mems } = await db
+        .from("org_members")
+        .select("user_id, role_id, roles(id, name, key)")
+        .in(
+          "user_id",
+          userIds.length ? userIds : ["00000000-0000-0000-0000-000000000000"]
+        )
+        .eq("org_id", DEFAULT_INTERNAL_ORG_ID)
+        .in("role_id", roleIds);
+      const allowedUserIds = new Set((mems ?? []).map((m) => m.user_id));
+      users = users.filter((u: { id: string }) => allowedUserIds.has(u.id));
     }
 
-    const userIds = users.map((u: any) => u.id);
+    const userIds = users.map((u: { id: string }) => u.id);
     const { data: memberships } = await db
       .from("org_members")
-      .select("user_id, org_id, role_id, created_at, orgs(*), roles(*)")
-      .in("user_id", userIds.length ? userIds : ["00000000-0000-0000-0000-000000000000"]);
+      .select("user_id, role_id, roles(id, name, key)")
+      .eq("org_id", DEFAULT_INTERNAL_ORG_ID)
+      .in(
+        "user_id",
+        userIds.length ? userIds : ["00000000-0000-0000-0000-000000000000"]
+      );
 
-    const memByUser: Record<string, any[]> = {};
+    const roleByUser: Record<string, ReturnType<typeof roleFromMembershipRow>> = {};
     for (const m of memberships ?? []) {
-      const uid = m.user_id;
-      if (!memByUser[uid]) memByUser[uid] = [];
-      memByUser[uid].push({
-        org_id: m.org_id,
-        user_id: m.user_id,
-        role_id: m.role_id,
-        created_at: m.created_at,
-        org: m.orgs,
-        role: m.roles,
-      });
+      const mapped = roleFromMembershipRow(
+        m as Parameters<typeof roleFromMembershipRow>[0]
+      );
+      if (mapped) roleByUser[m.user_id] = mapped;
     }
 
-    const data = users.map((u: any) => ({
+    const data = users.map((u: { id: string }) => ({
       ...u,
-      org_memberships: memByUser[u.id] ?? [],
+      role: roleByUser[u.id] ?? null,
     }));
 
     const totalPages = Math.ceil(total / limit);
 
-    return NextResponse.json({
-      data,
-      total,
-      uniqueValues: { role_unique_values },
-      page,
-      limit,
-      totalPages,
-    }, { status: 200 });
-  } catch (error: any) {
+    return NextResponse.json(
+      {
+        data,
+        total,
+        uniqueValues: { role_unique_values },
+        page,
+        limit,
+        totalPages,
+      },
+      { status: 200 }
+    );
+  } catch (error: unknown) {
     console.error("Error fetching users:", error);
     return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
   }
 }
 
 /**
- * POST /api/users
- * Create a new user (Supabase Auth + public.users) and org_members relation
+ * POST /api/users — create user with role (default internal org in DB only).
  */
 export async function POST(request: NextRequest) {
   try {
@@ -146,24 +144,24 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { email, password, name, phone, role_id, org_id } = body;
+    const { email, password, name, phone, role_id } = body;
 
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Email and password are required" },
+        { status: 400 }
+      );
     }
     if (!role_id) {
       return NextResponse.json({ error: "role_id is required" }, { status: 400 });
     }
 
-    const orgId = org_id ?? INTERNAL_ORG_ID;
-
-    const result = await createUserWithOrgMembership({
+    const result = await createUserWithRole({
       email,
       password,
       name: name ?? null,
       phone: phone ?? null,
       role_id,
-      org_id: orgId,
     });
 
     if (!result.ok) {
@@ -171,7 +169,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(result.user, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating user:", error);
     return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
   }

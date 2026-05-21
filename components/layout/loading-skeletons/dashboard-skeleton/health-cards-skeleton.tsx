@@ -8,7 +8,7 @@
  * Single Responsibility: Only handles health cards skeleton layout
  */
 
-import LoadingValue from '@/components/design/inputs/loading-value'
+import LoadingValue from '@/features/ui-kit/layout/loading-value'
 
 interface HealthCardsSkeletonProps {
   /** Number of cards to display (default: 6) */

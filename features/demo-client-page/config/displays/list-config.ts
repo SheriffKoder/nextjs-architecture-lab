@@ -7,10 +7,10 @@
  */
 
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
-import type { TableConfig, HeaderFilterConfig } from '@/features/filtering-wrapper-multi-display-clean/types'
+import type { TableConfig, HeaderFilterConfig } from '@/features/multi-view/types'
 import { demoRscEditableColumnKeys } from '../cells/rental-car-location-options'
-import type { GroupConfig } from '@/features/filtering-wrapper-multi-display-clean/features/virtualized-list/utils/grouping-utils'
-import type { SortConfig } from '@/features/ui/filters/feature-sorting/types'
+import type { GroupConfig } from '@/features/multi-view/features/virtualized-list/utils/grouping-utils'
+import type { SortConfig } from '@/features/url-kit/filters/feature-sorting/types'
 
 ////////////////////////////////////
 // List Display Configuration

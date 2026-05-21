@@ -8,9 +8,9 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { FilteringWrapper } from '@/features/filtering-wrapper-multi-display-clean/filtering-wrapper'
-import type { SubheadingsUpdateContext } from '@/features/filtering-wrapper-multi-display-clean/features/subheadings/dnd'
-import type { FilterConfig } from '@/features/ui/filters/feature-filtering/components/filter-types'
+import { FilteringWrapper } from '@/features/multi-view/filtering-wrapper'
+import type { SubheadingsUpdateContext } from '@/features/multi-view/features/subheadings/dnd'
+import type { FilterConfig } from '@/features/url-kit/filters/feature-filtering/components/filter-types'
 
 import { minimalControlsConfig } from './config/minimal-controls-config'
 import { tableConfig } from './config/displays/table-config'

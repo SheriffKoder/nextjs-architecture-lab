@@ -27,7 +27,7 @@
  */
 
 import type { RentalCarTableItem } from '../../../types/rental-car-table-item'
-import { decodeUrlParamListWithKnownMultiSelect } from '@/features/ui/filters/feature-filtering/utils/url-param-list-codec'
+import { decodeUrlParamListWithKnownMultiSelect } from '@/features/url-kit/filters/feature-filtering/utils/url-param-list-codec'
 import { filterBySearch } from './filter-by-search'
 import {
   rentalCarFieldMap,

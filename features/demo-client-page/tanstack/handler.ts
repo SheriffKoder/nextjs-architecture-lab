@@ -16,8 +16,8 @@
 import type { RentalCarTableItem } from '../types/rental-car-table-item'
 import type { RentalCarEditFormValues } from '../validation/rental-car-edit-form-schema'
 import type { RentalCarListQuery } from './key-factory'
-import type { FilterConfig } from '@/features/ui/filters/feature-filtering/components/filter-types'
-import { encodeUrlParamList } from '@/features/ui/filters/feature-filtering/utils/url-param-list-codec'
+import type { FilterConfig } from '@/features/url-kit/filters/feature-filtering/components/filter-types'
+import { encodeUrlParamList } from '@/features/url-kit/filters/feature-filtering/utils/url-param-list-codec'
 
 const PAGE_CLIENT_PATH = '/api/demo-client-page/page-client'
 const OPTIONS_PATH = '/api/demo-client-page/options'

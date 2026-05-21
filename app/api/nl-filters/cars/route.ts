@@ -13,17 +13,17 @@ import { z } from 'zod'
 import {
   buildNlFilterSystemPrompt,
   buildNlFilterUserContent,
-} from '@/features/ui/ai-filter/config/nl-filter-openai-messages'
+} from '@/features/url-kit/ai-filter/config/nl-filter-openai-messages'
 import {
   nlFilterResponseSchema,
   type NlFilterResponse,
-} from '@/features/ui/ai-filter/lib/nl-filter-response-schema'
+} from '@/features/url-kit/ai-filter/lib/nl-filter-response-schema'
 import {
   buildClearAllFilterPatches,
   isClearAllFiltersIntent,
-} from '@/features/ui/ai-filter/lib/nl-filter-clear-helpers'
-import { sanitizeNlFilterResponse } from '@/features/ui/ai-filter/lib/sanitize-nl-filter-response'
-import type { NlFilterCatalogEntry } from '@/features/ui/ai-filter/types/nl-filter-assistant'
+} from '@/features/url-kit/ai-filter/lib/nl-filter-clear-helpers'
+import { sanitizeNlFilterResponse } from '@/features/url-kit/ai-filter/lib/sanitize-nl-filter-response'
+import type { NlFilterCatalogEntry } from '@/features/url-kit/ai-filter/types/nl-filter-assistant'
 
 const nlFilterTypeSchema = z.enum([
   'multi-select',

@@ -6,16 +6,16 @@ import * as React from "react";
 import {
   badgeSemanticPalettes,
   type BadgeSemantic,
-} from "@/features/ui/badges/badge-semantic-palettes";
-import { RoundedIconBadge } from "@/features/ui/badges/rounded-icon-badge";
-import { RoundedDotBadge } from "@/features/ui/badges/rounded-dot-badge";
-import { RoundedBadge } from "@/features/ui/badges/rounded-badge";
-import { SemiRoundedBadge } from "@/features/ui/badges/semi-rounded-badge";
+} from "@/features/ui-kit/badges/badge-semantic-palettes";
+import { RoundedIconBadge } from "@/features/ui-kit/badges/rounded-icon-badge";
+import { RoundedDotBadge } from "@/features/ui-kit/badges/rounded-dot-badge";
+import { RoundedBadge } from "@/features/ui-kit/badges/rounded-badge";
+import { SemiRoundedBadge } from "@/features/ui-kit/badges/semi-rounded-badge";
 
 import {
   RentalCarStatus,
   type RentalCarStatusValue,
-} from "@/features/demo-rsc-page/types/rental-car-status";
+} from "@/features/cars-rsc/types/rental-car-status";
 
 const rentalCarStatusLabels: Record<RentalCarStatusValue, string> = {
   [RentalCarStatus.AVAILABLE]: "Available",

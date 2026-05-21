@@ -12,7 +12,7 @@
  * - Charts Row: Line Chart (left) | Pie Chart (right)
  */
 
-import LoadingValue from '@/components/design/inputs/loading-value'
+import LoadingValue from '@/features/ui-kit/layout/loading-value'
 import HealthCardsSkeleton from './health-cards-skeleton'
 import NotificationCardsSkeleton from './notification-cards-skeleton'
 import ChartsSkeleton from './charts-skeleton'

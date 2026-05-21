@@ -17,7 +17,7 @@
  * 3. For supported branches, delegate to getUniqueValuesForField and merge options into the config.
  */
 
-import type { FilterConfig, FilterOption } from '../../../../ui/filters/feature-filtering/components/filter-types'
+import type { FilterConfig, FilterOption } from '../../../../url-kit/filters/feature-filtering/components/filter-types'
 
 type DataRecord = Record<string, any>
 

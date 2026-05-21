@@ -13,9 +13,9 @@
  *           not just minimal controls, so it's kept separate for better separation of concerns
  */
 
-import type { SortConfig } from "../../ui/filters/feature-sorting/types"
-import type { FilterField } from "../../ui/filters/feature-query-builder-filter/types/field"
-import type { SearchConfig } from "../../ui/filters/feature-filtering/components/search-types"
+import type { SortConfig } from "../../url-kit/filters/feature-sorting/types"
+import type { FilterField } from "../../url-kit/filters/feature-query-builder-filter/types/field"
+import type { SearchConfig } from "../../url-kit/filters/feature-filtering/components/search-types"
 import { rentalCarSearchConfig } from "./header-filters-config"
 
 //////////////////////////////////

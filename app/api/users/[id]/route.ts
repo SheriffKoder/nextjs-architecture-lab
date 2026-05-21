@@ -1,9 +1,8 @@
+import { DEFAULT_INTERNAL_ORG_ID } from "@/lib/constants";
 import { createAdminClient } from "@/lib/supabase/server";
-import { getUserData } from "@/lib/utils-server";
+import { getUserData, roleFromMembershipRow } from "@/lib/utils-server";
 import { isInternalAdmin, isInternalAdminOrUser } from "@/lib/utils";
 import { NextResponse, type NextRequest } from "next/server";
-
-const DEFAULT_ORG_ID = "019be079-d528-77ad-bb2b-2c7590149e3b";
 
 /**
  * GET /api/users/[id]
@@ -21,7 +20,11 @@ export async function GET(
     }
 
     const db = await createAdminClient();
-    const { data: user, error: userError } = await db.from("users").select("*").eq("id", id).single();
+    const { data: user, error: userError } = await db
+      .from("users")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (userError || !user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -29,19 +32,17 @@ export async function GET(
 
     const { data: memberships } = await db
       .from("org_members")
-      .select("org_id, user_id, role_id, created_at, orgs(*), roles(*)")
-      .eq("user_id", id);
-    const org_memberships = (memberships ?? []).map((m: any) => ({
-      org_id: m.org_id,
-      user_id: m.user_id,
-      role_id: m.role_id,
-      created_at: m.created_at,
-      org: m.orgs,
-      role: m.roles,
-    }));
+      .select("role_id, roles(id, name, key)")
+      .eq("user_id", id)
+      .eq("org_id", DEFAULT_INTERNAL_ORG_ID)
+      .limit(1);
 
-    return NextResponse.json({ ...user, org_memberships }, { status: 200 });
-  } catch (error: any) {
+    const role = memberships?.[0]
+      ? roleFromMembershipRow(memberships[0] as Parameters<typeof roleFromMembershipRow>[0])
+      : null;
+
+    return NextResponse.json({ ...user, role }, { status: 200 });
+  } catch (error: unknown) {
     console.error("Error fetching user:", error);
     return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
   }
@@ -63,15 +64,20 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, email, phone, role_id: bodyRoleId, org_id: bodyOrgId } = body;
+    const { name, email, phone, role_id: bodyRoleId } = body;
 
     const db = await createAdminClient();
 
-    // check if the email changed
-    /////// Fetch auth user
-    const {data: existingUser, error: existingUserError} =await db.from("users").select("*").eq("id", id).single();
+    const { data: existingUser, error: existingUserError } = await db
+      .from("users")
+      .select("*")
+      .eq("id", id)
+      .single();
     if (existingUserError) {
-      return NextResponse.json({ error: existingUserError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: existingUserError.message },
+        { status: 500 }
+      );
     }
 
     const updateData: Record<string, unknown> = {};
@@ -80,41 +86,64 @@ export async function PUT(
     if (phone !== undefined) updateData.phone = phone ?? null;
 
     if (Object.keys(updateData).length > 0) {
-      const { error: updateError } = await db.from("users").update(updateData).eq("id", id);
+      const { error: updateError } = await db
+        .from("users")
+        .update(updateData)
+        .eq("id", id);
       if (updateError) {
         return NextResponse.json({ error: updateError.message }, { status: 500 });
       }
 
-      /////// Update auth user if email is changed
       if (email !== existingUser?.email) {
-        const { error: updateAuthError } = await db.auth.admin.updateUserById(id, { email: email });
+        const { error: updateAuthError } = await db.auth.admin.updateUserById(id, {
+          email: email,
+        });
         if (updateAuthError) {
-          return NextResponse.json({ error: updateAuthError.message }, { status: 500 });
+          return NextResponse.json(
+            { error: updateAuthError.message },
+            { status: 500 }
+          );
         }
       }
     }
 
     if (bodyRoleId != null) {
-      const orgId = bodyOrgId ?? DEFAULT_ORG_ID;
-      await db.from("org_members").update({ role_id: bodyRoleId }).eq("user_id", id).eq("org_id", orgId);
+      const { data: existingMem } = await db
+        .from("org_members")
+        .select("org_id")
+        .eq("user_id", id)
+        .eq("org_id", DEFAULT_INTERNAL_ORG_ID)
+        .maybeSingle();
+
+      if (existingMem) {
+        await db
+          .from("org_members")
+          .update({ role_id: bodyRoleId })
+          .eq("user_id", id)
+          .eq("org_id", DEFAULT_INTERNAL_ORG_ID);
+      } else {
+        await db.from("org_members").insert({
+          org_id: DEFAULT_INTERNAL_ORG_ID,
+          user_id: id,
+          role_id: bodyRoleId,
+        });
+      }
     }
 
     const { data: user } = await db.from("users").select("*").eq("id", id).single();
     const { data: memberships } = await db
       .from("org_members")
-      .select("org_id, user_id, role_id, created_at, orgs(*), roles(*)")
-      .eq("user_id", id);
-    const org_memberships = (memberships ?? []).map((m: any) => ({
-      org_id: m.org_id,
-      user_id: m.user_id,
-      role_id: m.role_id,
-      created_at: m.created_at,
-      org: m.orgs,
-      role: m.roles,
-    }));
+      .select("role_id, roles(id, name, key)")
+      .eq("user_id", id)
+      .eq("org_id", DEFAULT_INTERNAL_ORG_ID)
+      .limit(1);
 
-    return NextResponse.json({ ...user, org_memberships }, { status: 200 });
-  } catch (error: any) {
+    const role = memberships?.[0]
+      ? roleFromMembershipRow(memberships[0] as Parameters<typeof roleFromMembershipRow>[0])
+      : null;
+
+    return NextResponse.json({ ...user, role }, { status: 200 });
+  } catch (error: unknown) {
     console.error("Error updating user:", error);
     return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
   }
@@ -122,8 +151,6 @@ export async function PUT(
 
 /**
  * DELETE /api/users/[id]
- * Deletes the user from auth.users only. The public.users row is removed automatically
- * (e.g. via database trigger or Supabase behavior).
  */
 export async function DELETE(
   request: NextRequest,
@@ -132,7 +159,6 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // Authorization - Internal admin only
     const userData = await getUserData(request);
     if (!isInternalAdmin(userData)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
@@ -145,7 +171,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ message: "User deleted successfully" }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting user:", error);
     return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
   }

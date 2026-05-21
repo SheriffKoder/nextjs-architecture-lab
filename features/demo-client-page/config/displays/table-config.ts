@@ -11,7 +11,7 @@
  * It should only describe columns, cell renderers, and which props they expect.
  */
 
-import type { TableConfig } from "@/features/filtering-wrapper-multi-display-clean/types";
+import type { TableConfig } from "@/features/multi-view/types";
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 import { demoRscEditableColumnKeys } from '../cells/rental-car-location-options'
 

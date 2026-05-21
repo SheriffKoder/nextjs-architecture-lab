@@ -1,4 +1,4 @@
-import Profile from '@/features/profile'
+import Profile from '@/pages/profile-page'
 import React from 'react'
 
 const page = () => {
