@@ -1,7 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { NextResponse, type NextRequest } from "next/server";
-import { DEFAULT_INTERNAL_ORG_ID } from "@/lib/constants";
-import { roleFromMembershipRow } from "@/lib/utils-server";
+import { DEFAULT_INTERNAL_ORG_ID } from "@/features/auth";
+import { roleFromMembershipRow } from "@/features/auth/server";
 
 /**
  * POST /api/auth/login

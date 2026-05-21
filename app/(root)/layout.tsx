@@ -2,9 +2,9 @@
 
 import SidebarHeader from '@/components/side-nav/components/side-nav'
 import { SidebarProvider, useSidebar } from '@/components/side-nav/contexts/sidebar-context'
-import { User } from '@/lib/types'
+import { User } from '@/features/auth'
 import React, { Suspense, useEffect, useState } from 'react'
-import { useAppSelector } from '@/lib/store/hooks'
+import { useAppSelector } from '@/features/auth/store/hooks'
 import '@/pages/login/styles/main-background.css'
 
 function SidebarHeaderFallback() {

@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react'
 import { Users } from 'lucide-react'
 import DropdownSelect from './dropdown-select'
 import { getLabelClassName } from './utils/label-config'
-import { useUsers } from '@/hooks'
+import { useUsers } from '@/features/auth'
 
 interface DropdownItem {
   id: string | number

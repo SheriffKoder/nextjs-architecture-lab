@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRoles } from '@/hooks/useRoles';
-import { useAppSelector } from '@/lib/store/hooks';
+import { useRoles } from '@/features/auth/roles/hooks/useRoles';
+import { useAppSelector } from '@/features/auth/store/hooks';
 
 /**
  * RolesLoader component

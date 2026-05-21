@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { ReduxProvider } from "@/lib/store/ReduxProvider";
+import { ReduxProvider } from "@/features/auth/store/ReduxProvider";
 import DevelopmentToggle from "@/components/development-toggle/development-toggle";
-import { SessionRestorer } from "@/components/session-restorer";
-import { RolesLoader } from "@/components/roles-loader";
+import { SessionRestorer } from "@/features/auth/session/components/session-restorer";
+import { RolesLoader } from "@/features/auth/roles/components/roles-loader";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL

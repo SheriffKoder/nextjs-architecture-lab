@@ -7,7 +7,7 @@ import DetailRow from '@/features/ui-kit/layout/detail-row'
 import EditableAvatar from './components/editable-avatar'
 import PersonalInformationForm from './components/personal-information-form'
 import { User, UserIcon, Mail, Phone, Calendar } from 'lucide-react'
-import { useAppSelector } from '@/lib/store/hooks'
+import { useAppSelector } from '@/features/auth/store/hooks'
 import { format } from 'date-fns'
 
 const Profile = () => {

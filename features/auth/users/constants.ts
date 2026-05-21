@@ -1,8 +1,3 @@
-export enum RoleEnum {
-  ADMIN = "admin",
-  USER = "user",
-}
-
 /**
  * Single internal org row for `org_members` when the product does not expose multi-tenant orgs.
  * Server-only — do not surface org pickers or org_id in public APIs.

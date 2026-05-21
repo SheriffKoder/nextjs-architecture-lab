@@ -25,7 +25,7 @@ import {
   useState,
   type ChangeEvent,
 } from "react";
-import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number";
+import type { EditableGroupedNumberConfig } from "@/lib/number-formatters/format-grouped-number";
 import { applyGroupedNumberInputChange } from "./apply-grouped-number-input-change";
 import {
   formatGroupedFieldValue,

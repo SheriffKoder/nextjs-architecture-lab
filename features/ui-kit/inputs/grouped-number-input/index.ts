@@ -10,7 +10,7 @@
  * 1. Re-export types and implementations from sibling modules.
  */
 
-export type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number";
+export type { EditableGroupedNumberConfig } from "@/lib/number-formatters/format-grouped-number";
 export { applyGroupedNumberInputChange } from "./apply-grouped-number-input-change";
 export {
   commitGroupedNumberInput,

@@ -17,7 +17,7 @@
  */
 
 import React, { forwardRef } from "react";
-import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number";
+import type { EditableGroupedNumberConfig } from "@/lib/number-formatters/format-grouped-number";
 import { useGroupedNumberInput } from "./use-grouped-number-input";
 
 export type GroupedNumberInputProps = Omit<

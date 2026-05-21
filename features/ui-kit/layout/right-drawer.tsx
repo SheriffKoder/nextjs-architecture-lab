@@ -3,7 +3,7 @@
 import React, { useSyncExternalStore } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useResizableWidth } from '@/hooks/useResizableWidth'
+import { useResizableWidth } from '@/hooks'
 
 export interface RightDrawerProps {
   isOpen: boolean

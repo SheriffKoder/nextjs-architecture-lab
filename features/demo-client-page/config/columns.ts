@@ -14,7 +14,7 @@ import {
   rentalCarLocationDropdownOptions,
   rentalCarLocationFormat,
 } from "./cells/rental-car-location-options";
-import { formatGroupedInteger, formatGroupedNumber } from "@/utils/number-formatters/format-grouped-number";
+import { formatGroupedInteger, formatGroupedNumber } from "@/lib/number-formatters/format-grouped-number";
 
 ////////////////////////////////////
 // Centralized Column Definitions: All columns defined once

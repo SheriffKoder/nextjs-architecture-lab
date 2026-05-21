@@ -7,8 +7,8 @@
  */
 
 import React from "react";
-import { AllocationStatusEnum, ProjectStatusEnum } from '@/lib/constants';
-import { capitalizeAllFirstLetters } from '@/utils/formatters';
+import { AllocationStatusEnum, ProjectStatusEnum } from '@/features/multi-view/constants/status-enums';
+import { capitalizeAllFirstLetters } from '@/lib/formatters';
 
 interface StatusBadgeProps {
   status: string | null | undefined;

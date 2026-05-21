@@ -6,7 +6,7 @@
 
 import React from "react"
 import type { DropdownOption } from "../../../types/dropdown"
-import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number"
+import type { EditableGroupedNumberConfig } from "@/lib/number-formatters/format-grouped-number"
 
 export interface TableColumn<T = unknown> {
   key: string

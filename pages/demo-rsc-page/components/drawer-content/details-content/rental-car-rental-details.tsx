@@ -7,7 +7,7 @@ import {
   capitalizeAllFirstLetters,
   formatCurrency,
   formatDate,
-} from '@/utils/formatters'
+} from '@/lib/formatters'
 import type { RentalCarTableItem } from '../../../../../features/cars-rsc/types/rental-car-table-item'
 
 export interface RentalCarRentalDetailsProps {

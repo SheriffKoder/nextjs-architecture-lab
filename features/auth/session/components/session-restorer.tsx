@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
-import { setUser, setLoading } from '@/lib/store/slices/userSlice';
-import { User, UserRole } from '@/lib/types';
+import { createClient } from '@/features/auth/supabase/client';
+import { useAppDispatch, useAppSelector } from '@/features/auth/store/hooks';
+import { setUser, setLoading } from '@/features/auth/store/slices/userSlice';
+import type { User } from '@/features/auth/users/types';
+import type { UserRole } from '@/features/auth/roles/types';
 
 /**
  * Restores Redux user + role from Supabase session via GET /api/users/me.

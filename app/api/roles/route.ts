@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { getUserData } from "@/lib/utils-server";
-import { isInternalAdminOrUser } from "@/lib/utils";
+import { getUserData } from "@/features/auth/server";
+import { isInternalAdminOrUser } from "@/features/auth/roles/authorization";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**

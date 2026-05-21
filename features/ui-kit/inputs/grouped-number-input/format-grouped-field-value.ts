@@ -16,11 +16,11 @@
  * 2. formatGroupedFieldValue: guard empty/non-finite, branch allowDecimals → Intl grouped number vs integer.
  */
 
-import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number";
+import type { EditableGroupedNumberConfig } from "@/lib/number-formatters/format-grouped-number";
 import {
   formatGroupedInteger,
   formatGroupedNumber,
-} from "@/utils/number-formatters/format-grouped-number";
+} from "@/lib/number-formatters/format-grouped-number";
 
 /**
  * Plain numeric string (no thousands separators) for `variant: "plainNumber"` in the hook.

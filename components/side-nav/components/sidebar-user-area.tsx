@@ -19,9 +19,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { User, Download, LogOut } from 'lucide-react'
 import UserAvatar from './user-avatar'
-import { User as UserType } from '@/lib/types'
+import { User as UserType } from '@/features/auth'
 import { ThemeSwitcher } from '@/components/theme-switcher'
-import { useAuth } from '@/hooks'
+import { useAuth } from '@/features/auth'
 
 interface SidebarUserAreaProps {
   isCollapsed: boolean

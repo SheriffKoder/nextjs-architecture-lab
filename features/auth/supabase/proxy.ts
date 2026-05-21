@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { hasEnvVars } from "../utils";
+import { hasEnvVars } from "@/lib/utils";
 
 function isProxyAuthDisabled() {
   const v = process.env.DISABLE_PROXY_AUTH?.trim().toLowerCase();

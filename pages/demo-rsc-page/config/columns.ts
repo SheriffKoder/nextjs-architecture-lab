@@ -16,7 +16,7 @@ import {
   rentalCarLocationDropdownOptions,
   rentalCarLocationFormat,
 } from "./cells/rental-car-location-options";
-import { formatGroupedInteger, formatGroupedNumber } from "@/utils/number-formatters/format-grouped-number";
+import { formatGroupedInteger, formatGroupedNumber } from "@/lib/number-formatters/format-grouped-number";
 import { rentalCarSetActivityCell } from './cells/rental-car-set-activity-cell';
 
 ////////////////////////////////////

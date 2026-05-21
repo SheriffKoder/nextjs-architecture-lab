@@ -1,7 +1,7 @@
-import { DEFAULT_INTERNAL_ORG_ID } from "@/lib/constants";
-import { createAdminClient } from "@/lib/supabase/server";
-import { getUserData, roleFromMembershipRow } from "@/lib/utils-server";
-import { isInternalAdmin, isInternalAdminOrUser } from "@/lib/utils";
+import { DEFAULT_INTERNAL_ORG_ID } from "@/features/auth/users/constants";
+import { createAdminClient } from "@/features/auth/supabase/server";
+import { getUserData, roleFromMembershipRow } from "@/features/auth/server";
+import { isInternalAdmin, isInternalAdminOrUser } from "@/features/auth/roles/authorization";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**

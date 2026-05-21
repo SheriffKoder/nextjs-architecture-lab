@@ -13,8 +13,8 @@
  * 2. Export configuration for use in components
  */
 
-import { RoleEnum } from '@/lib/constants'
-import { Role } from '@/lib/types'
+import { RoleEnum } from '@/features/auth'
+import { Role } from '@/features/auth'
 
 /**
  * Available roles configuration

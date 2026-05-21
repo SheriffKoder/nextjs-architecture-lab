@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { User } from '@/lib/types';
-import { buildQueryParams } from '@/lib/utils';
+import type { User } from '@/features/auth/users/types';
+import { buildQueryParams } from '@/features/auth/users/utils';
 type RoleUniqueValue = {
   id: string;
   title: string;

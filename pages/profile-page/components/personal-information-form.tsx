@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import GlassInput from '@/features/ui-kit/inputs/glass-input'
 import PrimaryButton from '@/features/ui-kit/buttons/primary-button'
 import { User, Phone, Lock, Save, Edit } from 'lucide-react'
-import { User as UserType } from '@/lib/types'
+import { User as UserType } from '@/features/auth'
 
 interface PersonalInformationFormProps {
   user: UserType

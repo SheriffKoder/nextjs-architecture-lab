@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
-import { setRoles, setLoading, setError } from '@/lib/store/slices/roleSlice';
-import { Role } from '@/lib/types';
+import { useAppDispatch, useAppSelector } from '@/features/auth/store/hooks';
+import { setRoles, setLoading, setError } from '@/features/auth/store/slices/roleSlice';
+import type { Role } from '@/features/auth/roles/types';
 
 interface GetRolesResponse {
   data: Role[];

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
-import { setUser, clearUser, setLoading } from '@/lib/store/slices/userSlice';
-import { User, UserRole } from '@/lib/types';
+import { useAppDispatch, useAppSelector } from '@/features/auth/store/hooks';
+import { setUser, clearUser, setLoading } from '@/features/auth/store/slices/userSlice';
+import type { User } from '@/features/auth/users/types';
+import type { UserRole } from '@/features/auth/roles/types';
 
 interface LoginCredentials {
   email: string;

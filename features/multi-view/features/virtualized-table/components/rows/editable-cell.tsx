@@ -25,7 +25,7 @@ import {
   formatGroupedFieldValue,
   useGroupedNumberInput,
 } from '@/features/ui-kit/inputs/grouped-number-input';
-import type { EditableGroupedNumberConfig } from '@/utils/number-formatters/format-grouped-number';
+import type { EditableGroupedNumberConfig } from '@/lib/number-formatters/format-grouped-number';
 
 /**
  * Format number to 2 decimal places for display

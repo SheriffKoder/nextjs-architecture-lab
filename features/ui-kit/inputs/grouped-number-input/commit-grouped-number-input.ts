@@ -16,8 +16,8 @@
  * 2. commitPlainNumericInput: trim → Number → null if NaN (empty string yields 0, matching `Number("")`).
  */
 
-import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number";
-import { groupedInputToNumber } from "@/utils/number-formatters/parse-grouped-number-input";
+import type { EditableGroupedNumberConfig } from "@/lib/number-formatters/format-grouped-number";
+import { groupedInputToNumber } from "@/lib/number-formatters/parse-grouped-number-input";
 
 /**
  * Parses grouped display text to a number; `null` when input is incomplete or non-finite.

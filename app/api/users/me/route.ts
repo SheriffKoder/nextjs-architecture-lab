@@ -1,4 +1,4 @@
-import { getUserData } from "@/lib/utils-server";
+import { getUserData } from "@/features/auth/server";
 import { connection } from "next/server";
 import { NextResponse, type NextRequest } from "next/server";
 

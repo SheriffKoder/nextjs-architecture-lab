@@ -16,17 +16,17 @@
  * 3. Else: integer-only path — parse int segment, truncate, format with grouping.
  */
 
-import type { EditableGroupedNumberConfig } from "@/utils/number-formatters/format-grouped-number";
+import type { EditableGroupedNumberConfig } from "@/lib/number-formatters/format-grouped-number";
 import {
   appendTrailingThousandsComma,
   formatGroupedInteger,
   formatGroupedNumber,
-} from "@/utils/number-formatters/format-grouped-number";
+} from "@/lib/number-formatters/format-grouped-number";
 import {
   groupedInputIntegerEndsWithComma,
   normalizeCalculatorDecimalRaw,
   parseRawGroupedNumberInput,
-} from "@/utils/number-formatters/parse-grouped-number-input";
+} from "@/lib/number-formatters/parse-grouped-number-input";
 
 /**
  * Computes the next visible input string after the user typed `next`.
