@@ -24,6 +24,7 @@ import { FilteringWrapper } from '@/features/multi-view/filtering-wrapper'
 // Individual Display configs (different types of UI layouts)
 // Configs
 import { minimalControlsConfig } from './config/minimal-controls-config'
+import { DEMO_RSC_USE_ALL_ITEMS_VIEWS } from './config/demo-rsc-views-config'
 import { tableConfig } from './config/displays/table-config'
 import { accordionConfig } from './config/accordion-config'
 import { tableColumns } from './config/columns'
@@ -202,6 +203,8 @@ export default function DemoRscContent({
           setActivity: setActivityColumnAction,
         }}
         minimalControlsConfig={minimalControlsConfig}
+        useAllItems={[...DEMO_RSC_USE_ALL_ITEMS_VIEWS]}
+        defaultPageSize={10}
         availableViews={['table', 'kanban', 'calendar', 'map', 'timeline', 'subheadings', 'list']}
         tableConfig={{
           ...tableConfig,

@@ -11,7 +11,7 @@ import { serializeFiltersForNlCatalog } from '@/features/url-kit/ai-filter/lib/s
 import {
   NL_FILTER_ALLOWED_SORT_KEYS,
   NL_FILTER_EXCLUDED_URL_KEYS,
-} from '@/pages/demo-rsc-page/config/nl-filter-assistant-config'
+} from '@/screens/demo-rsc-page/config/nl-filter-assistant-config'
 import {
   rentalCarSearchConfig,
   rentalCarFiltersHeaderConfig,

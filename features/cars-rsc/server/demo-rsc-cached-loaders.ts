@@ -27,7 +27,7 @@
 
 import { unstable_cache } from 'next/cache'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
-import { rentalCarBaseFilters } from '../../../pages/demo-rsc-page/config/header-filters-config'
+import { rentalCarBaseFilters } from '../../../screens/demo-rsc-page/config/header-filters-config'
 import { buildRentalCarListQuery } from '@/features/cars-rsc/lib/build-rental-car-list-query'
 import type { RentalCarTableItem } from '../types/rental-car-table-item'
 import type { FilterConfig } from '@/features/url-kit/filters/feature-filtering/components/filter-types'
@@ -76,32 +76,32 @@ export const getFilters =
 // 2. Build `RentalCarListQuery` from URL-shaped record.
 // 3. Delegate to `getRentalCarsData` (filter → sort → paginate + simulated delay in that module).
 //////////////////////////////////
-export const getCars =
-  async (dataParamsKey: string): Promise<RentalCarsPagePayload> => {
-    // 1. Deserialize cache key so list logic never sees drawer/mode/id chrome
-    const params = JSON.parse(dataParamsKey) as DemoRscPageSearchParams
+// export const getCars =
+//   async (dataParamsKey: string): Promise<RentalCarsPagePayload> => {
+//     // 1. Deserialize cache key so list logic never sees drawer/mode/id chrome
+//     const params = JSON.parse(dataParamsKey) as DemoRscPageSearchParams
 
-    // 2. Same URL → query mapping as client parity (`buildRentalCarListQuery`)
-    const query = buildRentalCarListQuery(params)
+//     // 2. Same URL → query mapping as client parity (`buildRentalCarListQuery`)
+//     const query = buildRentalCarListQuery(params)
 
-    // 3. Produce `{ cars, pagination }` for `DemoRscContent` + footer
-    return getRentalCarsData(query)
-  }
+//     // 3. Produce `{ cars, pagination }` for `DemoRscContent` + footer
+//     return getRentalCarsData(query)
+//   }
 
-  // export const getCars = unstable_cache(
-  //   async (dataParamsKey: string): Promise<RentalCarsPagePayload> => {
-  //     // 1. Deserialize cache key so list logic never sees drawer/mode/id chrome
-  //     const params = JSON.parse(dataParamsKey) as DemoRscPageSearchParams
+  export const getCars = unstable_cache(
+    async (dataParamsKey: string): Promise<RentalCarsPagePayload> => {
+      // 1. Deserialize cache key so list logic never sees drawer/mode/id chrome
+      const params = JSON.parse(dataParamsKey) as DemoRscPageSearchParams
   
-  //     // 2. Same URL → query mapping as client parity (`buildRentalCarListQuery`)
-  //     const query = buildRentalCarListQuery(params)
+      // 2. Same URL → query mapping as client parity (`buildRentalCarListQuery`)
+      const query = buildRentalCarListQuery(params)
   
-  //     // 3. Produce `{ cars, pagination }` for `DemoRscContent` + footer
-  //     return getRentalCarsData(query)
-  //   },
-  //   ['demo-rsc-cars'],
-  //   { revalidate: 60 }
-  // )
+      // 3. Produce `{ cars, pagination }` for `DemoRscContent` + footer
+      return getRentalCarsData(query)
+    },
+    ['demo-rsc-cars'],
+    { revalidate: 60 }
+  )
 
 
 

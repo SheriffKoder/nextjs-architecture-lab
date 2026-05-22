@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react'
 import UserAvatar from '@/components/side-nav/components/user-avatar'
-import { User as UserType } from '@/features/auth'
+import type { User as UserType } from '@/features/auth/users/types'
 import { Camera } from 'lucide-react'
 
 interface EditableAvatarProps {

@@ -17,7 +17,7 @@ import type { RentalCarTableItem } from '@/features/cars-rsc/types/rental-car-ta
 import {
   rentalCarFieldMap,
   rentalCarPaginationConfig,
-} from '@/pages/demo-rsc-page/config/header-filters-config'
+} from '@/screens/demo-rsc-page/config/header-filters-config'
 import { rentalCars } from '@/features/cars-rsc/server/data-source'
 
 /** Flat search-param bag (same shape as Next `searchParams` after `await`). */
@@ -85,8 +85,7 @@ function getNumberRange(
  */
 export function buildRentalCarListQuery(params: PageSearchParams): RentalCarListQuery {
   const sp = searchParamsRecordToURLSearchParams(params)
-  const defaultLimit = rentalCarPaginationConfig.defaultPageSize || 20
-  const { page, limit } = parsePagination(sp, defaultLimit)
+  const showAll = getSingle(params, 'all') === '1'
 
   const year = getNumberRange(params, 'year')
   const pricePerDay = getNumberRange(params, 'pricePerDay')
@@ -116,11 +115,15 @@ export function buildRentalCarListQuery(params: PageSearchParams): RentalCarList
     ...(dateParam ? { date: dateParam } : {}),
     q: q || undefined,
     sort: sorts.length > 0 ? sorts : undefined,
-    page,
-    limit,
   }
 
-  return listQuery
+  if (showAll) {
+    return { ...listQuery, showAll: true }
+  }
+
+  const defaultLimit = rentalCarPaginationConfig.defaultPageSize || 20
+  const { page, limit } = parsePagination(sp, defaultLimit)
+  return { ...listQuery, page, limit }
 }
 
 function appendRange(out: PageSearchParams, key: string, range: RentalCarNumberRange | undefined) {
@@ -157,8 +160,12 @@ export function rentalCarListQueryToSearchParams(
     out.sort = query.sort.map((s) => `${s.key}:${s.direction}`).join(',')
   }
 
-  if (query.page !== undefined) out.page = String(query.page)
-  if (query.limit !== undefined) out.limit = String(query.limit)
+  if (query.showAll) {
+    out.all = '1'
+  } else {
+    if (query.page !== undefined) out.page = String(query.page)
+    if (query.limit !== undefined) out.limit = String(query.limit)
+  }
 
   return out
 }

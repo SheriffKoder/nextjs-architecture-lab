@@ -195,7 +195,9 @@ export const rentalCarSearchConfig: SearchConfig<RentalCarTableItem> = {
 export const rentalCarPaginationConfig: PaginationConfig = {
   defaultPageSize: 10,
   pageSizeOptions: [10, 20, 50, 100],
-  allowPageSizeChange: true
+  allowPageSizeChange: true,
+  allowShowAll: true,
+  showAllLabel: 'All',
 }
 
 //////////////////////////////////

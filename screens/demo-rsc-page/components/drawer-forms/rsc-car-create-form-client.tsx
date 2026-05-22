@@ -46,7 +46,7 @@ import {
   MOCK_CAR_LOCATION_ITEMS,
   MOCK_CAR_MAKE_ITEMS,
   MOCK_CAR_STATUS_ITEMS,
-} from '@/pages/demo-rsc-page/config/car-slider-dropdown-mocks'
+} from '@/screens/demo-rsc-page/config/car-slider-dropdown-mocks'
 import {
   defaultRentalCarFormValues,
   rentalCarFormSchema,

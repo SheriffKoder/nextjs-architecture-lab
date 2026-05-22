@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/features/auth/supabase/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { DEFAULT_INTERNAL_ORG_ID } from "@/features/auth";
 import { roleFromMembershipRow } from "@/features/auth/server";

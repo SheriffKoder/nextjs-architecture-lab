@@ -49,7 +49,7 @@ import {
   rentalCarBaseFilters, 
   rentalCars, 
   rentalCarFieldMap 
-} from "../../../pages/demo-rsc-page/config/header-filters-config"
+} from "../../../screens/demo-rsc-page/config/header-filters-config"
 import { filterRentalCarsExcludingColumn } from "./backend-simulate/filter-rental-cars"
 import type { FilterConfig } from "../../url-kit/filters/feature-filtering/components/filter-types"
 import type { RentalCarTableItem } from '../types/rental-car-table-item'

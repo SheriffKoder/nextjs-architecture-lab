@@ -1,12 +1,40 @@
 /**
- * Reset pagination to page 1 in a URLSearchParams batch before filter/sort/search updates.
+ * Pagination URL normalization before filter/sort/search updates.
  *
- * Used in: `useUrlFilters`, `useUrlSorting` (and sorting-builder-control copy)
- * Why: Changing filters or sort changes the result set; staying on page N often shows an empty table.
- *
- * Deletes the page param so `parsePagination` applies its default (page 1). Matches NL filter apply
- * (`resetNlApplyPaginationPage` in `features/ui/ai-filter`).
+ * Used in: `useUrlFilters`, `useUrlSorting`, NL filter apply
+ * - `all=1` (show all): strip `page` and `limit`; keep `all`
+ * - paginated: strip `page` (defaults to 1 via `parsePagination`); strip `all`
  */
+
+export const SHOW_ALL_URL_PARAM = 'all'
+
+export function isShowAllUrlParam(
+  searchParams: URLSearchParams | { get: (key: string) => string | null },
+  allParamKey = SHOW_ALL_URL_PARAM,
+): boolean {
+  return searchParams.get(allParamKey) === '1'
+}
+
+/**
+ * @param params - Mutable URLSearchParams about to be written to the router
+ * @param pageParamKey - URL key for page index (default `page`)
+ * @param allParamKey - URL key for show-all mode (default `all`)
+ * @param limitParamKey - URL key for page size (default `limit`)
+ */
+export function normalizePaginationParams(
+  params: URLSearchParams,
+  pageParamKey = 'page',
+  allParamKey = SHOW_ALL_URL_PARAM,
+  limitParamKey = 'limit',
+): void {
+  if (params.get(allParamKey) === '1') {
+    params.delete(pageParamKey)
+    params.delete(limitParamKey)
+    return
+  }
+  params.delete(allParamKey)
+  params.delete(pageParamKey)
+}
 
 /**
  * @param params - Mutable URLSearchParams about to be written to the router
@@ -16,5 +44,5 @@ export function resetPageInSearchParams(
   params: URLSearchParams,
   pageParamKey = 'page',
 ): void {
-  params.delete(pageParamKey)
+  normalizePaginationParams(params, pageParamKey)
 }

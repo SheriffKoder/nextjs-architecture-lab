@@ -26,6 +26,14 @@ export interface PaginationConfig {
    * Whether page size is configurable by user
    */
   allowPageSizeChange?: boolean
+
+  /**
+   * Show an "All" control that sets `all=1` and removes `page` / `limit` from the URL
+   */
+  allowShowAll?: boolean
+
+  /** Label for the show-all button (default: "All") */
+  showAllLabel?: string
 }
 
 /**
@@ -161,6 +169,9 @@ export interface PaginationInfoProps {
    * Optional CSS classes
    */
   className?: string
+
+  /** When true, display "Showing all N" instead of a page range */
+  showAll?: boolean
 }
 
 /**

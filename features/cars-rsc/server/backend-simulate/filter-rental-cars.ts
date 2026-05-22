@@ -12,7 +12,7 @@ import { filterBySearch } from "./filter-by-search"
 import {
   rentalCarFieldMap,
   rentalCarSearchConfig,
-} from "../../../../pages/demo-rsc-page/config/header-filters-config"
+} from "../../../../screens/demo-rsc-page/config/header-filters-config"
 
 //////////////////////////////////
 // Type Definitions

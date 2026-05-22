@@ -16,13 +16,5 @@ export { RoleEnum } from './roles/constants';
 export { buildQueryParams } from './users/utils';
 export { isInternalAdmin, isInternalAdminOrUser } from './roles/authorization';
 
-export {
-  getAuthUser,
-  getAuthUserFromHeader,
-  getUserData,
-  getUserId,
-  createUserWithRole,
-  roleFromMembershipRow,
-  type CreateUserParams,
-  type CreateUserResult,
-} from './server';
+// Server-only helpers live in `@/features/auth/server` — do not re-export here,
+// or client bundles under `screens/` will pull in `next/headers` via supabase/server.

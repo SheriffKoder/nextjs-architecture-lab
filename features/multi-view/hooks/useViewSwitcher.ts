@@ -1,7 +1,13 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  applyShowAllToSearchParams,
+  isShowAllUrlParam,
+  syncShowAllForViewChange,
+  viewRequiresAllItems,
+} from "@/features/url-kit/filters/feature-pagination/utils";
 
 interface UseViewSwitcherOptions {
   /** Available view keys */
@@ -10,6 +16,10 @@ interface UseViewSwitcherOptions {
   defaultView?: string;
   /** URL parameter name (default: 'view') */
   paramName?: string;
+  /** View keys that require `all=1` (full dataset) */
+  useAllItems?: readonly string[];
+  /** Default page size when leaving a useAllItems view */
+  defaultPageSize?: number;
 }
 
 interface UseViewSwitcherReturn {
@@ -28,14 +38,21 @@ interface UseViewSwitcherReturn {
  * ```tsx
  * const { currentView, setView } = useViewSwitcher({
  *   availableViews: ['table', 'kanban', 'map'],
- *   defaultView: 'table'
+ *   defaultView: 'table',
+ *   useAllItems: ['kanban', 'map'],
  * })
  * ```
  */
 export function useViewSwitcher(
   options: UseViewSwitcherOptions,
 ): UseViewSwitcherReturn {
-  const { availableViews, defaultView, paramName = "view" } = options;
+  const {
+    availableViews,
+    defaultView,
+    paramName = "view",
+    useAllItems,
+    defaultPageSize = 10,
+  } = options;
 
   const effectiveDefaultView =
     defaultView || (availableViews.length > 0 ? availableViews[0] : "table");
@@ -52,6 +69,14 @@ export function useViewSwitcher(
     return effectiveDefaultView;
   }, [searchParams, paramName, availableViews, effectiveDefaultView]);
 
+  const pushParams = useCallback(
+    (params: URLSearchParams) => {
+      const qs = params.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router],
+  );
+
   const setView = useCallback(
     (view: string) => {
       if (!availableViews.includes(view)) {
@@ -66,18 +91,45 @@ export function useViewSwitcher(
         params.set(paramName, view);
       }
 
-      const qs = params.toString();
-      router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      syncShowAllForViewChange(params, currentView, view, {
+        useAllItems,
+        defaultPageSize,
+      });
+
+      pushParams(params);
     },
     [
       availableViews,
+      currentView,
+      defaultPageSize,
       effectiveDefaultView,
       paramName,
+      pushParams,
       searchParams,
-      pathname,
-      router,
+      useAllItems,
     ],
   );
+
+  // Deep link: ?view=kanban without all=1 → sync once on mount / URL change
+  const didSyncShowAllRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!useAllItems?.length || !viewRequiresAllItems(currentView, useAllItems)) {
+      didSyncShowAllRef.current = null;
+      return;
+    }
+    if (isShowAllUrlParam(searchParams)) {
+      didSyncShowAllRef.current = searchParams.toString();
+      return;
+    }
+
+    const key = searchParams.toString();
+    if (didSyncShowAllRef.current === key) return;
+    didSyncShowAllRef.current = key;
+
+    const params = new URLSearchParams(searchParams.toString());
+    applyShowAllToSearchParams(params);
+    pushParams(params);
+  }, [currentView, pushParams, searchParams, useAllItems]);
 
   const isViewAvailable = useCallback(
     (view: string): boolean => availableViews.includes(view),

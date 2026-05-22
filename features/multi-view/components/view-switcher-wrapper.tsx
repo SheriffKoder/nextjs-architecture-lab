@@ -47,6 +47,10 @@ const VIEW_OPTIONS: Record<string, ViewSwitcherOption> = {
 interface ViewSwitcherWrapperProps {
   /** Available view keys to display */
   availableViews: string[]
+  /** View keys that require full dataset (`all=1`) */
+  useAllItems?: readonly string[]
+  /** Default page size when leaving a useAllItems view */
+  defaultPageSize?: number
   /** Optional className */
   className?: string
   /** Optional disabled state */
@@ -64,15 +68,18 @@ interface ViewSwitcherWrapperProps {
  */
 export function ViewSwitcherWrapper({
   availableViews,
+  useAllItems,
+  defaultPageSize,
   className = '',
   disabled = false
 }: ViewSwitcherWrapperProps) {
-  // Use first option as default, or 'table' if no options
   const defaultView = availableViews.length > 0 ? availableViews[0] : 'table'
   
   const { currentView, setView } = useViewSwitcher({
     availableViews,
-    defaultView
+    defaultView,
+    useAllItems,
+    defaultPageSize,
   })
 
   // Filter options to only show available views

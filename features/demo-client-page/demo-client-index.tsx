@@ -22,7 +22,7 @@ import { LoadingFiltersBar } from '@/features/url-kit/filters/feature-filtering/
 import { useUrlFilters } from '@/features/url-kit/filters/feature-filtering/hooks/useUrlFilters'
 import { useUrlSorting } from '@/features/url-kit/filters/feature-sorting/hooks/useUrlSorting'
 import { useUrlPagination } from '@/features/url-kit/filters/feature-pagination/hooks'
-import ActionButtons from '@/pages/demo-rsc-page/components/action-buttons'
+import ActionButtons from '@/screens/demo-rsc-page/components/action-buttons'
 
 // Toast Notifications
 import ToastContainer from '@/features/ui-kit/feeback/toast/toast-container'

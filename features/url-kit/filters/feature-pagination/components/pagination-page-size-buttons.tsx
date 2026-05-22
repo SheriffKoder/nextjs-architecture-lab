@@ -10,6 +10,10 @@ export interface PaginationPageSizeButtonsProps {
   className?: string
   /** When true, all preset buttons are non-interactive */
   disabled?: boolean
+  allowShowAll?: boolean
+  isShowAll?: boolean
+  onShowAll?: () => void
+  showAllLabel?: string
 }
 
 /**
@@ -21,8 +25,21 @@ export function PaginationPageSizeButtons({
   onLimitChange,
   className,
   disabled = false,
+  allowShowAll = false,
+  isShowAll = false,
+  onShowAll,
+  showAllLabel = 'All',
 }: PaginationPageSizeButtonsProps) {
-  if (options.length === 0) return null
+  if (options.length === 0 && !allowShowAll) return null
+
+  const presetButtonClass = (active: boolean) =>
+    cn(
+      'rounded-md border px-2 py-1 text-xs font-medium transition-colors',
+      active
+        ? 'border-primary bg-primary text-white'
+        : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50 dark:border-border dark:bg-background dark:text-foreground',
+      disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+    )
 
   return (
     <div
@@ -30,22 +47,15 @@ export function PaginationPageSizeButtons({
       role="group"
       aria-label="Rows per page"
     >
-      {/* <span className="mr-1 text-xs text-gray-500 dark:text-muted-foreground">Per page</span> */}
       {options.map((n) => {
-        const isActive = limit === n
+        const isActive = !isShowAll && limit === n
         return (
           <button
             key={n}
             type="button"
             disabled={disabled}
             onClick={() => onLimitChange(n)}
-            className={cn(
-              'rounded-md border px-2 py-1 text-xs font-medium transition-colors',
-              isActive
-                ? 'border-primary bg-primary text-white'
-                : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50 dark:border-border dark:bg-background dark:text-foreground',
-              disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-            )}
+            className={presetButtonClass(isActive)}
             aria-pressed={isActive}
             aria-label={`${n} items per page`}
           >
@@ -53,6 +63,18 @@ export function PaginationPageSizeButtons({
           </button>
         )
       })}
+      {allowShowAll && onShowAll ? (
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={onShowAll}
+          className={presetButtonClass(isShowAll)}
+          aria-pressed={isShowAll}
+          aria-label="Show all items"
+        >
+          {showAllLabel}
+        </button>
+      ) : null}
     </div>
   )
 }

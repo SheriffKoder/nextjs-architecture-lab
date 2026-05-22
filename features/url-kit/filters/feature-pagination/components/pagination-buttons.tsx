@@ -131,6 +131,10 @@ export function PaginationButtons({
   const isFirst = currentPage === 1
   const isLast = currentPage >= totalPages || totalPages === 0
 
+  if (totalPages <= 1) {
+    return null
+  }
+
   // Base button styles - consistent for all buttons
   // WHY: All buttons should have same height and base styling
   // HOW: Use consistent padding and rounded corners

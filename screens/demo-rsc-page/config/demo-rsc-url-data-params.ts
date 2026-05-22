@@ -9,6 +9,7 @@
 
 /** Keys that affect paginated list + facet counts (included in data cache key). */
 export const DEMO_RSC_LIST_DATA_SEARCH_PARAM_KEYS = [
+  'all',
   'page',
   'limit',
   'sort',

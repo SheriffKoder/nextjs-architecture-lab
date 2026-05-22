@@ -15,6 +15,13 @@ import { ViewSwitcherControl } from './view-switcher-control'
 interface NewSwitcherWrapperProps {
   /** Available view keys to display */
   availableViews: string[]
+  /** When provided with onViewChange, skips internal useViewSwitcher (parent owns URL sync) */
+  currentView?: string
+  onViewChange?: (view: string) => void
+  /** View keys that require full dataset (`all=1`) — used when parent does not pass onViewChange */
+  useAllItems?: readonly string[]
+  /** Default page size when leaving a useAllItems view */
+  defaultPageSize?: number
   /** Optional className */
   className?: string
   /** Optional disabled state */
@@ -32,18 +39,25 @@ interface NewSwitcherWrapperProps {
  */
 export function NewSwitcherWrapper({
   availableViews,
+  currentView: controlledView,
+  onViewChange,
+  useAllItems,
+  defaultPageSize,
   className = '',
   disabled = false
 }: NewSwitcherWrapperProps) {
-  // Use first option as default, or 'table' if no options
   const defaultView = availableViews.length > 0 ? availableViews[0] : 'table'
-  
-  const { currentView, setView } = useViewSwitcher({
+
+  const internal = useViewSwitcher({
     availableViews,
-    defaultView
+    defaultView,
+    useAllItems: controlledView !== undefined ? undefined : useAllItems,
+    defaultPageSize,
   })
 
-  // Don't render if no valid options or only one option
+  const currentView = controlledView ?? internal.currentView
+  const setView = onViewChange ?? internal.setView
+
   if (availableViews.length <= 1) {
     return null
   }

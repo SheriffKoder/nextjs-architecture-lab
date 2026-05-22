@@ -32,13 +32,21 @@ export function PaginationInfo({
   startItem,
   endItem,
   totalItems,
-  className
+  className,
+  showAll = false,
 }: PaginationInfoProps) {
-  // Handle empty state
   if (totalItems === 0) {
     return (
       <div className={cn("text-sm text-muted-foreground", className)}>
         Showing 0 of 0
+      </div>
+    )
+  }
+
+  if (showAll) {
+    return (
+      <div className={cn("text-sm text-muted-foreground", className)}>
+        Showing all {totalItems}
       </div>
     )
   }

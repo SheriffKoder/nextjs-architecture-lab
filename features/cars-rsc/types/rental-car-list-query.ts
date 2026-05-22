@@ -33,6 +33,8 @@ export interface RentalCarListQuery {
   date?: string
   q?: string
   sort?: SortSpec[]
+  /** When true, return the full filtered+sorted list; `page` / `limit` are ignored. */
+  showAll?: boolean
   page?: number
   limit?: number
 }

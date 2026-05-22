@@ -86,6 +86,10 @@ interface FilteringWrapperProps<T extends Record<string, any> = Record<string, a
   listViewConfig?: GroupConfig;
   // Available view modes to display in switcher (e.g., ['table', 'kanban', 'map'])
   availableViews?: string[];
+  /** Views that need the full filtered dataset (`?all=1`, no page/limit) */
+  useAllItems?: string[];
+  /** Page size restored when leaving a useAllItems view */
+  defaultPageSize?: number;
   // Calendar configuration for calendar view
   calendarConfig?: {
     startDateKey: string;
@@ -228,6 +232,8 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
   tableConfig,
   listViewConfig,
   availableViews = ['table'],
+  useAllItems,
+  defaultPageSize,
   calendarConfig,
   kanbanConfig,
   subheadingsConfig,
@@ -283,9 +289,11 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
   const effectiveAvailableViews = availableViews || ['table']
   const defaultView = effectiveAvailableViews.length > 0 ? effectiveAvailableViews[0] : 'table'
   
-  const { currentView } = useViewSwitcher({
+  const { currentView, setView } = useViewSwitcher({
     availableViews: effectiveAvailableViews,
-    defaultView
+    defaultView,
+    useAllItems,
+    defaultPageSize,
   })
 
   // Determine which view to render based on currentView and configs
@@ -335,6 +343,8 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
           )}
           <NewSwitcherWrapper
             availableViews={availableViews || ['table']}
+            currentView={currentView}
+            onViewChange={setView}
           />
           {/* ExpandableSearchControl - Compact search that expands on hover/focus */}
           {minimalControlsConfig?.searchConfig && (

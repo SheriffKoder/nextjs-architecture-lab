@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/features/auth/supabase/server";
 import { getUserData } from "@/features/auth/server";
 import { isInternalAdminOrUser } from "@/features/auth/roles/authorization";
 import { NextResponse, type NextRequest } from "next/server";

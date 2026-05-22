@@ -18,7 +18,7 @@ import { rentalCarListQueryToSearchParams } from '@/features/cars-rsc/lib/build-
 import { filterRentalCars } from './backend-simulate/filter-rental-cars'
 import { parseSorts, applySorts } from '../../url-kit/filters/feature-sorting/utils'
 import { parsePagination } from '../../url-kit/filters/feature-pagination/utils'
-import { rentalCarPaginationConfig } from '../../../pages/demo-rsc-page/config/header-filters-config'
+import { rentalCarPaginationConfig } from '../../../screens/demo-rsc-page/config/header-filters-config'
 import { decodeFilters } from '../../url-kit/filters/feature-query-builder-filter/utils'
 /**
  * Get mock rental cars data with optional filtering, sorting, and pagination
@@ -33,6 +33,7 @@ export async function getRentalCarsData(
     totalItems: number
     page: number
     limit: number
+    showAll?: boolean
   }
 }> {
 
@@ -69,6 +70,27 @@ export async function getRentalCarsData(
   const filteredAndSorted = sorts.length > 0 ? applySorts(filtered, sorts) : filtered
   
   //////////////////////////////////
+  // STEP 3: Check if show all is enabled
+  //////////////////////////////////
+  const showAll =
+    query.showAll === true ||
+    (typeof searchParams.all === 'string' && searchParams.all === '1')
+
+  // If show all is enabled, return the full list
+  if (showAll) {
+    const total = filteredAndSorted.length
+    return {
+      cars: filteredAndSorted,
+      pagination: {
+        totalItems: total,
+        page: 1,
+        limit: total,
+        showAll: true,
+      },
+    }
+  }
+
+  //////////////////////////////////
   // STEP 3: Parse pagination parameters from URL
   //////////////////////////////////
   const params = new URLSearchParams(
@@ -76,16 +98,20 @@ export async function getRentalCarsData(
       .filter(([_, v]) => v !== undefined)
       .map(([k, v]) => [k, Array.isArray(v) ? v[0] : v as string])
   )
-  
-  const { page, limit } = parsePagination(params, rentalCarPaginationConfig.defaultPageSize || 20)
-  
+
+  // If show all is not enabled, parse pagination parameters from URL
+  const { page, limit } = parsePagination(
+    params,
+    rentalCarPaginationConfig.defaultPageSize || 20,
+  )
+
   //////////////////////////////////
   // STEP 4: Apply pagination slice to sorted results
   //////////////////////////////////
   const startIndex = (page - 1) * limit
   const endIndex = startIndex + limit
   const paginatedCars = filteredAndSorted.slice(startIndex, endIndex)
-  
+
   //////////////////////////////////
   // STEP 5: Return results with pagination metadata
   //////////////////////////////////
@@ -94,7 +120,7 @@ export async function getRentalCarsData(
     pagination: {
       totalItems: filteredAndSorted.length,
       page,
-      limit
-    }
+      limit,
+    },
   }
 }

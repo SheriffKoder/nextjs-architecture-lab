@@ -20,7 +20,13 @@
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useNavigationTransitionOptional } from '@/features/url-kit/filters/navigation-transition-context'
 import { useMemo, useCallback } from 'react'
-import { parsePagination, calculatePagination as calcPagination } from '../utils'
+import {
+  parsePagination,
+  calculatePagination as calcPagination,
+  isShowAllUrlParam,
+  SHOW_ALL_URL_PARAM,
+  applyShowAllToSearchParams,
+} from '../utils'
 import type { PaginationConfig, PaginationState, PaginationCalculated } from '../types'
 
 /**
@@ -125,6 +131,17 @@ export function useUrlPagination(config: PaginationConfig = {}) {
   // HOW: Use useMemo with getPagination dependency
   const currentPagination = useMemo(() => getPagination(), [getPagination])
 
+  /**
+   * Check if show all is enabled
+   * WHY: Simple getter for show all
+   * HOW: Use isShowAllUrlParam utility with current searchParams
+   * @returns {boolean} True if show all is enabled
+   */
+  const isShowAll = useMemo(
+    () => isShowAllUrlParam(searchParams),
+    [searchParams],
+  )
+
   //////////////////////////////////
   // SETTERS: Update pagination in URL
   //////////////////////////////////
@@ -137,6 +154,7 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    */
   const setPage = useCallback((page: number) => {
     const params = buildParams()
+    params.delete(SHOW_ALL_URL_PARAM)
     const validPage = Math.max(1, page)
     params.set('page', validPage.toString())
     updateUrl(params)
@@ -150,10 +168,16 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    */
   const setLimit = useCallback((limit: number) => {
     const params = buildParams()
+    params.delete(SHOW_ALL_URL_PARAM)
     const validLimit = Math.max(1, limit)
     params.set('limit', validLimit.toString())
-    // Reset to page 1 when limit changes
     params.set('page', '1')
+    updateUrl(params)
+  }, [buildParams, updateUrl])
+
+  const setShowAll = useCallback(() => {
+    const params = buildParams()
+    applyShowAllToSearchParams(params)
     updateUrl(params)
   }, [buildParams, updateUrl])
 
@@ -166,6 +190,7 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    */
   const setPagination = useCallback((page: number, limit: number) => {
     const params = buildParams()
+    params.delete(SHOW_ALL_URL_PARAM)
     const validPage = Math.max(1, page)
     const validLimit = Math.max(1, limit)
     params.set('page', validPage.toString())
@@ -240,9 +265,21 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    * @returns {PaginationCalculated} All calculated pagination values
    */
   const calculatePagination = useCallback((totalItems: number): PaginationCalculated => {
+    if (isShowAll) {
+      const endItem = totalItems
+      return {
+        totalPages: totalItems > 0 ? 1 : 0,
+        isFirst: true,
+        isLast: true,
+        hasNext: false,
+        hasPrevious: false,
+        startItem: totalItems > 0 ? 1 : 0,
+        endItem,
+      }
+    }
     const { page, limit } = currentPagination
     return calcPagination(page, limit, totalItems)
-  }, [currentPagination])
+  }, [currentPagination, isShowAll])
 
   // Return all functions and current state
   // WHY: Provide complete API for pagination management
@@ -251,7 +288,8 @@ export function useUrlPagination(config: PaginationConfig = {}) {
     // Current state
     page: currentPagination.page,
     limit: currentPagination.limit,
-    
+    isShowAll,
+
     // Getters
     getPage,
     getLimit,
@@ -260,6 +298,7 @@ export function useUrlPagination(config: PaginationConfig = {}) {
     // Setters
     setPage,
     setLimit,
+    setShowAll,
     setPagination,
     resetPage,
     

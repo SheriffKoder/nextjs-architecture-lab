@@ -9,6 +9,10 @@ import { PaginationFooter } from '@/features/url-kit/filters/components/paginati
 
 // Page
 import { rentalCarPaginationConfig } from '../../config/header-filters-config'
+import {
+  DEMO_RSC_DEFAULT_VIEW,
+  DEMO_RSC_USE_ALL_ITEMS_VIEWS,
+} from '../../config/demo-rsc-views-config'
 import DemoRscContent from '../../demo-rsc-content'
 import { demoRscDataParamsToCacheKey } from '../../utils/demo-rsc-search-params-cache-key'
 import TablePaginationErrorRethrow from '../layout-sections-error-boundaries/table-pagination-error-rethrow'
@@ -49,6 +53,8 @@ export default async function TableAndPaginationSection({
           totalItems={cars.pagination.totalItems}
           config={rentalCarPaginationConfig}
           title="Pagination"
+          hideWhenShowAllForViews={DEMO_RSC_USE_ALL_ITEMS_VIEWS}
+          defaultView={DEMO_RSC_DEFAULT_VIEW}
         />
       </div>
     </NavigationPendingDimmer>

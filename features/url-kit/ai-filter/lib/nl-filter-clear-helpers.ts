@@ -3,6 +3,7 @@
  */
 
 import type { NlFilterCatalogEntry } from '@/features/url-kit/ai-filter/types/nl-filter-assistant'
+import { normalizePaginationParams } from '@/features/url-kit/filters/feature-pagination/utils'
 
 /** Phrases that should clear every catalog facet (and sorts handled separately). */
 export function isClearAllFiltersIntent(text: string): boolean {
@@ -69,6 +70,6 @@ export function resetNlApplyPaginationPage(
   pageParamKey = 'page',
 ): string {
   const sp = new URLSearchParams(queryString)
-  sp.delete(pageParamKey)
+  normalizePaginationParams(sp, pageParamKey)
   return sp.toString()
 }
