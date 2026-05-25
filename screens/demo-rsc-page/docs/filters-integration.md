@@ -1,4 +1,3 @@
-okay, let us work on implementing this into a real page.
 
 // Target
 if we checked features\demo-rsc-page\demo-rsc-index.tsx
