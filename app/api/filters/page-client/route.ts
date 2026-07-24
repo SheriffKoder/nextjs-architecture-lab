@@ -19,12 +19,12 @@
 
 import { connection } from "next/server"
 import { NextResponse, type NextRequest } from "next/server"
-import { employees } from "@/app/development/filters/page-client/feature-config/data-source"
-import { filterEmployees } from "@/app/development/filters/page-server/utils/backend-simulate/filter-employees"
-import { parseSorts, applySorts } from "@/app/development/filters/feature-sorting/utils"
-import { parsePagination } from "@/app/development/filters/feature-pagination/utils"
-import { employeePaginationConfig } from "@/app/development/filters/page-client/feature-config/employee-filter-config"
-import { decodeFilters } from "@/app/development/filters/feature-query-builder-filter/utils/decode-filters"
+import { employees } from "@/platform/url-kit/filters/page-client/feature-config/data-source"
+import { filterEmployees } from "@/platform/url-kit/filters/page-server/utils/backend-simulate/filter-employees"
+import { parseSorts, applySorts } from "@/platform/url-kit/filters/feature-sorting/utils"
+import { parsePagination } from "@/platform/url-kit/filters/feature-pagination/utils"
+import { employeePaginationConfig } from "@/platform/url-kit/filters/page-client/feature-config/employee-filter-config"
+import { decodeFilters } from "@/platform/url-kit/filters/feature-query-builder-filter/utils/decode-filters"
 
 /**
  * GET handler for filtering employees

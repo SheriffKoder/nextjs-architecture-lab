@@ -7,14 +7,14 @@
 
 import { connection } from 'next/server'
 import { NextResponse, type NextRequest } from 'next/server'
-import { rentalCars } from '@/features/demo-client-page/config/lib/data-source'
+import { rentalCars } from '@/entities/demo-client-page/config/lib/data-source'
 import {
   deleteRentalCarFromMockStore,
   parseRentalCarEditPatch,
   RentalCarNotFoundError,
   updateRentalCarInMockStoreById,
   UpdateRentalCarValidationError,
-} from '@/features/demo-client-page/lib/server'
+} from '@/entities/demo-client-page/lib/server'
 import { delayDemoClientApi } from '../../demo-api-delay'
 
 type RouteContext = { params: Promise<{ id: string }> }

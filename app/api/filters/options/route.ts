@@ -18,13 +18,13 @@
 
 import { connection } from "next/server"
 import { NextResponse } from "next/server"
-import { getFilterOptions } from "@/app/development/filters/page-client/utils/api/get-filter-options"
+import { getFilterOptions } from "@/platform/url-kit/filters/page-client/utils/api/get-filter-options"
 import { 
   employeeBaseFilters, 
   employees, 
   employeeFieldMap 
-} from "@/app/development/filters/page-client/feature-config/employee-filter-config"
-import { filterEmployeesExcludingColumn } from "@/app/development/filters/page-server/utils/backend-simulate/filter-employees"
+} from "@/platform/url-kit/filters/page-client/feature-config/employee-filter-config"
+import { filterEmployeesExcludingColumn } from "@/platform/url-kit/filters/page-server/utils/backend-simulate/filter-employees"
 
 /**
  * GET handler for filter options

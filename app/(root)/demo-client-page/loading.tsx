@@ -5,8 +5,8 @@
  * Used in: `app/(root)/demo-client-page/page.tsx` `Suspense` boundary
  */
 
-import TableSkeleton from '@/components/layout/loading-skeletons/table-skeleton'
-import PageHeaderSkeleton from '@/components/layout/loading-skeletons/page-header-skeleton'
+import TableSkeleton from '@/shared/ui/loading-skeletons/table/table-skeleton'
+import PageHeaderSkeleton from '@/shared/ui/loading-skeletons/page-header-skeleton'
 
 export default function DemoClientPageLoading() {
   return (

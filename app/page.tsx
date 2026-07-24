@@ -1,12 +1,12 @@
 'use client'
-import GlassLoginForm from '@/screens/login/components/glass-login-form'
-import '@/screens/login/styles/login-background.css'
-import BlurGrid from '@/screens/login/components/blur-grid'
+import GlassLoginForm from '@/views/login/ui/glass-login-form'
+import '@/views/login/styles/login-background.css'
+import BlurGrid from '@/views/login/ui/blur-grid'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 // import '../features/login/styles/login-background.css'
 // import '../features/login/styles/login-background-light.css'
-import '../screens/login/styles/main-background.css'
+import '../views/login/styles/main-background.css'
 
 const HOME_PATH = process.env.NEXT_PUBLIC_HOME_PATH || '/dashboard'
 

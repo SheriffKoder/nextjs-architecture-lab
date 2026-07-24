@@ -6,10 +6,10 @@
  * Why: Mirrors shell layout — header, filters strip, table, pagination footer
  */
 
-import FiltersSkeleton from '@/components/layout/loading-skeletons/filters-skeleton'
-import PaginationSkeleton from '@/components/layout/loading-skeletons/pagination-skeleton'
-import TableSkeleton from '@/components/layout/loading-skeletons/table-skeleton'
-import PageHeaderSkeleton from '@/components/layout/loading-skeletons/page-header-skeleton'
+import FiltersSkeleton from '@/shared/ui/loading-skeletons/filters/filters-skeleton'
+import PaginationSkeleton from '@/shared/ui/loading-skeletons/pagination/pagination-skeleton'
+import TableSkeleton from '@/shared/ui/loading-skeletons/table/table-skeleton'
+import PageHeaderSkeleton from '@/shared/ui/loading-skeletons/page-header-skeleton'
 
 export default function DemoRscLoading() {
   return (

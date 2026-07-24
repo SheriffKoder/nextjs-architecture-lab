@@ -7,9 +7,9 @@
  */
 
 import { connection, NextRequest, NextResponse } from 'next/server'
-import { applyFilters, validateFilter, type FieldMapping } from '@/app/development/filters/feature-query-builder-filter/backend'
-import { decodeFilters } from '@/app/development/filters/feature-query-builder-filter/utils'
-import type { FilterNode } from '@/app/development/filters/feature-query-builder-filter/types'
+import { applyFilters, validateFilter, type FieldMapping } from '@/platform/url-kit/filters/feature-query-builder-filter/backend'
+import { decodeFilters } from '@/platform/url-kit/filters/feature-query-builder-filter/utils'
+import type { FilterNode } from '@/platform/url-kit/filters/feature-query-builder-filter/types'
 
 // Mock data - replace with actual data source
 const mockData = [

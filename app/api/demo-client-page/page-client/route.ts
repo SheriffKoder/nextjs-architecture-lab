@@ -31,8 +31,8 @@ import {
   createRentalCarServer,
   getRentalCarsData,
   parseCreateRentalCarPayload,
-} from '@/features/demo-client-page/lib/server'
-// import { rentalCarFormSchema } from '@/features/demo-client-page/validation/rental-car-form-schema'
+} from '@/entities/demo-client-page/lib/server'
+// import { rentalCarFormSchema } from '@/entities/demo-client-page/validation/rental-car-form-schema'
 import { delayDemoClientApi } from '../demo-api-delay'
 
 /** `true` → POST always returns 503 + JSON `error` (mutation fails, cache rolls back). Set to `false` for normal creates. */

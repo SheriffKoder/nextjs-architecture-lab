@@ -1,9 +1,8 @@
 'use client'
 
-import SidebarHeader from '@/components/side-nav/components/side-nav'
-import { SidebarProvider, useSidebar } from '@/components/side-nav/contexts/sidebar-context'
+import SideNav, { SidebarProvider, useSidebar } from '@/widgets/side-nav'
 import React, { Suspense, useEffect } from 'react'
-import '@/screens/login/styles/main-background.css'
+import '@/views/login/styles/main-background.css'
 
 /** Temporary stub until auth is re-implemented. */
 interface User {
@@ -59,7 +58,7 @@ function LayoutContent({ children, user }: { children: React.ReactNode; user: Us
         {/* SidebarHeader uses usePathname — must be under Suspense for Cache Components prerender */}
           <aside className='h-full flex-shrink-0'>
             <Suspense fallback={<SidebarHeaderFallback />}>
-              <SidebarHeader user={user} />
+              <SideNav user={user} />
             </Suspense>
         </aside>
 

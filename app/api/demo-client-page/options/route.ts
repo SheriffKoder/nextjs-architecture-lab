@@ -18,7 +18,7 @@
 
 import { connection } from 'next/server'
 import { NextResponse, type NextRequest } from 'next/server'
-import { getFilterOptionsServer } from '@/features/demo-client-page/lib/server'
+import { getFilterOptionsServer } from '@/entities/demo-client-page/lib/server'
 import { delayDemoClientApi } from '../demo-api-delay'
 
 export async function GET(request: NextRequest) {
