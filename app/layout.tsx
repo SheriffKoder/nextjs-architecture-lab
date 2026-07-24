@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { ReduxProvider } from "@/features/auth/store/ReduxProvider";
-import DevelopmentToggle from "@/components/development-toggle/development-toggle";
-import { SessionRestorer } from "@/features/auth/session/components/session-restorer";
-import { RolesLoader } from "@/features/auth/roles/components/roles-loader";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -35,19 +31,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <ReduxProvider>
-          <SessionRestorer />
-          <RolesLoader />
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            {/* <DevelopmentToggle /> */}
-          </ThemeProvider>
-        </ReduxProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

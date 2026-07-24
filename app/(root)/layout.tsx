@@ -2,10 +2,18 @@
 
 import SidebarHeader from '@/components/side-nav/components/side-nav'
 import { SidebarProvider, useSidebar } from '@/components/side-nav/contexts/sidebar-context'
-import { User } from '@/features/auth'
-import React, { Suspense, useEffect, useState } from 'react'
-import { useAppSelector } from '@/features/auth/store/hooks'
+import React, { Suspense, useEffect } from 'react'
 import '@/screens/login/styles/main-background.css'
+
+/** Temporary stub until auth is re-implemented. */
+interface User {
+  id: string
+  email: string | null
+  name: string | null
+  phone?: string | null
+  created_at: string
+  updated_at: string
+}
 
 function SidebarHeaderFallback() {
   return (
@@ -63,32 +71,18 @@ function LayoutContent({ children, user }: { children: React.ReactNode; user: Us
   )
 }
 
+const fallbackUser: User = {
+  id: '',
+  email: null,
+  name: null,
+  created_at: '1970-01-01T00:00:00.000Z',
+  updated_at: '1970-01-01T00:00:00.000Z',
+}
+
 export default function layout({ children }: { children: React.ReactNode }) {
-    // Get user from Redux store
-    const user = useAppSelector((state) => state.user.user)
-      // Get default sidebar open state safely
-    const [defaultOpen, setDefaultOpen] = useState(true)
-
-    useEffect(() => {
-      // Set default open state on client side
-      setDefaultOpen(window.innerWidth > 768)
-    }, [])
-    
-    // Fallback user if not authenticated (should not happen in protected routes)
-    // Using static date to avoid SSR issues with new Date()
-    const fallbackUser: User = {
-        id: '',
-        email: null,
-        name: null,
-        created_at: '1970-01-01T00:00:00.000Z',
-        updated_at: '1970-01-01T00:00:00.000Z',
-    }
-    
-    const displayUser: User = user || fallbackUser
-
   return (
     <SidebarProvider defaultOpen={false}>
-      <LayoutContent user={displayUser}>
+      <LayoutContent user={fallbackUser}>
         {children}
       </LayoutContent>
     </SidebarProvider>

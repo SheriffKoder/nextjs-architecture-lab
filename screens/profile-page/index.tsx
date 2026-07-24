@@ -6,24 +6,30 @@ import CollapsibleCard from '@/features/ui-kit/layout/CollapsibleCard-sm'
 import DetailRow from '@/features/ui-kit/layout/detail-row'
 import EditableAvatar from './components/editable-avatar'
 import PersonalInformationForm from './components/personal-information-form'
-import { User, UserIcon, Mail, Phone, Calendar } from 'lucide-react'
-import { useAppSelector } from '@/features/auth/store/hooks'
+import { UserIcon, Calendar } from 'lucide-react'
 import { format } from 'date-fns'
 
-const Profile = () => {
-  const user = useAppSelector((state) => state.user.user)
-  const role = useAppSelector((state) => state.user.role)
+/** Temporary stub until auth is re-implemented. */
+interface User {
+  id: string
+  email: string | null
+  name: string | null
+  phone?: string | null
+  created_at: string
+  updated_at: string
+}
 
-  if (!user) {
-    return (
-      <div className="flex-1 w-full flex flex-col gap-8 p-6 md:p-8">
-        <PageHeader />
-        <div className="text-center text-foreground/60">
-          No user data available
-        </div>
-      </div>
-    )
-  }
+const fallbackUser: User = {
+  id: '',
+  email: null,
+  name: null,
+  phone: null,
+  created_at: '1970-01-01T00:00:00.000Z',
+  updated_at: '1970-01-01T00:00:00.000Z',
+}
+
+const Profile = () => {
+  const user = fallbackUser
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'N/A'
@@ -94,9 +100,6 @@ const Profile = () => {
           <div className="">
             <DetailRow label="Account Created" value={formatDate(user?.created_at)} />
             <DetailRow label="Last Updated" value={formatDate(user?.updated_at)} />
-            {role?.role?.name ? (
-              <DetailRow label="Role" value={role.role.name} />
-            ) : null}
           </div>
         </CollapsibleCard>
 

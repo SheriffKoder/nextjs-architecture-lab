@@ -17,28 +17,32 @@
 import React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { User, Download, LogOut } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import UserAvatar from './user-avatar'
-import { User as UserType } from '@/features/auth'
 import { ThemeSwitcher } from '@/components/theme-switcher'
-import { useAuth } from '@/features/auth'
+
+/** Temporary stub until auth is re-implemented. */
+interface User {
+  id: string
+  email: string | null
+  name: string | null
+  phone?: string | null
+  created_at: string
+  updated_at: string
+}
 
 interface SidebarUserAreaProps {
   isCollapsed: boolean
   style: 'dark' | 'light'
-  user: UserType
+  user: User
 }
 
 export default function SidebarUserArea({ isCollapsed, style, user }: SidebarUserAreaProps) {
   const router = useRouter()
- const { logout } = useAuth();
 
-  ///////////////////////
-  // Handle logout
   const handleLogout = async () => {
-    await logout();
-    router.push('/');
-  };
+    router.push('/')
+  }
 
   return (
     <div className={`p-4 ${style === 'dark' ? 'border-t border-border' : 'border-t border-tertiary/20'}`}>

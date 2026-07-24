@@ -58,8 +58,8 @@ const GlassLoginForm = ({
   // Form state
   // Why: Track email and password values for controlled inputs
   // How: useState hooks to manage form field values
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('demo@example.com')
+  const [password, setPassword] = useState('password')
 
   ///////////////////////
   // Form validation

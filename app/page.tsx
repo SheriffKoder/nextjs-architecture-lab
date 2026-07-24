@@ -4,23 +4,17 @@ import '@/screens/login/styles/login-background.css'
 import BlurGrid from '@/screens/login/components/blur-grid'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/features/auth'
 // import '../features/login/styles/login-background.css'
 // import '../features/login/styles/login-background-light.css'
 import '../screens/login/styles/main-background.css'
 
+const HOME_PATH = process.env.NEXT_PUBLIC_HOME_PATH || '/dashboard'
+
 const page = () => {
   const router = useRouter()
-  const {login, isLoading, error}  = useAuth() 
 
-  const handleSubmit = async (email: string, password: string) => {    
-    const user = await login({ email, password });
-    
-    if (user) {
-      router.push("/dashboard");
-    } else {
-      console.error('[LoginForm] Login failed');
-    }
+  const handleSubmit = async (_email: string, _password: string) => {
+    router.push(HOME_PATH)
   }
 
   return (
@@ -52,8 +46,8 @@ const page = () => {
                         size='md'
                         labelPosition='top'
                         onSubmit={handleSubmit}
-                        isLoading={isLoading}
-                        error={error}
+                        isLoading={false}
+                        error={null}
                     />
                 </div>
             </div>

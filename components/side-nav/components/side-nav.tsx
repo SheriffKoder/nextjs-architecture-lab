@@ -18,7 +18,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { ChevronLeft, X } from 'lucide-react'
-import { User } from '@/features/auth'
 import NavLink from './nav-link'
 import ExpandableGroup from './expandable-group'
 import SidebarUserArea from './sidebar-user-area'
@@ -26,9 +25,17 @@ import SidebarLogo from './sidebar-logo'
 import LogoIconPair from './logo-icon-pair'
 import { sidebarConfig as config, independentButtonConfig } from '../config'
 import { useSidebar } from '../contexts/sidebar-context'
-import { isInternalAdmin } from '@/features/auth/roles/authorization'
-import { useAppSelector } from '@/features/auth/store/hooks'
 import '@/components/custom-scrollbar.css'
+
+/** Temporary stub until auth is re-implemented. */
+interface User {
+  id: string
+  email: string | null
+  name: string | null
+  phone?: string | null
+  created_at: string
+  updated_at: string
+}
 
 interface SidebarHeaderProps {
   user: User
@@ -42,20 +49,10 @@ export default function SidebarHeader({ user, isScrollable = false }: SidebarHea
   const [expandAllSignal, setExpandAllSignal] = useState(0)
   const [collapseAllSignal, setCollapseAllSignal] = useState(0)
 
-  const sliceUser = useAppSelector((state) => state.user.user)
-  const role = useAppSelector((state) => state.user.role)
-  const userWithRole = useMemo(
-    () => (sliceUser ? { ...sliceUser, role } : null),
-    [sliceUser, role]
-  )
-
   const style = config.style || 'light'
 
-  const navItems = useMemo(() => {
-    const adminOnly = isInternalAdmin(userWithRole)
-    if (adminOnly) return config.items
-    return config.items.filter((item) => item.href !== '/admin-settings')
-  }, [userWithRole])
+  // Show all nav items while auth/RBAC is removed
+  const navItems = config.items
 
   // Handle Expand All and Collapse All
   const hasExpandableGroups = useMemo(

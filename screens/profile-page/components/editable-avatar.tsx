@@ -2,8 +2,17 @@
 
 import React, { useState, useRef } from 'react'
 import UserAvatar from '@/components/side-nav/components/user-avatar'
-import type { User as UserType } from '@/features/auth/users/types'
 import { Camera } from 'lucide-react'
+
+/** Temporary stub until auth is re-implemented. */
+interface UserType {
+  id: string
+  email: string | null
+  name: string | null
+  phone?: string | null
+  created_at: string
+  updated_at: string
+}
 
 interface EditableAvatarProps {
   user: UserType

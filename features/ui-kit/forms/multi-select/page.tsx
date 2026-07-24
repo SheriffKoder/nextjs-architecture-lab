@@ -6,11 +6,10 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Users } from 'lucide-react'
 import DropdownSelect from './dropdown-select'
 import { getLabelClassName } from './utils/label-config'
-import { useUsers } from '@/features/auth'
 
 interface DropdownItem {
   id: string | number
@@ -18,50 +17,16 @@ interface DropdownItem {
   value: any
 }
 
+const MOCK_USERS: DropdownItem[] = [
+  { id: '1', label: 'Alex Rivera', value: { id: '1', name: 'Alex Rivera', email: 'alex@example.com' } },
+  { id: '2', label: 'Jordan Lee', value: { id: '2', name: 'Jordan Lee', email: 'jordan@example.com' } },
+  { id: '3', label: 'Sam Chen', value: { id: '3', name: 'Sam Chen', email: 'sam@example.com' } },
+  { id: '4', label: 'Taylor Brooks', value: { id: '4', name: 'Taylor Brooks', email: 'taylor@example.com' } },
+]
+
 export default function UserFilterPage() {
-  const usersHook = useUsers()
-  const [users, setUsers] = useState<DropdownItem[]>([])
+  const [users] = useState<DropdownItem[]>(MOCK_USERS)
   const [selectedUsers, setSelectedUsers] = useState<DropdownItem[]>([])
-  const [loading, setLoading] = useState(true)
-
-  // Load real users from API
-  useEffect(() => {
-    const loadUsers = async () => {
-      setLoading(true)
-      try {
-        const response = await usersHook.getAll({ limit: 1000 })
-        if (response) {
-          const transformedUsers: DropdownItem[] = response.data.map((user) => ({
-            id: user.id,
-            label: user.name || user.email || 'Unknown User',
-            value: user,
-          }))
-          setUsers(transformedUsers)
-        }
-      } catch (error) {
-        console.error('Error loading users:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadUsers()
-  }, [])
-
-  // Configuration to pass as one prop {...userFilterConfig}
-//   const userFilterConfig = {
-//     icon: Users,
-//     buttonText: 'Filter Users',
-//     items: mockUsers,
-//     selectedItems: selectedUsers,
-//     onSelectionChange: (items: DropdownItem[]) => {
-//       setSelectedUsers(items)
-//     },
-//     searchPlaceholder: 'Search users...',
-//     searchable: true,
-//     width: '100%',
-//     maxHeight: '400px'
-//   }
 
   return (
     <div className="min-h-screen p-8 bg-gray-50" id="multi-select-2">
@@ -99,22 +64,6 @@ export default function UserFilterPage() {
           </div>
         </div>
 
-
-        {/* Configuration Display */}
-        {/* <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Configuration</h2>
-          <pre className="bg-gray-100 p-4 rounded overflow-auto text-sm">
-            {JSON.stringify({
-              buttonText: userFilterConfig.buttonText,
-              searchable: userFilterConfig.searchable,
-              width: userFilterConfig.width,
-              maxHeight: userFilterConfig.maxHeight,
-              totalItems: mockUsers.length,
-              selectedCount: selectedUsers.length
-            }, null, 2)}
-          </pre>
-        </div> */}
-
         {/* Selected Users */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Selected Users</h2>
@@ -151,4 +100,3 @@ export default function UserFilterPage() {
     </div>
   )
 }
-
