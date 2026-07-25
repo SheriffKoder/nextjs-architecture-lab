@@ -5,6 +5,7 @@ Query, cache, pagination, validation, and domain option vocabularies. Changing t
 | File | Responsibility |
 |------|----------------|
 | `demo-rsc-views-config.ts` | Which display modes need the full filtered set (`?all=1`) and the default view id. |
+| `demo-rsc-grouping-config.ts` | Default group expand behavior when URL `groupBy` is applied. |
 | `nl-filter-assistant-config.ts` | NL assistant: URL keys it must not overwrite; allowed sort field keys. |
 | `rental-car-base-filters.ts` | Base `FilterConfig[]` for facet generation / `getFilterOptionsServer` (no icons or FiltersHeader layout). |
 | `rental-car-pagination-config.ts` | Default page size, size options, show-all — used by list query + PaginationFooter. |

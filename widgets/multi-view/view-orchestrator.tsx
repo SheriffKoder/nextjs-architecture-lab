@@ -189,6 +189,8 @@ interface ViewOrchestratorProps<T extends Record<string, any> = Record<string, a
   externalUrlControls?: boolean;
   /** Allowed `groupBy` / `subGroupBy` keys when `externalUrlControls` is true. */
   urlGroupingAllowedKeys?: string[];
+  /** Expand groups when grouping is first applied (page-level SSOT). */
+  defaultGroupsExpanded?: boolean;
 };
 ////////////////////////////////////
 // Component Implementation: Main table logic
@@ -236,6 +238,7 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
   minimalControlsConfig,
   externalUrlControls = false,
   urlGroupingAllowedKeys = EMPTY_GROUPING_KEYS,
+  defaultGroupsExpanded = false,
   columnActions,
   filters,
 }: ViewOrchestratorProps<T>) {
@@ -491,6 +494,7 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
               columnActions={columnActions}
               selectedGroupBy={selectedGroupBy}
               selectedSubGroupBy={selectedSubGroupBy}
+              defaultGroupsExpanded={defaultGroupsExpanded}
               minimalControlsConfig={groupingControlsSignal}
               filters={filters}
             />
@@ -515,6 +519,7 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
               columnActions={columnActions}
               selectedGroupBy={selectedGroupBy}
               selectedSubGroupBy={selectedSubGroupBy}
+              defaultGroupsExpanded={defaultGroupsExpanded}
               minimalControlsConfig={groupingControlsSignal}
               filters={filters}
             />

@@ -90,6 +90,8 @@ interface VirtualizedTableComponentProps<T = any> {
   // Dynamic grouping state (overrides config)
   selectedGroupBy?: string | null;
   selectedSubGroupBy?: string | null;
+  /** Expand groups when grouping is first applied (page-level SSOT). */
+  defaultGroupsExpanded?: boolean;
   // Configuration for minimal controls
   minimalControlsConfig?: {
     availableColumnsForGrouping?: string[];
@@ -140,6 +142,7 @@ export function VirtualizedTableComponent<T = any>({
   columnActions,
   selectedGroupBy,
   selectedSubGroupBy,
+  defaultGroupsExpanded = false,
   minimalControlsConfig,
   filters,
 }: VirtualizedTableComponentProps<T>) {
@@ -258,9 +261,12 @@ export function VirtualizedTableComponent<T = any>({
   }, [data, effectiveGroupBy, effectiveSubGroupBy, groupKeyFormatter, subGroupKeyFormatter]);
 
   /**
-   * Group state management
+   * Group state management — seed expanded when page requests default open groups
    */
-  const groupState = useGroupState(groupedData || []);
+  const groupState = useGroupState(groupedData || [], {
+    defaultExpanded: defaultGroupsExpanded,
+    resetKey: effectiveGroupBy,
+  });
 
   /**
    * Flatten grouped rows for virtualization

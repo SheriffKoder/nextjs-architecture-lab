@@ -774,7 +774,7 @@ export function SubHeadingsContainer<T = any>({
       
       <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
         <div
-          className={`shrink-0 z-10 w-full ${accordionConfig?.groups && accordionConfig?.groups?.length > 0 ? 'pt-[40px]' : ''}`}
+          className={`shrink-0 z-10 w-full ${accordionConfig?.groups && accordionConfig?.groups?.length > 0 ? 'pt-[24px]' : ''}`}
         >
           <VirtualizedTableHeader
             columns={visibleColumns as TableColumn<any>[]}

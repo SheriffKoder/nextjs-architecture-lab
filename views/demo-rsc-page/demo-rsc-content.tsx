@@ -27,6 +27,7 @@ import {
   DEMO_RSC_AVAILABLE_VIEWS,
   DEMO_RSC_USE_ALL_ITEMS_VIEWS,
 } from './config/data/demo-rsc-views-config'
+import { DEMO_RSC_DEFAULT_GROUPS_EXPANDED } from './config/data/demo-rsc-grouping-config'
 import { DEMO_RSC_GROUPING_ALLOWED_KEYS } from './config/ui/demo-rsc-minimal-controls-config'
 import { tableConfig } from './config/ui/displays/table-config'
 import { accordionConfig } from './config/ui/accordion-config'
@@ -197,7 +198,7 @@ export default function DemoRscContent({
         accordionConfig={accordionConfig}
         filters={filters}
         onRowClick={handleRowClick}
-        onRowPointerEnter={handleRowPointerEnter}
+        // onRowPointerEnter={handleRowPointerEnter}
         onCellValueChange={onCellValueChange}
         onActionClick={onActionClick}
         actionConfigs={getRowActionConfigs}
@@ -207,6 +208,7 @@ export default function DemoRscContent({
         }}
         externalUrlControls
         urlGroupingAllowedKeys={DEMO_RSC_GROUPING_ALLOWED_KEYS}
+        defaultGroupsExpanded={DEMO_RSC_DEFAULT_GROUPS_EXPANDED}
         useAllItems={[...DEMO_RSC_USE_ALL_ITEMS_VIEWS]}
         defaultPageSize={10}
         availableViews={[...DEMO_RSC_AVAILABLE_VIEWS]}

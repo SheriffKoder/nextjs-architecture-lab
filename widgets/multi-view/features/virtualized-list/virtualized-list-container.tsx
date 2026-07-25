@@ -87,6 +87,8 @@ interface VirtualizedTableComponentProps<T = any> {
   // Dynamic grouping state (overrides config)
   selectedGroupBy?: string | null;
   selectedSubGroupBy?: string | null;
+  /** Expand groups when grouping is first applied (page-level SSOT). */
+  defaultGroupsExpanded?: boolean;
   // When true, ignore config-based grouping and use only selectedGroupBy
   minimalControlsConfig?: {
     availableColumnsForGrouping?: string[];
@@ -137,6 +139,7 @@ export function VirtualizedTableComponent<T = any>({
   columnActions,
   selectedGroupBy,
   selectedSubGroupBy,
+  defaultGroupsExpanded = false,
   minimalControlsConfig,
   filters,
 }: VirtualizedTableComponentProps<T>) {
@@ -263,9 +266,12 @@ export function VirtualizedTableComponent<T = any>({
   }, [data, effectiveGroupBy, effectiveSubGroupBy, tableConfig, groupSortState, columns]);
 
   /**
-   * Group state management
+   * Group state management — seed expanded when page requests default open groups
    */
-  const groupState = useGroupState(groupedData || []);
+  const groupState = useGroupState(groupedData || [], {
+    defaultExpanded: defaultGroupsExpanded,
+    resetKey: effectiveGroupBy,
+  });
 
   /**
    * Flatten grouped rows for virtualization
@@ -302,6 +308,29 @@ export function VirtualizedTableComponent<T = any>({
     // Default: return data directly
     return data;
   }, [data, flattenedRows]);
+
+  /**
+   * Real data rows only for height measurement.
+   * Flattened rows (headers/spacers) must not be passed to TableRowMeasurer —
+   * they are not T items and poison calculatedRowHeight.
+   */
+  const measureData = useMemo(() => {
+    if (!flattenedRows) return data;
+    return flattenedRows
+      .filter((row) => row.type === 'data-row' && row.data != null)
+      .map((row) => row.data as T);
+  }, [flattenedRows, data]);
+
+  /**
+   * Clear react-window's per-index size cache when the flattened structure
+   * changes (group/ungroup, expand/collapse). Stale sizes cause vertical shifts.
+   */
+  useEffect(() => {
+    const list = listRef.current as VariableSizeList | null;
+    if (list && typeof list.resetAfterIndex === 'function') {
+      list.resetAfterIndex(0, true);
+    }
+  }, [flattenedRows, effectiveGroupBy, effectiveSubGroupBy, listRef]);
 
   ////////////////////////////////////
   // Row Height Calculation: Calculate height based on content
@@ -477,19 +506,12 @@ export function VirtualizedTableComponent<T = any>({
             flattenedRow.subGroupKey
           );
           
-          // Calculate indentation to align with parent group header
-          // Same formula as group headers: level * 20px
+          // Indent to align with parent group header (level * 20px).
+          // Apply on the react-window slot — no nested bordered wrapper (avoids 1px height overflow).
           const tableHeaderIndent = (flattenedRow.level || 0) * 20;
           
           return (
-            <div style={style}>
-              <div 
-                style={{ 
-                  marginLeft: `${tableHeaderIndent}px`,
-                  width: tableHeaderIndent > 0 ? `calc(100% - ${tableHeaderIndent}px)` : '100%'
-                }} 
-                className="border-b border-foreground/5"
-              >
+            <div style={{ ...style, paddingLeft: tableHeaderIndent }}>
               <VirtualizedTableHeader
                 columns={visibleColumns}
                 transparentHeader={transparentHeader}
@@ -498,7 +520,6 @@ export function VirtualizedTableComponent<T = any>({
                 headerFilterConfig={headerFilters}
                 sortConfig={sortConfig}
               />
-              </div>
             </div>
           );
         
@@ -507,8 +528,8 @@ export function VirtualizedTableComponent<T = any>({
           const isSelected = selectedItemId && (item as any).id && (item as any).id.toString() === selectedItemId.toString();
           const rowId = (item as any)?.id;
           
-          // Calculate indentation to align with parent group header
-          // Same formula as group headers: level * 20px
+          // Indent to align with parent group header (level * 20px).
+          // Apply on the react-window slot — no nested bordered wrapper (avoids 1px height overflow).
           const dataRowIndent = (flattenedRow.level || 0) * 20;
           
           // Create toggle handler that resets list after index
@@ -520,14 +541,7 @@ export function VirtualizedTableComponent<T = any>({
           } : undefined;
           
           return (
-            <div style={style}>
-              <div 
-                style={{ 
-                  marginLeft: `${dataRowIndent}px`,
-                  width: dataRowIndent > 0 ? `calc(100% - ${dataRowIndent}px)` : '100%'
-                }} 
-                className="border-b border-foreground/5"
-              >
+            <div style={{ ...style, paddingLeft: dataRowIndent }}>
               <VirtualizedTableRow
                 item={item as T}
                 columns={visibleColumns}
@@ -556,7 +570,6 @@ export function VirtualizedTableComponent<T = any>({
                 expandedContentHeight={rowExpansion?.expandedContentHeight}
                 columnActions={columnActions}
               />
-              </div>
             </div>
           );
       }
@@ -616,10 +629,10 @@ export function VirtualizedTableComponent<T = any>({
 
   return (
     <div className="relative flex h-full min-h-0 flex-col gap-0 p-0">
-      {/* Hidden measurement component for accurate row height calculation (only when dynamic height is enabled) */}
-      {dynamicRowHeight && displayData.length > 0 && (
+      {/* Hidden measurement: real data rows only (never flattened headers/spacers) */}
+      {dynamicRowHeight && measureData.length > 0 && (
         <TableRowMeasurer
-          data={displayData}
+          data={measureData}
           columns={columns}
           onHeightCalculated={setCalculatedRowHeight}
           onRowClick={onRowClick}
@@ -639,7 +652,7 @@ export function VirtualizedTableComponent<T = any>({
       
       <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
         <div
-          className={`shrink-0 z-10 w-full ${accordionConfig?.groups && accordionConfig?.groups?.length > 0 ? 'pt-[40px]' : ''}`}
+          className={`shrink-0 z-10 w-full ${accordionConfig?.groups && accordionConfig?.groups?.length > 0 ? 'pt-[24px]' : ''}`}
         >
           <VirtualizedTableHeader
             columns={visibleColumns}
@@ -683,7 +696,9 @@ export function VirtualizedTableComponent<T = any>({
                   <div className="h-full relative">
                     {dynamicRowHeight ? (
                       <VariableSizeList
-                        key={`table-${calculatedRowHeight}`} // Force re-render when height changes
+                        // Remount when height or grouping mode changes so react-window
+                        // does not keep stale per-index sizes (causes vertical row shift).
+                        key={`table-${calculatedRowHeight}-${flattenedRows ? 'grouped' : 'ungrouped'}`}
                         ref={(ref: any) => {
                           listRef.current = ref;
                           if (rowExpansionEnabled) {

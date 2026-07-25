@@ -1,6 +1,7 @@
 /**
  * Demo RSC — config for url-kit `MinimalControls` (filters island).
  * availableViews / defaultView / useAllItems come from `config/data/demo-rsc-views-config`.
+ * defaultGroupsExpanded comes from `config/data/demo-rsc-grouping-config`.
  */
 
 import type { MinimalControlsConfig } from '@/platform/url-kit/minimal-controls'
@@ -19,12 +20,14 @@ import {
   RENTAL_CAR_SEARCHABLE_FIELDS,
 } from '../contract/rental-car-search-fields'
 
-/** Re-export so consumers can import views + minimal controls from one place if desired. */
+/** Re-export so consumers can import views + grouping + minimal controls from one place if desired. */
 export {
   DEMO_RSC_AVAILABLE_VIEWS,
   DEMO_RSC_DEFAULT_VIEW,
   DEMO_RSC_USE_ALL_ITEMS_VIEWS,
 } from '../data/demo-rsc-views-config'
+
+export { DEMO_RSC_DEFAULT_GROUPS_EXPANDED } from '../data/demo-rsc-grouping-config'
 
 const rentalCarSearchConfig: SearchConfig<RentalCarTableItem> = {
   searchableFields: RENTAL_CAR_SEARCHABLE_FIELDS,
