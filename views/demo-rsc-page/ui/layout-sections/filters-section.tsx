@@ -6,6 +6,7 @@
  */
 
 import { FiltersHeader } from '@/platform/url-kit/filters/components/filters-header'
+import { FilterToolbar } from '@/platform/url-kit/filter-toolbar'
 import { MinimalControls } from '@/platform/url-kit/minimal-controls'
 import { ViewSwitcherWrapper } from '@/platform/url-kit/view-switchers'
 import { NlFilterAssistant } from '@/platform/url-kit/ai-filter/components/nl-filter-assistant'
@@ -38,14 +39,15 @@ export default async function FiltersSection({
 
   return (
     <div className="shrink-0 space-y-2">
-      <FiltersHeader
+
+      {/* <FiltersHeader
         filters={filters}
         searchConfig={rentalCarSearchConfig}
         config={rentalCarFiltersHeaderConfig}
         dateFilterKey="rentalStartDate"
         dateFilterButtonText="Filter by Rental Start Date"
         dateFilterWidth="300px"
-      />
+      /> */}
       {/* <div className="w-full px-2">
         <ViewSwitcherWrapper
           availableViews={DEMO_RSC_AVAILABLE_VIEWS}
@@ -55,6 +57,22 @@ export default async function FiltersSection({
         />
       </div> */}
       {/* <MinimalControls {...demoRscMinimalControlsConfig} /> */}
+      <FilterToolbar
+        filters={filters}
+        searchConfig={rentalCarSearchConfig}
+        labelFilterKey={rentalCarFiltersHeaderConfig.columnOptionsKey ?? 'status'}
+        labelSelectType="single-select"
+        dateFilterKey="rentalStartDate"
+        dateFilterButtonText="Filter by Rental Start Date"
+        groupableFields={demoRscMinimalControlsConfig.groupableFields}
+        availableViews={demoRscMinimalControlsConfig.availableViews}
+        defaultView={demoRscMinimalControlsConfig.defaultView}
+        useAllItems={demoRscMinimalControlsConfig.useAllItems}
+        defaultPageSize={demoRscMinimalControlsConfig.defaultPageSize}
+        enabledFilterKeys={rentalCarFiltersHeaderConfig.enabledFilterKeys}
+        showInitialCount
+      />
+
       {/* <NlFilterAssistant
         catalog={nlCatalog}
         assistantConfig={{
