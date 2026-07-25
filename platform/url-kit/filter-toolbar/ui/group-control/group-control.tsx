@@ -8,6 +8,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Layers, X, RotateCcw, ChevronDown } from 'lucide-react'
@@ -76,6 +78,22 @@ export function GroupControl({
         align="start"
         className="w-64 min-h-[300px] flex flex-col p-0"
       >
+        <div className="px-3 pt-3 pb-1">
+          <DropdownMenuLabel className="p-0 text-xs">
+            {selectedGroupBy && selectedSubGroupBy ? 'Grouping' : 'Group by'}
+          </DropdownMenuLabel>
+          {!selectedGroupBy && (
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Organize rows by a field
+            </p>
+          )}
+          {selectedGroupBy && !selectedSubGroupBy && (
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Optionally add a subgroup
+            </p>
+          )}
+        </div>
+        <DropdownMenuSeparator className="my-0" />
         <div className="flex-1 flex flex-col p-3 overflow-y-auto">
           {!selectedGroupBy && (
             <div className="space-y-1">
@@ -97,8 +115,8 @@ export function GroupControl({
             <>
               <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
                 <div className="flex-1 flex items-center gap-2">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    A
+                  <span className="w-[3.5rem] shrink-0 text-xs font-medium text-muted-foreground">
+                    Group
                   </span>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -136,6 +154,9 @@ export function GroupControl({
                   <X className="w-3 h-3" />
                 </button>
               </div>
+              <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">
+                Subgroup by
+              </p>
               <div className="space-y-1">
                 {availableSubGroupFields.map((field) => (
                   <div

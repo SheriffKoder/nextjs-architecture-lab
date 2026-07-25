@@ -11,7 +11,10 @@
 import { Suspense } from 'react'
 import { cn } from '@/shared/lib/utils'
 import type { FilterToolbarProps } from '../model/types'
-import { DEFAULT_GROUPING_SUPPORTED_VIEWS } from '../config/chrome'
+import {
+  DEFAULT_GROUPING_SUPPORTED_VIEWS,
+  FILTER_TOOLBAR_PANEL_SURFACE_CLASS,
+} from '../config/chrome'
 import { useUrlGrouping } from '../hooks/use-url-grouping'
 import { useViewResolution } from '../hooks/use-view-resolution'
 import { FilterControl } from './filter-control/filter-control'
@@ -29,7 +32,7 @@ function FilterToolbarInner({
   labelFilterKey,
   labelSelectType = 'single-select',
   dateFilterKey = 'rentalStartDate',
-  dateFilterButtonText = 'Filter by Date',
+  dateFilterButtonText,
   groupableFields = [],
   groupingSupportedViews = DEFAULT_GROUPING_SUPPORTED_VIEWS,
   availableViews = [],
@@ -62,6 +65,11 @@ function FilterToolbarInner({
     filters[0]?.key ||
     ''
 
+  const dateFilterLabel =
+    dateFilterKey
+      ? filters.find((f) => f.key === dateFilterKey)?.label
+      : undefined
+
   return (
     <div
       className={cn(
@@ -73,6 +81,7 @@ function FilterToolbarInner({
         <FilterControl
           filters={displayedFilters}
           showInitialCount={showInitialCount}
+          panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
         />
         {groupableFields.length > 0 && (
           <GroupControl
@@ -108,7 +117,9 @@ function FilterToolbarInner({
         {dateFilterKey ? (
           <DateControl
             filterKey={dateFilterKey}
+            filterLabel={dateFilterLabel}
             buttonText={dateFilterButtonText}
+            panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
           />
         ) : null}
       </div>

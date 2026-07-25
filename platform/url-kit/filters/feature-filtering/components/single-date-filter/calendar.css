@@ -1,9 +1,10 @@
 /* Custom Calendar Styles - Small size with dark/light theme support */
 
-/* Base wrapper - smaller font size */
+/* Base wrapper - smaller font size; match app surface (override package #fff) */
 .rdrCalendarWrapper {
   color: hsl(var(--foreground));
   font-size: 10px; /* Reduced from 12px */
+  background: hsl(var(--background));
 }
 
 /* Remove any text decorations from all elements */
@@ -361,7 +362,8 @@
 
 /* Calendar wrapper background */
 .rdrDateRangeWrapper {
-  background: hsl(var(--background));
+  /* background: hsl(var(--background)); */
+  background: transparent;
   border: none;
   border-radius: 0.6em;
   padding: 3px;

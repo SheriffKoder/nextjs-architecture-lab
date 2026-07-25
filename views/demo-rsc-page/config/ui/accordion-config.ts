@@ -25,5 +25,5 @@ export const accordionConfig = {
     },
   ],
   allowMultipleOpen: true,
-  defaultOpenGroup: 'updates',
+  defaultOpenGroup: '',
 }

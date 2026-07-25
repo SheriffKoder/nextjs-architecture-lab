@@ -5,6 +5,9 @@
 
 export const FILTER_TOOLBAR_SURFACE_BG = 'bg-white dark:bg-[#000000]'
 
+/** Opaque panel surface for filter / date dropdowns. */
+export const FILTER_TOOLBAR_PANEL_SURFACE_CLASS = 'bg-background'
+
 /** Search field surface at reduced opacity. */
 export const FILTER_TOOLBAR_SEARCH_SURFACE_BG =
   'bg-white/50 dark:bg-[#000000]/50'

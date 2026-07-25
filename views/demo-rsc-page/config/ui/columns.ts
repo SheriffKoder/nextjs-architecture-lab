@@ -114,7 +114,7 @@ export const allColumns: TableColumn<RentalCarTableItem>[] = [
   },
   {
     key: 'licensePlate',
-    name: 'License Plate',
+    name: 'Plate #',
   },
   {
     key: 'rentalStartDate',

@@ -19,12 +19,15 @@ export interface FilterControlProps {
   filters: FilterConfig[]
   showInitialCount?: boolean
   className?: string
+  /** Dropdown panel surface (e.g. `bg-background`). */
+  panelClassName?: string
 }
 
 export function FilterControl({
   filters,
   showInitialCount = false,
   className,
+  panelClassName = 'bg-background/80 backdrop-blur-sm',
 }: FilterControlProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [activeFilterKey, setActiveFilterKey] = useState<string | null>(null)
@@ -127,12 +130,19 @@ export function FilterControl({
       <div
         ref={dropdownRef}
         className={cn(
-          'absolute min-w-[calc(100vw-1.5rem)] lg:min-w-[600px] w-fit top-full left-0 z-50 mt-2 border border-border rounded-lg shadow-lg transition-all duration-200 bg-background/80 backdrop-blur-sm',
+          'absolute min-w-[calc(100vw-1.5rem)] lg:min-w-[600px] w-fit top-full left-0 z-50 mt-2 border border-border rounded-lg shadow-lg transition-all duration-200',
+          panelClassName,
           isDropdownOpen
             ? 'opacity-100 visible'
             : 'opacity-0 invisible pointer-events-none'
         )}
       >
+        <div className="border-b border-border px-3 pt-3 pb-2">
+          <p className="text-xs font-medium">Filters</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Narrow results by one or more fields, applied forward.
+          </p>
+        </div>
         <div className="flex gap-2 lg:gap-6 p-2">
           <FilterColumnList
             filters={filters}

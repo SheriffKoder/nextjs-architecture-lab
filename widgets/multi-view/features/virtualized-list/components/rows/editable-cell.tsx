@@ -3,11 +3,11 @@
  * 
  * Purpose: Renders a cell that can switch between text display and input editing
  * Used in: VirtualizedTableRow for editable columns
- * Why: Provides inline editing functionality with double-click to edit
+ * Why: Provides inline editing functionality with single-click to edit
  * 
  * Features:
  * - Displays as text by default
- * - Double-click to enter edit mode
+ * - Single-click to enter edit mode
  * - ESC key to cancel editing
  * - Blur or Enter to save changes
  * - Seamless visual transition between modes
@@ -132,19 +132,14 @@ export function EditableCell<T = any>({
     return () => el.removeEventListener("wheel", onWheel);
   }, [isEditing, inputType]);
 
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click from triggering
-    if (!disabled) {
-      if (isDropdown && dropdownOptions.length > 0) {
-        setIsDropdownOpen(true);
-      } else {
-        setIsEditing(true);
-      }
-    }
-  };
-
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click from triggering on single click too
+    e.stopPropagation(); // Prevent row click from triggering
+    if (disabled) return;
+    if (isDropdown && dropdownOptions.length > 0) {
+      setIsDropdownOpen((open) => !open);
+      return;
+    }
+    setIsEditing(true);
   };
 
   const handleDropdownSelect = (option: DropdownOption) => {
@@ -272,12 +267,15 @@ export function EditableCell<T = any>({
     displayValue || <span className="text-muted-foreground italic">Click to edit</span>;
 
   return (
-    <div ref={cellRef} className="relative w-full min-w-0" onClick={handleClick}>
+    <div
+      ref={cellRef}
+      className="relative w-full min-w-0"
+      onClick={(e) => e.stopPropagation()}
+    >
       <div
         className={shellClassName}
-        onDoubleClick={handleDoubleClick}
         onClick={handleClick}
-        title={disabled ? 'This field is not editable' : 'Double-click to edit'}
+        title={disabled ? 'This field is not editable' : 'Click to edit'}
       >
         <div className="min-w-0 flex-1 truncate">{labelContent}</div>
         {isDropdown && dropdownOptions.length > 0 ? (

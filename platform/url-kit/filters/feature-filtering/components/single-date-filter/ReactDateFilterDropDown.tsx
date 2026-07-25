@@ -30,6 +30,7 @@ import { createLocalDate, formatDisplayDate } from '../../../utils/formatting/da
 import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 import './calendar.css'
+import { useIsMobile } from './use-is-mobile'
 /**
  * Date selection mode type
  */
@@ -52,6 +53,10 @@ interface DateSelectorDropdownProps {
   onReset?: () => void
   setIsDropdownOpen?: (isOpen: boolean) => void
   showDateFilterHeader?: boolean
+  /** Field label shown in the panel header (e.g. from FilterConfig.label). */
+  filterLabel?: string
+  /** Panel surface classes (default: translucent background). */
+  panelClassName?: string
 }
 
 /**
@@ -71,7 +76,9 @@ export default function DateSelectorDropdown({
   initialStartDate,
   initialEndDate,
   onReset,
-  showDateFilterHeader = false
+  showDateFilterHeader = false,
+  filterLabel,
+  panelClassName = 'bg-background/80 backdrop-blur-sm',
 }: DateSelectorDropdownProps) {
   // Helper function to get today's date in YYYY-MM-DD format using local time
   const getTodayString = () => {
@@ -88,6 +95,7 @@ export default function DateSelectorDropdown({
 
   const [mode, setMode] = useState<DateMode>(selectedDateMode)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile()
   
   ///////////////////////
   // Date range state for react-date-range
@@ -369,14 +377,15 @@ export default function DateSelectorDropdown({
   }
 
   ///////////////////////
-  // Render range mode with a single 2-month calendar
+  // Render range mode with a 2-month calendar
+  // Mobile: stack months vertically; desktop: side-by-side
   const renderRangeMode = () => (
     <DateRange
       onChange={(item: any) => handleDateSelect(item)}
       moveRangeOnFirstSelection={false}
       months={2}
       ranges={dateRange}
-      direction="horizontal"
+      direction={isMobile ? 'vertical' : 'horizontal'}
       weekStartsOn={1}
       rangeColors={['var(--color-primary)']}
     />
@@ -385,14 +394,24 @@ export default function DateSelectorDropdown({
 
   return (
     <div className="relative" ref={dropdownRef} style={{ width }}>
-        <div className="mt-1 bg-background/80 backdrop-blur-sm border border-border rounded-lg shadow-lg z-50" style={{ 
-          width: mode === 'range' || showDateFilterHeader ? 'fit-content' : '250px' 
+        <div
+          className={`mt-1 border border-border rounded-lg shadow-lg z-50 ${panelClassName}`}
+          style={{
+          width: mode === 'range' || showDateFilterHeader ? 'fit-content' : '250px'
         }}>
           <div className="p-1 lg:p-4 flex flex-col items-center justify-center">
             {/* Header */}
-            <div className={`mr-auto items-center justify-between mb-2 ${showDateFilterHeader ? 'flex' : 'hidden'}`}>
+            <div className={`mr-auto mb-2 w-full ${showDateFilterHeader ? 'block' : 'hidden'}`}>
+              <p className="text-xs font-medium">
+                {filterLabel || buttonText || 'Date'}
+              </p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {filterLabel
+                  ? `Filter results by day, week, month, or range`
+                  : 'Filter results by day, week, month, or range'}
+              </p>
               {/* Mode Selector Buttons */}
-              <div className="flex gap-1">
+              <div className="mt-2 flex gap-1">
                 {(['day', 'week', 'month', 'range'] as DateMode[]).map((modeOption) => (
                   <button
                     key={modeOption}
@@ -406,7 +425,6 @@ export default function DateSelectorDropdown({
                     {modeOption.charAt(0).toUpperCase() + modeOption.slice(1)}
                   </button>
                 ))}
-
               </div>
             </div>
 
