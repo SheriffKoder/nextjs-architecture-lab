@@ -32,9 +32,9 @@ export default function NavTooltip({ text, color = 'primary', isActive }: NavToo
       arrow: 'border-r-primary'
     },
     secondary: {
-      bg: 'bg-teal-500',
-      text: 'text-white',
-      arrow: 'border-r-teal-500'
+      bg: 'bg-tertiary',
+      text: 'text-background dark:text-background/70',
+      arrow: 'border-r-tertiary'
     }
   }
   

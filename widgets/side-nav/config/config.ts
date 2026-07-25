@@ -150,6 +150,7 @@
       href: '/dashboard'
     },
     style: 'light',
+    defaultCollapsed: true,
     items: [
       {
         href: '/dashboard',

@@ -15,9 +15,10 @@ interface User {
 }
 
 function SidebarHeaderFallback() {
+  // Match defaultCollapsed rail width to avoid load layout jump (see sidebarConfig.defaultCollapsed)
   return (
     <div
-      className="h-full min-h-[700px] w-[calc(100vw-16px)] max-w-[300px] shrink-0 rounded-lg border border-tertiary/10 bg-background/20 backdrop-blur-lg animate-pulse md:w-[300px]"
+      className="h-full min-h-[700px] w-24 shrink-0 rounded-lg border border-tertiary/10 bg-background/20 backdrop-blur-lg animate-pulse"
       aria-hidden
     />
   )

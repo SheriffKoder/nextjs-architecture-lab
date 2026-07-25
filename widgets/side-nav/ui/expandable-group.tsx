@@ -127,7 +127,7 @@ export default function ExpandableGroup({
         tabIndex={0}
         onClick={toggleOpen}
         className={cn(
-          'relative flex w-full items-center justify-between px-4 pt-2 pb-0 text-left text-sm font-medium transition-colors',
+          'group relative flex w-full items-center justify-between px-4 pt-2 pb-0 text-left text-sm font-medium transition-colors',
           isCollapsed ? 'justify-center' : 'cursor-pointer',
           triggerTone
         )}
@@ -146,7 +146,9 @@ export default function ExpandableGroup({
         <div className={cn('flex flex-1 items-center gap-3', isCollapsed && 'justify-center')}>
           {/* {Icon && <Icon className={cn('size-5 shrink-0', triggerTone)} />} */}
           {!isCollapsed && (
-            <span className={cn('min-w-0 flex-1 text-xs', triggerTone)}>{item.text}</span>
+            <span className={cn('min-w-0 flex-1 whitespace-nowrap text-xs', triggerTone)}>
+              {item.text}
+            </span>
           )}
         </div>
 

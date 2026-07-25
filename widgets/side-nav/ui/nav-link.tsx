@@ -157,10 +157,10 @@ export default function NavLink({
       )}
 
       {!isCollapsed && (
-        <div className="flex flex-col">
-          <span className="font-semibold">{text}</span>
+        <div className="flex min-w-0 flex-col">
+          <span className="whitespace-nowrap font-semibold">{text}</span>
           {subtext && (
-            <span className={`text-xs ${sidebarColorConfig.subtext[style]}`}>
+            <span className={`whitespace-nowrap text-xs ${sidebarColorConfig.subtext[style]}`}>
               {subtext}
             </span>
           )}

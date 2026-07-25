@@ -101,5 +101,7 @@ export interface SidebarConfig {
   }
   items: NavItemConfig[]
   style?: 'dark' | 'light'
+  /** When true, the sidebar starts in the narrow (icon-only) collapsed state. */
+  defaultCollapsed?: boolean
 }
 

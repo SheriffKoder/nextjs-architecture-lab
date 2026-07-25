@@ -39,6 +39,8 @@ interface SidebarLogoProps {
 export default function SidebarLogo({ logo, logoText, isCollapsed }: SidebarLogoProps) {
   // Ref for the logoText wrapper div to animate its width
   const logoTextWrapperRef = useRef<HTMLDivElement>(null)
+  // Skip tween on first paint so defaultCollapsed does not flash expand→collapse
+  const hasMountedRef = useRef(false)
 
   /////////////////////////////////////
   // Animate wrapper div width based on collapse state
@@ -47,10 +49,17 @@ export default function SidebarLogo({ logo, logoText, isCollapsed }: SidebarLogo
   useEffect(() => {
     if (!logoTextWrapperRef.current || !logoText) return
 
-    // Animate wrapper width: 0px when collapsed, expanded width when expanded
-    // Image inside stays at fixed width, overflow-hidden clips it
+    const width = isCollapsed ? 0 : 200
+
+    // First paint: set immediately (matches defaultCollapsed / initial isCollapsed)
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      gsap.set(logoTextWrapperRef.current, { width })
+      return
+    }
+
     gsap.to(logoTextWrapperRef.current, {
-      width: isCollapsed ? 0 : 200,
+      width,
       duration: 0.3,
       ease: 'power2.inOut',
     })
@@ -75,6 +84,7 @@ export default function SidebarLogo({ logo, logoText, isCollapsed }: SidebarLogo
         <div
           ref={logoTextWrapperRef}
           className="overflow-hidden flex-shrink-0"
+          style={{ width: isCollapsed ? 0 : 200 }}
         >
           <div className="w-[200px] h-[75px]">
             <Image 
