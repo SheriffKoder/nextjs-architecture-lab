@@ -39,6 +39,8 @@ export const DEMO_RSC_UI_ONLY_SEARCH_PARAM_KEYS = [
   'id',
   'action',
   'view',
+  'groupBy',
+  'subGroupBy',
 ] as const
 
 export type DemoRscUiOnlySearchParamKey =

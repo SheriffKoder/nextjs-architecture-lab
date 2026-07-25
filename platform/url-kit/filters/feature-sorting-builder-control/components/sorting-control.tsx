@@ -9,7 +9,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +29,8 @@ import type { SortingControlProps } from '../types'
 export function SortingControl({
   sortConfig,
   className,
+  triggerClassName,
+  triggerSurfaceClassName,
   placeholder = "Sort",
 }: SortingControlProps) {
   const { getSorts, setSorts, clearSorts } = useUrlSorting()
@@ -111,14 +112,22 @@ export function SortingControl({
     <div className={className}>
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant={hasSorts ? "default" : "outline"}
-            size="sm"
-            className="flex items-center gap-2"
+          <button
+            type="button"
+            className={
+              triggerClassName ??
+              'relative inline-flex h-8 items-center justify-center gap-2 rounded-md border border-input bg-transparent px-3 text-xs font-medium shadow-sm'
+            }
           >
-            <ArrowUpDown className="w-4 h-4" />
-            {getButtonText()}
-          </Button>
+            {triggerSurfaceClassName ? (
+              <span
+                className={`absolute inset-px z-0 rounded-[calc(0.5rem-1px)] pointer-events-none ${triggerSurfaceClassName}`}
+                aria-hidden
+              />
+            ) : null}
+            <ArrowUpDown className="relative z-10 w-4 h-4" />
+            <span className="relative z-10">{getButtonText()}</span>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="min-w-64 min-h-[300px] flex flex-col p-0">
           <div className="flex-1 flex flex-col p-3 overflow-y-auto">

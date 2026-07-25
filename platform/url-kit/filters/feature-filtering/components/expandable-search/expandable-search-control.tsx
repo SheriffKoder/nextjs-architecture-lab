@@ -60,6 +60,12 @@ export interface ExpandableSearchControlProps<T extends Record<string, any>> {
    * HOW: Merged with default classes
    */
   className?: string
+
+  /**
+   * Opaque surface class (e.g. `bg-white dark:bg-black`) for the absolute
+   * fill behind the input when expanded. Collapsed icon-only state stays clear.
+   */
+  surfaceClassName?: string
 }
 
 /**
@@ -73,6 +79,7 @@ export function ExpandableSearchControl<T extends Record<string, any>>({
   debounceMs = 300,
   expandedWidth = '300px',
   className,
+  surfaceClassName,
 }: ExpandableSearchControlProps<T>) {
   // Get search functions from useUrlFilters hook
   // WHY: Provides setSearch function for URL state management
@@ -227,6 +234,17 @@ export function ExpandableSearchControl<T extends Record<string, any>>({
       onMouseLeave={handleMouseLeave}
     >
       <div className="relative w-full">
+        {/* Opaque surface when open — same fill as minimal-controls triggers */}
+        {isExpanded && surfaceClassName && (
+          <div
+            className={cn(
+              'absolute inset-0 rounded-lg pointer-events-none z-0',
+              surfaceClassName
+            )}
+            aria-hidden
+          />
+        )}
+
         {/* Search Icon - Always visible, clickable when collapsed */}
         <div 
           className={cn(
@@ -249,12 +267,11 @@ export function ExpandableSearchControl<T extends Record<string, any>>({
           onKeyDown={handleKeyDown}
           placeholder={isExpanded ? (config.placeholder || "Search...") : ''}
           className={cn(
-            "block w-full pl-10 pr-10 py-2 border border-border rounded-lg shadow-sm",
+            "relative z-[1] block w-full pl-10 pr-10 py-2 border border-border rounded-lg shadow-sm",
             "placeholder:text-muted-foreground text-sm",
             "outline-none transition-all duration-300 ease-in-out",
-            "bg-background text-foreground",
-            "hover:bg-background hover:text-foreground",
-            "focus:bg-background focus:text-foreground",
+            "bg-transparent text-foreground",
+            "focus:outline-none focus:ring-0",
             !isExpanded ? 'opacity-0 cursor-pointer' : 'opacity-100'
           )}
           aria-label="Search"
@@ -265,10 +282,10 @@ export function ExpandableSearchControl<T extends Record<string, any>>({
           <button
             onClick={handleClearClick}
             className={cn(
-              "absolute inset-y-0 right-0 pr-3 flex items-center",
+              "absolute inset-y-0 right-0 pr-3 flex items-center z-10",
               "transition-colors duration-200",
-              "text-muted-foreground hover:text-foreground",
-              "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+              "text-muted-foreground hover:text-tertiary",
+              "focus:outline-none focus-visible:ring-0"
             )}
             aria-label="Clear search"
             title="Clear search (Esc)"

@@ -9,7 +9,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +28,13 @@ import type { FilterNode } from '../../types/filter'
 interface QueryBuilderProps {
   fields?: FilterField[]
   className?: string
+  /** Extra classes for the trigger button (e.g. minimal-controls shared chrome). */
+  triggerClassName?: string
+  /**
+   * Solid fill class for an absolute layer behind the trigger label
+   * (e.g. `bg-white dark:bg-black`). Button itself stays transparent.
+   */
+  triggerSurfaceClassName?: string
   placeholder?: string
 }
 
@@ -40,6 +46,8 @@ interface QueryBuilderProps {
 export function QueryBuilder({
   fields = filterFields,
   className,
+  triggerClassName,
+  triggerSurfaceClassName,
   placeholder = "Filter",
 }: QueryBuilderProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -93,14 +101,22 @@ export function QueryBuilder({
     <div className={className}>
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant={hasFilters ? "default" : "outline"}
-            size="sm"
-            className="flex items-center gap-2"
+          <button
+            type="button"
+            className={
+              triggerClassName ??
+              'relative inline-flex h-8 items-center justify-center gap-2 rounded-md border border-input bg-transparent px-3 text-xs font-medium shadow-sm'
+            }
           >
-            <Filter className="w-4 h-4" />
-            {getButtonText()}
-          </Button>
+            {triggerSurfaceClassName ? (
+              <span
+                className={`absolute inset-px z-0 rounded-[calc(0.5rem-1px)] pointer-events-none ${triggerSurfaceClassName}`}
+                aria-hidden
+              />
+            ) : null}
+            <Filter className="relative z-10 w-4 h-4" />
+            <span className="relative z-10">{getButtonText()}</span>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-[800px] h-fit flex flex-col p-0">
           <div className="flex-1 flex flex-col p-3 overflow-y-auto">

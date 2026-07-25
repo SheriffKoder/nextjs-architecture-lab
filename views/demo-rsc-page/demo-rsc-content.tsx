@@ -1,14 +1,14 @@
 /**
  * Demo RSC Content Component
  *
- * Purpose: Client component that renders FilteringWrapper with rental cars data
+ * Purpose: Client component that renders ViewOrchestrator with rental cars data
  * Used in: `demo-rsc-index.tsx`
  * Why: Separates client-side rendering logic from server component
  *
  * Steps:
- * 1. Import FilteringWrapper from clean version
+ * 1. Import ViewOrchestrator
  * 2. Import table configurations
- * 3. Render FilteringWrapper with data and configs
+ * 3. Render ViewOrchestrator with data and configs
  */
 
 'use client'
@@ -17,14 +17,17 @@ import { useCallback } from 'react'
 
 // Features/UI
 import { useDrawerActions } from '@/platform/url-kit/url-drawer'
-import { FilteringWrapper } from '@/widgets/multi-view/filtering-wrapper'
+import { ViewOrchestrator } from '@/widgets/multi-view/view-orchestrator'
 
 
 ////////////////////////////////////////////////////////////
 // Individual Display configs (different types of UI layouts)
 // Configs
-import { DEMO_RSC_USE_ALL_ITEMS_VIEWS } from './config/data/demo-rsc-views-config'
-import { minimalControlsConfig } from './config/ui/minimal-controls-config'
+import {
+  DEMO_RSC_AVAILABLE_VIEWS,
+  DEMO_RSC_USE_ALL_ITEMS_VIEWS,
+} from './config/data/demo-rsc-views-config'
+import { DEMO_RSC_GROUPING_ALLOWED_KEYS } from './config/ui/demo-rsc-minimal-controls-config'
 import { tableConfig } from './config/ui/displays/table-config'
 import { accordionConfig } from './config/ui/accordion-config'
 import { tableColumns } from './config/ui/columns'
@@ -62,8 +65,8 @@ interface DemoRscContentProps {
 /**
  * Demo RSC content component
  *
- * Why: Displays rental cars in all available views using FilteringWrapper
- * How: Configures FilteringWrapper with all view configs and enables all views
+ * Why: Displays rental cars in all available views using ViewOrchestrator
+ * How: Configures ViewOrchestrator with all view configs and enables all views
  */
 export default function DemoRscContent({
   cars,
@@ -188,7 +191,7 @@ export default function DemoRscContent({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <FilteringWrapper
+      <ViewOrchestrator
         data={displayData}
         columns={tableColumns}
         accordionConfig={accordionConfig}
@@ -202,10 +205,11 @@ export default function DemoRscContent({
           delete: (item) => handleDeleteColumnAction(item),
           setActivity: setActivityColumnAction,
         }}
-        minimalControlsConfig={minimalControlsConfig}
+        externalUrlControls
+        urlGroupingAllowedKeys={DEMO_RSC_GROUPING_ALLOWED_KEYS}
         useAllItems={[...DEMO_RSC_USE_ALL_ITEMS_VIEWS]}
         defaultPageSize={10}
-        availableViews={['table', 'kanban', 'calendar', 'map', 'timeline', 'subheadings', 'list']}
+        availableViews={[...DEMO_RSC_AVAILABLE_VIEWS]}
         tableConfig={{
           ...tableConfig,
           loading,

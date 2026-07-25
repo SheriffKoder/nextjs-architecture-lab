@@ -131,7 +131,7 @@ export default function DemoClientIndex() {
         stacking={ToastStacking.PUSH_DOWN}
       />
       <header className="flex flex-col md:flex-row gap-4 p-4 border-b border-tertiary/10 items-center justify-between flex-shrink-0">
-        <PageHeader subTitle="Client-side data via TanStack Query, URL filters, and shared FilteringWrapper" />
+        <PageHeader subTitle="Client-side data via TanStack Query, URL filters, and shared ViewOrchestrator" />
 
         {/* Action buttons */}
         <ActionButtons

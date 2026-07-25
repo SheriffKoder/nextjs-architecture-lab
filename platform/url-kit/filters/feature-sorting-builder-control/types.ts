@@ -24,6 +24,17 @@ export interface SortingControlProps {
    * Optional CSS classes
    */
   className?: string
+
+  /**
+   * Extra classes for the trigger button (e.g. minimal-controls shared chrome).
+   */
+  triggerClassName?: string
+
+  /**
+   * Solid fill for an absolute layer behind the trigger label
+   * (e.g. `bg-white dark:bg-black`).
+   */
+  triggerSurfaceClassName?: string
   
   /**
    * Button text when no sorts are active

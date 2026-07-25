@@ -6,10 +6,12 @@
 // Features/UI
 import { NavigationPendingDimmer } from '@/platform/url-kit/filters/navigation-transition-context'
 import { PaginationFooter } from '@/platform/url-kit/filters/components/pagination-footer'
+import { FolderTabs } from '@/platform/url-kit/view-switchers'
 
 // Page
 import { rentalCarPaginationConfig } from '../../config/data/rental-car-pagination-config'
 import {
+  DEMO_RSC_AVAILABLE_VIEWS,
   DEMO_RSC_DEFAULT_VIEW,
   DEMO_RSC_USE_ALL_ITEMS_VIEWS,
 } from '../../config/data/demo-rsc-views-config'
@@ -45,6 +47,14 @@ export default async function TableAndPaginationSection({
 
   return (
     <NavigationPendingDimmer className="flex min-h-0 flex-1 flex-col gap-4">
+      {/* <div className="w-full flex justify-start shrink-0">
+        <FolderTabs
+          availableViews={DEMO_RSC_AVAILABLE_VIEWS}
+          defaultView={DEMO_RSC_DEFAULT_VIEW}
+          useAllItems={DEMO_RSC_USE_ALL_ITEMS_VIEWS}
+          defaultPageSize={10}
+        />
+      </div> */}
       <div className="flex min-h-0 flex-1 flex-col">
         <DemoRscContent cars={cars.cars} filters={filters} />
       </div>

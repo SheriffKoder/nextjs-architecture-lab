@@ -10,6 +10,10 @@ export const NL_FILTER_EXCLUDED_URL_KEYS = [
   'drawer',
   'mode',
   'id',
+  'view',
+  'groupBy',
+  'subGroupBy',
+  'action',
 ] as const
 
 /** Sort `key` values allowed in `sort` URL param (`key:direction` comma-separated). */

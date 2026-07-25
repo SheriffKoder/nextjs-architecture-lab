@@ -1,23 +1,15 @@
 /**
- * VirtualizedTable Component
- * 
- * Purpose: High-performance virtualized table with multiple view modes
- * Used in: Various pages
- * Why: Provides efficient rendering of large datasets with view switching
- * 
- * Note: Filtering, sorting, and pagination removed - data should be pre-processed
- * 
- * Steps:
- * 1. Import view components and utilities
- * 2. Initialize view switcher
- * 3. Render appropriate view based on current selection
+ * ViewOrchestrator
+ *
+ * Purpose: Resolve URL view/grouping and render the matching multi-view display
+ * Used in: Demo RSC / demo client pages
+ * Why: Orchestrates view modes; filter/sort/pagination chrome lives in url-kit
  */
 
 "use client";
 
-import React, { useState, useRef, useEffect, Suspense } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { VariableSizeList, FixedSizeList } from "react-window";
-import { usePathname } from "next/navigation";
 import { LoadingSpinner } from "./components/loading-spinner";
 import {
   TableColumn,
@@ -32,24 +24,19 @@ import { useAccordionColumns } from "./hooks/useAccordionColumns";
 import { GroupIndicators } from "./components/GroupIndicators";
 import { VirtualizedTableComponent } from "./features/virtualized-table/virtualized-table-container";
 import { VirtualizedTableComponent as VirtualizedListComponent } from "./features/virtualized-list/virtualized-list-container";
-import { ViewSwitcherWrapper } from "./components/view-switcher-wrapper";
 import CalendarContainer from "./features/calendar/calendar-container";
 import KanbanWrapper from "./features/kanban/kanban-wrapper";
 import { SubHeadingsContainer } from "./features/subheadings/subheadings-container";
 import type { SubheadingsUpdateContext } from "./features/subheadings/dnd";
 import type { ColumnConfig } from "./features/kanban/types/kanban-types";
-import { Loading } from "@/components/ui/loading";
 import { MapsContainerWithMock } from "@/widgets/maps-view/mock";
 import TimelineWrapper from "./features/timeline-3/timeline-wrapper";
 import type { GroupConfig } from "./features/virtualized-list/utils/grouping-utils";
-import { GroupingControl } from "./components/minimals/grouping-control";
-import { NewSwitcherWrapper } from "./components/minimals/minimal-switcher-wrapper";
-import { SortingControl } from "@/platform/url-kit/filters/feature-sorting-builder-control/components";
-import { QueryBuilder } from "@/platform/url-kit/filters/feature-query-builder-filter/components/query-builder";
 import type { FilterField } from "@/platform/url-kit/filters/feature-query-builder-filter/types/field";
-import { ExpandableSearchControl } from "@/platform/url-kit/filters/feature-filtering/components";
 import type { SearchConfig } from "@/platform/url-kit/filters/feature-filtering/components/search-types";
-import { FolderTabShape2View } from "@/widgets/multi-view/components/folder-tab-shape-2/folder-tab-shape-2-view";
+import { useUrlGrouping } from "@/platform/url-kit/minimal-controls";
+
+const EMPTY_GROUPING_KEYS: string[] = [];
 // Lazy load DashboardContent to avoid loading it when not on dashboard route
 // const DashboardContent = lazy(() => import("@/features/dashboard/dashboard-content"));
 
@@ -58,9 +45,9 @@ import { FolderTabShape2View } from "@/widgets/multi-view/components/folder-tab-
 ////////////////////////////////////
 
 /**
- * Props for the VirtualizedTable component
+ * Props for the ViewOrchestrator component
  */
-interface FilteringWrapperProps<T extends Record<string, any> = Record<string, any>> {
+interface ViewOrchestratorProps<T extends Record<string, any> = Record<string, any>> {
   // Data array to display in the table
   data: T[];
   // Column definitions for table structure
@@ -195,22 +182,28 @@ interface FilteringWrapperProps<T extends Record<string, any> = Record<string, a
     queryBuilderFields?: FilterField[]; // Fields for QueryBuilder component
     searchConfig?: SearchConfig<T>; // Search configuration for ExpandableSearchControl component
   };
+  /**
+   * When true, toolbar is owned by url-kit `MinimalControls` outside this wrapper.
+   * Grouping + view still come from URL; local toolbar is not rendered.
+   */
+  externalUrlControls?: boolean;
+  /** Allowed `groupBy` / `subGroupBy` keys when `externalUrlControls` is true. */
+  urlGroupingAllowedKeys?: string[];
 };
 ////////////////////////////////////
 // Component Implementation: Main table logic
 ////////////////////////////////////
 
 /**
- * High-performance virtualized table component
- * Supports multiple view modes (table, kanban, calendar, map, timeline, subheadings, list)
- * 
- * @template T - The type of data items in the table
- * @param {FilteringWrapperProps<T>} props - Component props
- * @returns {JSX.Element} Complete table component
- * 
+ * Resolves URL view state and renders the matching multi-view display.
+ *
+ * @template T - The type of data items
+ * @param {ViewOrchestratorProps<T>} props - Component props
+ * @returns {JSX.Element}
+ *
  * @example
  * ```tsx
- * <FilteringWrapper
+ * <ViewOrchestrator
  *   data={items}
  *   columns={tableColumns}
  *   onRowClick={handleRowClick}
@@ -218,7 +211,7 @@ interface FilteringWrapperProps<T extends Record<string, any> = Record<string, a
  * />
  * ```
  */
-export function FilteringWrapper<T extends Record<string, any> = Record<string, any>>({
+export function ViewOrchestrator<T extends Record<string, any> = Record<string, any>>({
   data,
   columns,
   onRowClick,
@@ -241,13 +234,11 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
   timelineConfig,
   noTableDisplay = false,
   minimalControlsConfig,
+  externalUrlControls = false,
+  urlGroupingAllowedKeys = EMPTY_GROUPING_KEYS,
   columnActions,
   filters,
-}: FilteringWrapperProps<T>) {
-  // Get current pathname to detect dashboard route
-  const pathname = usePathname();
-  const isDashboardRoute = pathname === '/dashboard';
-
+}: ViewOrchestratorProps<T>) {
   // Extract table config values with defaults
   const {
     actionMode = 'inline',
@@ -267,9 +258,20 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
   ////////////////////////////////////
 
 
-  // Dynamic grouping state (overrides config-based grouping)
-  const [selectedGroupBy, setSelectedGroupBy] = useState<string | null>(null);
-  const [selectedSubGroupBy, setSelectedSubGroupBy] = useState<string | null>(null);
+  // Dynamic grouping: URL when external kit owns controls; local state for legacy toolbar
+  const [localGroupBy] = useState<string | null>(null);
+  const [localSubGroupBy] = useState<string | null>(null);
+
+  const urlGrouping = useUrlGrouping({
+    allowedKeys: urlGroupingAllowedKeys,
+  });
+
+  const selectedGroupBy = externalUrlControls
+    ? urlGrouping.groupBy
+    : localGroupBy;
+  const selectedSubGroupBy = externalUrlControls
+    ? urlGrouping.subGroupBy
+    : localSubGroupBy;
 
   // Initialize accordion column management - Up in level for button communication with child components
   const {
@@ -289,88 +291,58 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
   const effectiveAvailableViews = availableViews || ['table']
   const defaultView = effectiveAvailableViews.length > 0 ? effectiveAvailableViews[0] : 'table'
   
-  const { currentView, setView } = useViewSwitcher({
+  const { currentView, resolution } = useViewSwitcher({
     availableViews: effectiveAvailableViews,
     defaultView,
     useAllItems,
     defaultPageSize,
   })
 
-  // Determine which view to render based on currentView and configs
-  const isKanbanView = currentView === 'kanban' && kanbanConfig !== undefined
-  const isCalendarView = currentView === 'calendar' && calendarConfig !== undefined
-  const isMapView = currentView === 'map' // mapConfig is optional, map view works without it
-  const isSubHeadingsView = currentView === 'subheadings' && subheadingsConfig !== undefined
-  const isTimelineView = currentView === 'timeline' && timelineConfig !== undefined
-  const isListView = currentView === 'list' && listViewConfig !== undefined
-  const isTableView = currentView === 'table' || (!isKanbanView && !isCalendarView && !isMapView && !isSubHeadingsView && !isTimelineView && !isListView)
+  // Renderability: URL view may be in availableViews but page config missing → fall back to table
+  const canRenderView = (view: string): boolean => {
+    switch (view) {
+      case 'kanban':
+        return kanbanConfig !== undefined
+      case 'calendar':
+        return calendarConfig !== undefined
+      case 'subheadings':
+        return subheadingsConfig !== undefined
+      case 'timeline':
+        return timelineConfig !== undefined
+      case 'list':
+        return listViewConfig !== undefined
+      case 'map':
+      case 'table':
+        return true
+      default:
+        return false
+    }
+  }
+
+  const renderView =
+    canRenderView(currentView) ? currentView : defaultView
+
+  // Determine which view to render based on resolved + renderable view
+  const isKanbanView = renderView === 'kanban' && kanbanConfig !== undefined
+  const isCalendarView = renderView === 'calendar' && calendarConfig !== undefined
+  const isMapView = renderView === 'map' // mapConfig is optional, map view works without it
+  const isSubHeadingsView = renderView === 'subheadings' && subheadingsConfig !== undefined
+  const isTimelineView = renderView === 'timeline' && timelineConfig !== undefined
+  const isListView = renderView === 'list' && listViewConfig !== undefined
+  const isTableView = renderView === 'table' || (!isKanbanView && !isCalendarView && !isMapView && !isSubHeadingsView && !isTimelineView && !isListView)
 
   const isScrollableDataView = isTableView || isListView || isSubHeadingsView
 
-  // Calculate enabled state from config presence
-  const isMinimalControlsEnabled = minimalControlsConfig !== undefined;
+  // Children treat URL / legacy grouping as authoritative when either path is active
+  const groupingControlsSignal =
+    externalUrlControls ? (minimalControlsConfig ?? {}) : minimalControlsConfig
 
   return (
-    <div className="flex flex-col h-full min-h-0 gap-0 p-0 relative">
-      {/* Grouping Control Row */}
-      {isMinimalControlsEnabled && (
-      <div className="w-full flex items-center justify-end px-2 py-2 mb-2 border-b border-tertiary/10">
-        <div className="flex items-center gap-2">
-          <GroupingControl
-            columns={columns}
-            selectedGroupBy={selectedGroupBy}
-            selectedSubGroupBy={selectedSubGroupBy}
-            onGroupByChange={setSelectedGroupBy}
-            onSubGroupByChange={setSelectedSubGroupBy}
-            availableViews={availableViews}
-            currentView={currentView}
-            availableColumns={minimalControlsConfig?.availableColumnsForGrouping}
-          />
-
-          {/* QueryBuilder - Advanced filtering with dropdown */}
-          {minimalControlsConfig?.queryBuilderFields && (
-            <QueryBuilder 
-              fields={minimalControlsConfig.queryBuilderFields} 
-              placeholder="Advanced Filter" 
-            />
-          )}
-          {/* SortingControl - Advanced sorting with dropdown */}
-          {minimalControlsConfig?.sortConfig && (
-            <SortingControl 
-              sortConfig={minimalControlsConfig.sortConfig} 
-              placeholder="Sort by..." 
-            />
-          )}
-          <NewSwitcherWrapper
-            availableViews={availableViews || ['table']}
-            currentView={currentView}
-            onViewChange={setView}
-          />
-          {/* ExpandableSearchControl - Compact search that expands on hover/focus */}
-          {minimalControlsConfig?.searchConfig && (
-            <ExpandableSearchControl 
-              config={minimalControlsConfig.searchConfig} 
-            />
-          )}
-        </div>
-      </div>
-      )}
-      
-      {/* View Switcher - if minimal controls are not enabled, display the expanded view switcher */}
-      {/* {!isMinimalControlsEnabled && availableViews && availableViews.length > 1 && (
-        <div className="w-full flex justify-end my-auto mb-4">
-          <ViewSwitcherWrapper
-            availableViews={availableViews}
-          />
-        </div>
-      )} */}
-
-      {!isMinimalControlsEnabled && availableViews && availableViews.length > 1 && (
-        <div className="w-full flex justify-start my-auto mb-0">
-          <FolderTabShape2View />
-        </div>
-      )}
-
+    <div
+      className="flex flex-col h-full min-h-0 gap-0 p-0 relative"
+      data-view-resolution={resolution.status}
+      data-render-view={renderView}
+    >
       {isItemLoading && (
         <div className="flex items-center justify-center h-full absolute inset-0">
           <LoadingSpinner />
@@ -405,16 +377,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
               : "flex-1 overflow-y-auto overflow-x-hidden tertiary-scrollbar"
         }
       >
-        {/* If noTableDisplay is true and route is /dashboard, render DashboardContent */}
-        {noTableDisplay && isDashboardRoute ? (
-          <Suspense fallback={<Loading message="Loading dashboard..." size="md" />}>
-            {/* Dashboard Content - displays active columns and values using getActiveColumns and getAllActiveValues*/}
-            {/* <DashboardContent 
-            data={data as any} 
-            columns={columns as TableColumn<Record<string, any>>[]}
-          /> */}
-          </Suspense>
-        ) : noTableDisplay ? (
+        {noTableDisplay ? (
           // For other routes with noTableDisplay, render nothing
           null
         ) : isKanbanView ? (
@@ -465,7 +428,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
             isGroupInline={timelineConfig.isGroupInline}
             showUnifiedEventOnCollapse={timelineConfig.showUnifiedEventOnCollapse}
             selectedGroupBy={selectedGroupBy}
-            minimalControlsConfig={minimalControlsConfig}
+            minimalControlsConfig={groupingControlsSignal}
             onEventClick={timelineConfig.onEventClick}
             onItemDrag={timelineConfig.onItemDrag}
             onItemResize={timelineConfig.onItemResize}
@@ -495,7 +458,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
             nestedGrouping={subheadingsConfig?.nestedGrouping}
             selectedGroupBy={selectedGroupBy}
             selectedSubGroupBy={selectedSubGroupBy}
-            minimalControlsConfig={minimalControlsConfig}
+            minimalControlsConfig={groupingControlsSignal}
             columnActions={columnActions}
             filters={filters}
             manualSorting={subheadingsConfig?.manualSorting}
@@ -528,7 +491,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
               columnActions={columnActions}
               selectedGroupBy={selectedGroupBy}
               selectedSubGroupBy={selectedSubGroupBy}
-              minimalControlsConfig={minimalControlsConfig}
+              minimalControlsConfig={groupingControlsSignal}
               filters={filters}
             />
           ) : (
@@ -552,7 +515,7 @@ export function FilteringWrapper<T extends Record<string, any> = Record<string, 
               columnActions={columnActions}
               selectedGroupBy={selectedGroupBy}
               selectedSubGroupBy={selectedSubGroupBy}
-              minimalControlsConfig={minimalControlsConfig}
+              minimalControlsConfig={groupingControlsSignal}
               filters={filters}
             />
           )

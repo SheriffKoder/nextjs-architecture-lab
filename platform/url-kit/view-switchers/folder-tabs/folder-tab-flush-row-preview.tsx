@@ -5,9 +5,9 @@
  * Used in: app/development/folder-tab-shape-2/folder-tab-shape-2-view.tsx
  */
 
-import { cn } from "./cn";
-import type { FolderTabFlushRowItem } from "./config";
-import shape from "./folder-tab-shape.module.css";
+import { cn } from '@/shared/lib/utils'
+import type { FolderTabFlushRowItem } from './config'
+import shape from './folder-tab-shape.module.css'
 
 export type FolderTabFlushRowPreviewProps = {
   gap: string;

@@ -1,5 +1,5 @@
 /**
- * Demo Client Page — `FilteringWrapper` only
+ * Demo Client Page — `ViewOrchestrator` only
  *
  * Purpose: Isolate table / multi-view chrome from page chrome (`demo-client-index.tsx`)
  * Used in: `demo-client-index.tsx`
@@ -8,7 +8,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { FilteringWrapper } from '@/widgets/multi-view/filtering-wrapper'
+import { ViewOrchestrator } from '@/widgets/multi-view/view-orchestrator'
 import type { SubheadingsUpdateContext } from '@/widgets/multi-view/features/subheadings/dnd'
 import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
 
@@ -63,7 +63,7 @@ export default function DemoClientFilteringContent({
 
   return (
     <div className="flex-1 min-h-0">
-      <FilteringWrapper
+      <ViewOrchestrator
         data={tableData}
         columns={tableColumns}
         filters={filters}
