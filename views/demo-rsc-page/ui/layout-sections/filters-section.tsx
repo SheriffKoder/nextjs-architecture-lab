@@ -11,11 +11,9 @@ import { serializeFiltersForNlCatalog } from '@/platform/url-kit/ai-filter/lib/s
 import {
   NL_FILTER_ALLOWED_SORT_KEYS,
   NL_FILTER_EXCLUDED_URL_KEYS,
-} from '@/views/demo-rsc-page/config/nl-filter-assistant-config'
-import {
-  rentalCarSearchConfig,
-  rentalCarFiltersHeaderConfig,
-} from '../../config/header-filters-config'
+} from '@/views/demo-rsc-page/config/data/nl-filter-assistant-config'
+import { rentalCarSearchConfig } from '../../config/data/rental-car-search-config'
+import { rentalCarFiltersHeaderConfig } from '../../config/ui/rental-car-filters-header-config'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 import { getFilters } from '../../../../entities/cars-rsc/server/demo-rsc-cached-loaders'
 import { demoRscDataParamsToCacheKey } from '../../lib/demo-rsc-search-params-cache-key'

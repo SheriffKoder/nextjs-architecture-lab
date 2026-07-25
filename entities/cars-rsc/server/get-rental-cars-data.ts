@@ -18,7 +18,7 @@ import { rentalCarListQueryToSearchParams } from '@/entities/cars-rsc/lib/build-
 import { filterRentalCars } from './backend-simulate/filter-rental-cars'
 import { parseSorts, applySorts } from '@/platform/url-kit/filters/feature-sorting/utils'
 import { parsePagination } from '@/platform/url-kit/filters/feature-pagination/utils'
-import { rentalCarPaginationConfig } from '../../../views/demo-rsc-page/config/header-filters-config'
+import { rentalCarPaginationConfig } from '../../../views/demo-rsc-page/config/data/rental-car-pagination-config'
 import { decodeFilters } from '@/platform/url-kit/filters/feature-query-builder-filter/utils'
 /**
  * Get mock rental cars data with optional filtering, sorting, and pagination

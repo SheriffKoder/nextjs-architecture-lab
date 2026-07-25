@@ -1,12 +1,12 @@
 'use client'
 
 import type { RentalCarTableItem } from '../../../../../entities/cars-rsc/types/rental-car-table-item'
-import { useDrawerChrome } from '@/platform/url-kit/drawer-2'
+import { useDrawerChrome } from '@/platform/url-kit/url-drawer'
 import { cn } from '@/shared/lib/utils'
 import RentalCarVehicleDetails from './rental-car-vehicle-details'
 import RentalCarRentalDetails from './rental-car-rental-details'
 import TimelineJourney from './timeline-journey'
-import { MOCK_TIMELINE_JOURNEY_ITEMS } from '../../../config/car-slider-dropdown-mocks'
+import { MOCK_TIMELINE_JOURNEY_ITEMS } from '../../../config/mocks/timeline-journey-mocks'
 
 export interface DemoClientCarSliderDetailsContainerProps {
   selectedCar: RentalCarTableItem | null

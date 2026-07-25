@@ -1,8 +1,8 @@
 /**
  * Demo RSC — which URL search param keys affect list + filter facets vs UI-only chrome.
  *
- * Purpose: Single source of truth for `extractDemoRscListDataParams` / `demoRscDataParamsToCacheKey`.
- * Why: Drawer / mode / id etc. must not change `unstable_cache` identity for `getFilters` / `getCars`.
+ * Single source of truth for `extractDemoRscListDataParams` / `demoRscDataParamsToCacheKey`.
+ * Drawer / mode / id etc. must not change `unstable_cache` identity for `getFilters` / `getCars`.
  *
  * Keep list keys aligned with `lib/build-rental-car-list-query.ts` + `filter-rental-cars.ts` inputs.
  */

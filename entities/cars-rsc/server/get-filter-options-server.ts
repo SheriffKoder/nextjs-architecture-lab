@@ -45,11 +45,9 @@
  * that filter.
  */
 import { getFilterOptions } from "./backend-simulate/get-filter-options"
-import { 
-  rentalCarBaseFilters, 
-  rentalCars, 
-  rentalCarFieldMap 
-} from "../../../views/demo-rsc-page/config/header-filters-config"
+import { rentalCarBaseFilters } from '../../../views/demo-rsc-page/config/data/rental-car-base-filters'
+import { rentalCarFieldMap } from '../../../views/demo-rsc-page/config/contract/rental-car-field-map'
+import { rentalCars } from './data-source'
 import { filterRentalCarsExcludingColumn } from "./backend-simulate/filter-rental-cars"
 import type { FilterConfig } from "@/platform/url-kit/filters/feature-filtering/components/filter-types"
 import type { RentalCarTableItem } from '../types/rental-car-table-item'

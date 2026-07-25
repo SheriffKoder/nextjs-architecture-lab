@@ -27,7 +27,7 @@
 
 import { unstable_cache } from 'next/cache'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
-import { rentalCarBaseFilters } from '../../../views/demo-rsc-page/config/header-filters-config'
+import { rentalCarBaseFilters } from '../../../views/demo-rsc-page/config/data/rental-car-base-filters'
 import { buildRentalCarListQuery } from '@/entities/cars-rsc/lib/build-rental-car-list-query'
 import type { RentalCarTableItem } from '../types/rental-car-table-item'
 import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
@@ -116,8 +116,11 @@ export const getFilters =
 // Steps (inside cached callback):
 // 1. Delegate to `getRentalCarById` (React `cache()` + mock `rentalCars` + simulated delay live there).
 //////////////////////////////////
-export const getRentalCarByIdCached = 
+export const getRentalCarByIdCached = unstable_cache(
   async (id: string): Promise<RentalCarTableItem | null> => {
     // 1. Underlying loader keeps per-request dedupe and delay semantics unchanged
     return getRentalCarById(id)
-  }
+  },
+  ['demo-rsc-rental-car-by-id'],
+  { revalidate: 60 }
+)

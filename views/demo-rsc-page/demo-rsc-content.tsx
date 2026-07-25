@@ -16,25 +16,25 @@
 import { useCallback } from 'react'
 
 // Features/UI
-import { useDrawerActions } from '@/platform/url-kit/drawer-2'
+import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 import { FilteringWrapper } from '@/widgets/multi-view/filtering-wrapper'
 
 
 ////////////////////////////////////////////////////////////
 // Individual Display configs (different types of UI layouts)
 // Configs
-import { minimalControlsConfig } from './config/minimal-controls-config'
-import { DEMO_RSC_USE_ALL_ITEMS_VIEWS } from './config/demo-rsc-views-config'
-import { tableConfig } from './config/displays/table-config'
-import { accordionConfig } from './config/accordion-config'
-import { tableColumns } from './config/columns'
-import { kanbanConfig } from './config/displays/kanban-config'
-import { calendarConfig } from './config/displays/calendar-config'
-import { mapConfig } from './config/displays/map-config'
-import { timelineConfig } from './config/displays/timeline-config'
-import { subheadingsConfig } from './config/displays/subheadings-config'
-import { listViewConfig } from './config/displays/list-config'
-import { demoRscRowActionConfigs } from './config/demo-rsc-row-action-configs'
+import { DEMO_RSC_USE_ALL_ITEMS_VIEWS } from './config/data/demo-rsc-views-config'
+import { minimalControlsConfig } from './config/ui/minimal-controls-config'
+import { tableConfig } from './config/ui/displays/table-config'
+import { accordionConfig } from './config/ui/accordion-config'
+import { tableColumns } from './config/ui/columns'
+import { kanbanConfig } from './config/ui/displays/kanban-config'
+import { calendarConfig } from './config/ui/displays/calendar-config'
+import { mapConfig } from './config/ui/displays/map-config'
+import { timelineConfig } from './config/ui/displays/timeline-config'
+import { subheadingsConfig } from './config/ui/displays/subheadings-config'
+import { listViewConfig } from './config/ui/displays/list-config'
+import { demoRscRowActionConfigs } from './config/ui/demo-rsc-row-action-configs'
 
 // Data
 import { getRentalCarByIdAction } from '@/entities/cars-rsc/actions/get-rental-car-by-id-action'

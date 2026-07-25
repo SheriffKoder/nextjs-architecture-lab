@@ -16,8 +16,10 @@ import type { RentalCarListQuery, RentalCarNumberRange } from '@/entities/cars-r
 import type { RentalCarTableItem } from '@/entities/cars-rsc/types/rental-car-table-item'
 import {
   rentalCarFieldMap,
+} from '@/views/demo-rsc-page/config/contract/rental-car-field-map'
+import {
   rentalCarPaginationConfig,
-} from '@/views/demo-rsc-page/config/header-filters-config'
+} from '@/views/demo-rsc-page/config/data/rental-car-pagination-config'
 import { rentalCars } from '@/entities/cars-rsc/server/data-source'
 
 /** Flat search-param bag (same shape as Next `searchParams` after `await`). */

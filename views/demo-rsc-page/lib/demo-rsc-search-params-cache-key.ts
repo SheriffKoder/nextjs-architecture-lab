@@ -7,7 +7,7 @@
  */
 
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
-import { DEMO_RSC_LIST_DATA_SEARCH_PARAM_KEYS } from '../config/demo-rsc-url-data-params'
+import { DEMO_RSC_LIST_DATA_SEARCH_PARAM_KEYS } from '../config/contract/url-param-keys'
 
 /** Subset of `params` that drives list + filter facet loaders (see `DEMO_RSC_LIST_DATA_SEARCH_PARAM_KEYS`). */
 export function extractDemoRscListDataParams(

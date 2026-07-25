@@ -8,11 +8,11 @@ import { NavigationPendingDimmer } from '@/platform/url-kit/filters/navigation-t
 import { PaginationFooter } from '@/platform/url-kit/filters/components/pagination-footer'
 
 // Page
-import { rentalCarPaginationConfig } from '../../config/header-filters-config'
+import { rentalCarPaginationConfig } from '../../config/data/rental-car-pagination-config'
 import {
   DEMO_RSC_DEFAULT_VIEW,
   DEMO_RSC_USE_ALL_ITEMS_VIEWS,
-} from '../../config/demo-rsc-views-config'
+} from '../../config/data/demo-rsc-views-config'
 import DemoRscContent from '../../demo-rsc-content'
 import { demoRscDataParamsToCacheKey } from '../../lib/demo-rsc-search-params-cache-key'
 import TablePaginationErrorRethrow from '../layout-sections-error-boundaries/table-pagination-error-rethrow'

@@ -40,13 +40,13 @@ import GlassInput from '@/shared/ui/inputs/glass-input'
 import DropdownSelect from '@/shared/ui/multi-select'
 import type { DropdownItem } from '@/shared/ui/multi-select'
 
-import { useDrawerActions } from '@/platform/url-kit/drawer-2'
+import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 
 import {
   MOCK_CAR_LOCATION_ITEMS,
   MOCK_CAR_MAKE_ITEMS,
   MOCK_CAR_STATUS_ITEMS,
-} from '@/views/demo-rsc-page/config/car-slider-dropdown-mocks'
+} from '@/views/demo-rsc-page/config/mocks/form-option-mocks'
 import {
   defaultRentalCarFormValues,
   rentalCarFormSchema,
