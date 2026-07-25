@@ -1,34 +1,41 @@
-📐 Params vs Query — Architecture Decision
+# 📐 Params vs Query — Architecture Decision
 
+## 🧠 Context
 
-🧠 Context
 In this project, we deal with:
 
-URL-driven state (filters, sorting, pagination)
-Server Components (RSC)
-Future integration with TanStack Query (client-side)
-A reusable backend API layer
+- URL-driven state (filters, sorting, pagination)
+- Server Components (RSC)
+- Future integration with TanStack Query (client-side)
+- A reusable backend API layer
 
 We needed a consistent way to:
 
-Read user intent from the URL
-Transform it into a backend-friendly format
-Keep both RSC and client flows aligned
+- Read user intent from the URL
+- Transform it into a backend-friendly format
+- Keep both RSC and client flows aligned
 
+## 🧱 Final Architecture
 
-🧱 Final Architecture
+```text
 URL params (source of truth)
         ↓
-buildQuery(params)
+normalizeParams (page.tsx)
         ↓
-Data Fetcher (API layer)
+RSC sections (params)
         ↓
-Backend (DB / external API)
-🔑 Definitions
-✅ Params (URL Layer)
+data-only cache key
+        ↓
+getFilters(params)  |  getCars → buildRentalCarListQuery → getRentalCarsData(query)
+```
 
+## 🔑 Definitions
 
+### ✅ Params (URL Layer)
+
+```ts
 type Params = Record<string, string | string[] | undefined>
+```
 
 Represents:
 
@@ -36,10 +43,13 @@ Represents:
 
 Examples:
 
+```text
 ?status=active&make=toyota&page=2&sort=price_desc
+```
 
+### ✅ Query (Data Contract)
 
-✅ Query (Data Contract)
+```ts
 type RentalCarListQuery = {
   status?: string[]
   make?: string[]
@@ -47,182 +57,282 @@ type RentalCarListQuery = {
   limit?: number
   sort?: { field: string; order: 'asc' | 'desc' }[]
 }
+```
 
 Represents:
 
 "How the backend understands the request"
 
-///////////////////////////////////////////////////////////////
-❌ Previous Approach (Problematic)
-Flow
-params → query → searchParams → fetch
-Issues
+👉 Used for the **list** path. Facets (`getFilters` / `getFilterOptionsServer`) still operate on params.
 
-1. 🔁 Conversion Loop
+---
+
+## ❌ Previous Approach (Problematic)
+
+### Flow
+
+```text
+params → query → searchParams → fetch
+```
+
+### Issues
+
+#### 1. 🔁 Conversion Loop
+
+```text
 params → query → params again
+```
 
 👉 Redundant and confusing
 
-2. 🧩 Mixed Responsibilities
-UI layer handled query + params
-API layer expected params again
+#### 2. 🧩 Mixed Responsibilities
+
+- UI layer handled query + params
+- API layer expected params again
 
 👉 No clear boundary
 
-3. 🔗 Component Coupling
+#### 3. 🔗 Component Coupling
+
+```tsx
 <TableSection query={query} />
+```
 
 👉 Components depend on derived state instead of source of truth
 
-4. 🚫 Harder TanStack Migration
-Query logic scattered
-No single reusable contract
+#### 4. 🚫 Harder TanStack Migration
 
+- Query logic scattered
+- No single reusable contract
 
-✅ Current Approach (Clean)
-Flow
-params → query → fetch
+## ✅ Current Approach (Clean)
 
-///////////////////////////////////////////////////////////////
+### Flow
 
-🧠 Responsibilities by Layer
-1. UI Layer (RSC / Client)
-const query = buildRentalCarListQuery(params)
+```text
+params → sections → cache key → getCars / getFilters
+getCars: params → buildRentalCarListQuery → getRentalCarsData(query)
+```
 
-✔ Reads URL
-✔ Builds query
-❌ Does NOT handle transport (URLSearchParams, fetch)
+---
 
-2. Data Layer (Fetcher)
-const searchParams = queryToSearchParams(query)
-fetch(`/api/cars?${searchParams}`)
+## 🧠 Responsibilities by Layer
 
-✔ Converts query → transport format
-✔ Calls API
-❌ Does NOT know about UI or URL
+### 1. UI Layer (RSC / Client)
 
-3. Backend
+```tsx
+<FiltersSection params={params} />
+<TableAndPaginationSection params={params} />
+```
 
-✔ Parses request
-✔ Executes DB query
+- ✔ Reads URL (via normalized params from `page.tsx`)
+- ✔ Passes params into sections
+- ❌ Does NOT build query at the page/layout layer
+- ❌ Does NOT handle transport
 
-///////////////////////////////////////////////////////////////
+### 2. Cached loaders (entity layer)
 
+```ts
+// facets — params stay params
+getFilters(dataParamsKey) → getFilterOptionsServer(baseFilters, params)
 
-🔥 Benefits of Current Approach
+// list — params → query → data
+getCars(dataParamsKey) → buildRentalCarListQuery(params) → getRentalCarsData(query)
+```
 
-1. 🧼 Clean Separation of Concerns
-params = UI concern
-query  = data contract
-transport = API concern
+- ✔ Owns params → query conversion for the list
+- ✔ Owns caching / data-only cache keys
+- ❌ Does NOT know about drawer chrome or layout UI
 
-2. 🔁 No More Conversion Loops
-params → query → fetch
+### 3. Data contract (`getRentalCarsData`)
 
-👉 Simple, predictable flow
+```ts
+getRentalCarsData(query: RentalCarListQuery)
+```
 
+- ✔ Accepts the typed query contract
+- ✔ May convert query → flat params internally for filter/sort helpers
+- ❌ Does NOT know about UI or URL chrome
 
-3. 🧩 Decoupled Components
-<TableSection params={params} />
+### 4. Backend / simulate layer
 
-👉 Each component derives what it needs
+- ✔ Parses request shape (or mock pipeline)
+- ✔ Executes filter / sort / paginate
+
+---
+
+## 🔥 Benefits of Current Approach
+
+### 1. 🧼 Clean Separation of Concerns
+
+```text
+params     = UI / URL concern (section surface)
+query      = list data contract (inside getCars)
+facets     = params-driven (getFilters)
+transport  = internal to data helpers when needed
+```
+
+### 2. 🔁 No More Conversion Loops at the UI Layer
+
+```text
+params → getCars → query → getRentalCarsData
+```
+
+👉 Simple, predictable flow for the list
+
+### 3. 🧩 Decoupled Components
+
+```tsx
+<TableAndPaginationSection params={params} />
+```
+
+👉 Each section derives what it needs
+
 👉 No prop-drilling of query
 
+### 4. 🚀 TanStack Ready
 
-4. 🚀 TanStack Ready
+```ts
 useQuery({
   queryKey: ['cars', query],
   queryFn: () => getRentalCarsData(query),
 })
+```
 
-✔ Same query builder
-✔ Same API function
-✔ Zero rewrite
+- ✔ Same query builder
+- ✔ Same API function
+- ✔ Zero rewrite of the list contract
 
-5. 🔄 Transport Agnostic
-You can switch from:
+### 5. 🔄 Transport Agnostic
+
+Switch from:
+
+```text
 GET /api/cars?status=active
+```
+
 to:
+
+```text
 POST /api/cars
 body: { status: "active" }
+```
 
-👉 Only change the fetcher layer
+👉 Only change how the list is transported; `RentalCarListQuery` stays stable
 
-6. 🧠 Strong Backend Contract
-Everything is typed around:
-RentalCarListQuery
+### 6. 🧠 Strong List Contract
+
+List data is typed around:
+
+`RentalCarListQuery`
+
 NOT:
-string-based params ❌
 
-7. 🧪 Easier Testing
-You can test:
-buildRentalCarListQuery(params)
+string-based params at the list boundary ❌
+
+### 7. 🧪 Easier Testing
+
+Test:
+
+`buildRentalCarListQuery(params)`
+
 and
-getRentalCarsData(query)
+
+`getRentalCarsData(query)`
+
 independently
 
-///////////////////////////////////////////////////////////////
+---
 
-⚖️ Tradeoffs
-Tradeoff 1: Recomputing Query
+## ⚖️ Tradeoffs
 
-Each component may do:
+### Tradeoff 1: Query Built in the Loader
 
-buildQuery(params)
+Query is built inside `getCars`, not recomputed in every section:
 
-✔ Acceptable (cheap operation)
-✔ Better than shared mutable state
+```ts
+buildRentalCarListQuery(params)
+```
 
-Tradeoff 2: Duplicate Fetch Calls in RSC
+- ✔ Single conversion point for the list
+- ✔ Sections stay on the source of truth (params)
 
-Multiple sections call:
+### Tradeoff 2: Duplicate Loader Calls in RSC
 
-getRentalCarsPageData(params)
+Multiple sections may call:
 
-✔ Handled by React cache() + fetch deduplication
-✔ No real performance issue
+```ts
+getFilters(dataKey)
+getCars(dataKey)
+```
 
-Tradeoff 3: More Explicit Layers
+- ✔ Handled by shared data-only cache keys + `unstable_cache` / dedupe
+- ✔ No real performance issue when the data key matches
 
-You now maintain:
+### Tradeoff 3: More Explicit Layers
 
-params
-query
-transport conversion
+This maintains:
 
-✔ Slightly more code
-✔ Much better scalability
+- params (section surface)
+- data-only cache key
+- query (list contract)
+- optional internal transport conversion
 
+- ✔ Slightly more code
+- ✔ Much better scalability
 
-///////////////////////////////////////////////////////////////
+---
 
-🧠 Key Principles
-1. Single Source of Truth
+## 🧠 Key Principles
+
+### 1. Single Source of Truth
+
 URL params drive everything
-2. Derive, Don’t Pass
-Build query where data is fetched
-3. Isolate Transport Logic
-Only API layer knows about URLSearchParams
-4. Think in Contracts
-query = stable contract between frontend and backend
-🚀 Final Takeaway
+
+### 2. Derive, Don’t Pass
+
+Build query where list data is fetched (`getCars`), not in the page tree
+
+### 3. Isolate Transport Logic
+
+Only the data layer converts query ↔ flat params when helpers need that shape
+
+### 4. Think in Contracts
+
+query = stable contract between list consumers and `getRentalCarsData`
+
+## 🚀 Final Takeaway
+
 We didn’t just “clean up params vs query”
 
 We established a layered data architecture:
 
+```text
 UI → Intent (params)
-Data → Contract (query)
-API → Transport
+Loaders → Facets (params) | List (query)
+Data → Contract (getRentalCarsData)
 Backend → Execution
+```
 
 This is:
+
 - correctly layered
 - scalable
 - ready for DSL filters
 - ready for TanStack
 - ready for performance optimization
 
+👉 This can extend into a Filter DSL system, so query becomes a full query language (AND/OR/groups) instead of simple key-value filters — and it will plug into this exact architecture cleanly.
 
-👉 we can extend this into your Filter DSL system, so query becomes a full query language (AND/OR/groups) instead of simple key-value filters — and it will plug into this exact architecture cleanly.
+👉 Facets and list stay on separate loaders (`getFilters` + `getCars`) with a shared data-only cache key so drawer/UI chrome does not split cache identity.
 
-👉 refactor your current getRentalCarsPageData + getFilterOptionsServer into a single “data kernel” architecture that eliminates duplication for calling filter server from filters and getRentalCarsPageData separately.
+---
+
+## Key Learnings
+
+- **Params ≠ query** — Params are URL intent (“what the user asked for”). Query is the typed list contract (“how the backend understands the request”).
+- **URL is the source of truth** — Drive UI and data from params; don’t pass derived query around as shared state.
+- **One-way list flow** — `params → getCars → buildRentalCarListQuery → getRentalCarsData`. Avoid UI-level conversion loops.
+- **Layers own one job** — Sections pass params; `getCars` builds query; `getRentalCarsData` owns the list contract; facets stay on params.
+- **Same contract for RSC and TanStack** — One `buildRentalCarListQuery` + one `getRentalCarsData` works for both; no rewrite when moving client-side.
+- **Shared cache key is fine** — Duplicate `getFilters` / `getCars` calls across sections are fine when keyed by data-only params; explicit layers cost a bit more code but scale better.

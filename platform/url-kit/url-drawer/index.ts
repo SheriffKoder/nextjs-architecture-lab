@@ -1,5 +1,5 @@
 /**
- * Drawer-2 — URL-driven drawer system (Zod + Next router)
+ * url-drawer — URL-driven drawer system (Zod + Next router)
  *
  * Purpose: Public exports for schema, parser, hook, and UI shells
  * Used in: App routes that want `?drawer=&mode=&id=&action=` without global state

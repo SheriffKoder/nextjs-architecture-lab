@@ -16,7 +16,7 @@
 
 import type { ReactNode } from 'react'
 import { Eye, Pencil, Trash2, Save, RotateCcw } from 'lucide-react'
-import { useDrawerActions } from '@/platform/url-kit/drawer-2'
+import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './rsc-car-drawer-constants'
 import { RscCarDrawerToolbarButton } from './rsc-car-drawer-toolbar-button'
 

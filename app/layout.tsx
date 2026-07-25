@@ -9,12 +9,20 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Revilo Group Investment Management",
-  description: "Portfolio management and financial reporting system for real estate investments, investor allocations, and project tracking",
-  keywords: ["real estate", "investment management", "portfolio", "financial reporting", "revilo group"],
-  authors: [{ name: "Revilo Group" }],
-  creator: "Revilo Group",
-  applicationName: "Revilo Investment Web App",
+  title: "Next.js Architecture Lab",
+  description:
+    "Practical exploration of Next.js App Router architecture: RSC, Suspense streaming, URL state, server actions, and feature-based design",
+  keywords: [
+    "Next.js",
+    "RSC",
+    "Suspense",
+    "server actions",
+    "URL state",
+    "architecture",
+  ],
+  authors: [{ name: "SheriffKoder" }],
+  creator: "SheriffKoder",
+  applicationName: "Next.js Architecture Lab",
 };
 
 const geistSans = Geist({

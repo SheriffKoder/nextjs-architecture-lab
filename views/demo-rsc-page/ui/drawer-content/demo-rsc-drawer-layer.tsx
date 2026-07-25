@@ -7,7 +7,7 @@
  */
 
 // Features/UI
-import { DrawerWrapper } from '@/platform/url-kit/drawer-2'
+import { DrawerWrapper } from '@/platform/url-kit/url-drawer'
 
 // Types
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'

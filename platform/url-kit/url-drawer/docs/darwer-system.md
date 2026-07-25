@@ -26,7 +26,7 @@ npm install zod
 ///////////////////////////////////////////////////////////////
 // Files
 
-📁 features/ui/drawer-2/drawer-schema.ts
+📁 platform/url-kit/url-drawer/drawer-schema.ts
 import { z } from 'zod'
 
 export const drawerModeSchema = z.enum(['view', 'edit', 'create'])
@@ -50,7 +50,7 @@ export type DrawerState = {
 }
 
 ///////////////////////////////////////////////////////////////
-📁 features/ui/drawer/drawer-parser.ts
+📁 platform/url-kit/url-drawer/drawer-parser.ts
 import { drawerSearchParamsSchema, type DrawerState } from './drawer-schema'
 
 export function parseDrawerState(
@@ -87,7 +87,7 @@ export function parseDrawerState(
 
 
 ///////////////////////////////////////////////////////////////
-📁 features/ui/drawer/use-drawer.ts
+📁 platform/url-kit/url-drawer/hooks/use-drawer-actions.ts
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
@@ -174,7 +174,7 @@ export function useDrawerActions() {
 }
 
 ///////////////////////////////////////////////////////////////
-📁 features/ui/drawer/DrawerWrapper.tsx
+📁 platform/url-kit/url-drawer/components/drawer-wrapper.tsx
 'use client'
 
 import { useSearchParams } from 'next/navigation'
@@ -198,7 +198,7 @@ export default function DrawerWrapper({
 
 ///////////////////////////////////////////////////////////////
 Copy style from: components\confirm-modal.tsx
-📁 features/ui/drawer/DeleteActionModal.tsx
+📁 platform/url-kit/url-drawer/components/delete-action-modal.tsx
 'use client'
 
 import { useSearchParams } from 'next/navigation'

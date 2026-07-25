@@ -1,132 +1,161 @@
-Recommended architecture (senior choice)
-Drawer always fetches by id
+# Drawer Detail — Fetch By Id
+
+## Recommended architecture
+
+Drawer always fetches by id.
 
 Treat drawer as independent:
 
+```text
 DrawerLayer
    ↓
 CarDetailSection(id)
    ↓
 getRentalCarById(id)
+```
 
 Example:
 
+```tsx
 <Suspense fallback={<DrawerLoading />}>
   <CarDrawerContent carId={drawer.id} />
 </Suspense>
-Why this is correct
-1. Works for all entry points
+```
 
-User can open:
+### Why this is correct
 
+#### 1. Works for all entry points
+
+A user can open:
+
+```text
 /cars?page=1&drawer=car&id=123
+```
 
 or directly:
 
+```text
 /cars?drawer=car&id=999
+```
 
 No issue.
 
-2. Drawer becomes portable
+#### 2. Drawer becomes portable
 
 Later:
 
-Dashboard alerts → open car drawer
-Search results → open car drawer
-Kanban → open car drawer
+- Dashboard alerts → open car drawer
+- Search results → open car drawer
+- Kanban → open car drawer
 
 Same detail loader.
 
-3. Keeps section isolation
+#### 3. Keeps section isolation
 
-Table remains:
+Table remains: table concern only.
 
-table concern only
-
-Drawer remains:
-
-detail concern only
+Drawer remains: detail concern only.
 
 Much cleaner.
 
-But what about duplicate fetch cost?
+---
 
-Good question.
+## But what about duplicate fetch cost?
 
-You already noticed:
+Same server calls are cached.
 
-same server calls are cached.
-
-You can use React cache or Next caching.
+React `cache` or Next caching can be used.
 
 Example:
 
+```ts
 const getRentalCarById = cache(async (id: string) => {
   ...
 })
+```
 
-That helps if same ID is requested multiple times.
+That helps if the same ID is requested multiple times **in one request**.
 
 But:
 
+```text
 table list fetch != detail fetch
+```
 
 These are different queries.
 
-So table cache won't automatically help unless you manually reuse it.
+So table cache will not automatically help unless it is manually reused.
 
-Best UX improvement: prefetch drawer data
+---
 
-This is the missing piece.
+## Best UX improvement: prefetch drawer data
 
-When user hovers or clicks row:
+When a user hovers or clicks a row, warm the by-id loader before open.
 
-<Link
-  href={...}
-  prefetch
-/>
+Options:
 
-or explicit prefetch:
-
-router.prefetch(...)
-
-or later in TanStack:
-
-queryClient.prefetchQuery(...)
+- `<Link href={...} prefetch />`
+- `router.prefetch(...)`
+- explicit server action: `getRentalCarByIdAction(id)`
+- later in TanStack: `queryClient.prefetchQuery(...)`
 
 That way:
 
+```text
 open drawer → data already warm
+```
 
-This is better than trying to steal data from current page.
+This is better than trying to steal data from the current page.
 
-Suggested final flow
-Current
+Hover prefetch vs drawer open sharing one cache is covered in
+[6-2-rsc-bottleneck-by-id-prefetch](../bottlenecks/6-2-rsc-bottleneck-by-id-prefetch.md).
+
+---
+
+## Suggested final flow
+
+### Current
+
+```text
 Index
  ├── TableAndPaginationSection
  └── DrawerLayer
-Drawer
+```
+
+### Drawer
+
+```text
 DrawerLayer
   parse URL
   if drawer open:
       render DrawerContent(id)
-DrawerContent
+```
+
+### DrawerContent
+
+```text
 DrawerContent
    await getRentalCarById(id)
-UX optimization
+```
+
+### UX optimization
 
 If row click triggers:
 
+```ts
 router.replace(...drawer params...)
+```
 
-Also:
-
-prefetch detail first
+Also prefetch detail first.
 
 Possible sequence:
 
+```ts
 await preloadRentalCar(id)
 openDrawer()
+```
+
+In this repo the sequence is fire-and-forget prefetch on hover, then URL open on click (no await before open).
 
 ---
 
@@ -136,13 +165,16 @@ Legend: **Done** — shipped as described. **Done (variant)** — same intent, d
 
 ### Done
 
-- **Server loader + per-request dedupe:** `features/demo-rsc-page/utils/server/get-rental-car-by-id.ts` — `loadRentalCarById` wrapped in React **`cache()`**; reads from `data-source` `rentalCars`; optional delay via `DEMO_RSC_SIMULATE_RENTAL_CAR_BY_ID_MS` in `simulate-server-delay.ts`.
-- **Server Action entry (fetch):** `features/demo-rsc-page/actions/get-rental-car-by-id-action.ts` — **`getRentalCarByIdAction(id)`** (`'use server'`) delegates to **`getRentalCarById`**; re-exported from `features/demo-rsc-page/actions.ts` for convenience.
-- **Async view body:** `features/demo-rsc-page/components/drawer-content/rsc-car-drawer-view-content.tsx` — default export **`async`**; **`await getRentalCarByIdAction(id)`**; renders **`DemoClientCarSliderDetailsContainer`** from `details-content/details-container.tsx` (collapsible vehicle + rental sections).
-- **Suspense + loading UI:** `features/demo-rsc-page/components/drawer-content/rsc-car-drawer-content.tsx` — **`mode === 'view'`** wraps **`RscCarDrawerViewContent`** in **`<Suspense>`** with **`RscCarDrawerViewSkeleton`** (header + pulse block). *(Original plan suggested placing this boundary in `demo-rsc-index`; functionally the boundary lives in `RscCarDrawerContent` instead.)*
+- **Server loader + per-request dedupe:** `entities/cars-rsc/server/get-rental-car-by-id.ts` — `loadRentalCarById` wrapped in React **`cache()`**; reads from `data-source` `rentalCars`; optional delay via `DEMO_RSC_SIMULATE_RENTAL_CAR_BY_ID_MS` in `simulate-server-delay.ts`.
+- **Cross-request cache:** `entities/cars-rsc/server/demo-rsc-cached-loaders.ts` — **`getRentalCarByIdCached`** wraps `getRentalCarById` in **`unstable_cache`** keyed by `id` (`revalidate: 60`).
+- **Server Action entry (fetch):** `entities/cars-rsc/actions/get-rental-car-by-id-action.ts` — **`getRentalCarByIdAction(id)`** (`'use server'`) delegates to **`getRentalCarByIdCached`**.
+- **Async view body:** `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-view-content.tsx` — default export **`async`**; **`await getRentalCarByIdAction(id)`**; renders **`DemoClientCarSliderDetailsContainer`** from `details-content/details-container.tsx`.
+- **Suspense + loading UI:** `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-content.tsx` — **`mode === 'view'`** wraps **`RscCarDrawerViewContent`** in **`<Suspense>`** with **`RscCarDrawerViewSkeleton`** (header + pulse block).
+- **`key={id}` on async child:** `RscCarDrawerViewContent` is rendered with **`key={id}`** so row switches remount the detail subtree.
 - **Server drawer stack + params (no `useSearchParams` in content):** `demo-rsc-index.tsx` passes **`params`** into **`DemoRscDrawerLayer`** → **`RscCarDrawerContent`** uses **`parseDrawerState(params)`** (same contract as URL).
-- **Server `DemoRscDrawerLayer`:** `components/drawer-content/demo-rsc-drawer-layer.tsx` — no `'use client'`; composes **`DrawerWrapper`** + **`RscCarDrawerContent`**. Delete confirm UI lives in client island **`rsc-car-drawer-delete-modal.tsx`**.
-- **`DrawerWrapper`** remains client (`features/ui/drawer-2`); it receives server-rendered drawer body as children.
+- **Server `DemoRscDrawerLayer`:** `ui/drawer-content/demo-rsc-drawer-layer.tsx` — no `'use client'`; composes **`DrawerWrapper`** + **`RscCarDrawerContent`**. Delete confirm UI lives in client island **`rsc-car-drawer-delete-modal.tsx`**.
+- **`DrawerWrapper`** remains client (`platform/url-kit/url-drawer`); it receives server-rendered drawer body as children.
+- **Prefetch on row hover:** `demo-rsc-content.tsx` — **`onRowPointerEnter`** calls **`void getRentalCarByIdAction(row.id)`** so open can hit the warm `unstable_cache` entry.
 
 ### Done (variant) / deferred from original plan
 
@@ -151,51 +183,7 @@ Legend: **Done** — shipped as described. **Done (variant)** — same intent, d
 
 ### Todo
 
-- **`key={id}` on `Suspense` (or async child)** in `rsc-car-drawer-content.tsx` when switching rows via client navigation — reduces risk of stale UI if React ever reuses the boundary incorrectly. *(Verify first whether param-only `router.replace` already remounts the RSC subtree in your Next version.)*
-- **Prefetch** (row hover / before open): call **`getRentalCarByIdAction(id)`**, `router.prefetch`, or TanStack `prefetchQuery` — not wired.
-- **Edit mode detail fetch:** `RscCarDrawerEditContent` still placeholder-by-id only; no **`getRentalCarByIdAction`** / shared **`DetailsContainer`** there yet if you want parity with view.
-- **Cross-request cache** (optional): today only React **`cache()`** (per request); no `unstable_cache` / HTTP `fetch` cache for by-id reads.
-
----
-
-## Implementation plan (original checklist — annotated)
-
-Target: `demo-rsc-page` — drawer detail loads by **`id`** via loader + **server action**, **`Suspense`** for view loading, table payload not required for drawer.
-
-### 1. Server loader — **Done**
-
-- **`getRentalCarById(id)`** in `utils/server/get-rental-car-by-id.ts`, mock `rentalCars` + **`cache()`**.
-
-### 2. Async detail UI (Server Component) — **Done (variant)**
-
-- Async **`RscCarDrawerViewContent`** + **`getRentalCarByIdAction`** + **`DetailsContainer`**; no separate **`CarDrawerDetailSection`** file.
-
-### 3. `Suspense` boundary — **Done (variant)**
-
-- Boundary is in **`rsc-car-drawer-content.tsx`**, not a separate slot under **`demo-rsc-index.tsx`**.
-
-### 4. Compose with the client drawer shell — **Done (variant)**
-
-- **`DemoRscDrawerLayer`** is server and passes **`params`**; delete modal is a **client** sibling file. Original “`children` only from index” pattern not used.
-
-### 5. Trim / split `RscCarDrawerContent` — **Done (partial)**
-
-- **`RscCarDrawerContent`** is **server**; **`create`** still uses client **`RscCarDrawerCreateContent`**. View uses server async child; edit unchanged (still thin placeholder).
-
-### 6. Navigation and remounting — **Todo**
-
-add a stable remount strategy when id changes, and confirm URL-only updates refresh server drawer data.”
-Putting key={id} on the Suspense boundary (or on RscCarDrawerViewContent) tells React: when id changes, treat this as a new subtree
-
-- Explicit **`key={id}`** + verify RSC refresh on search-param-only navigations as needed.
-
-### 7. Prefetch (optional UX) — **Todo**
-
-- Not implemented.
-
-### 8. Order of work — **superseded by status above**
-
-Historical order replaced by **Implementation status** at top of this section.
+- **Edit mode detail fetch:** `RscCarDrawerEditContent` is still placeholder-by-id only; no **`getRentalCarByIdAction`** / shared **`DetailsContainer`** there yet if parity with view is wanted.
 
 ---
 
@@ -203,13 +191,26 @@ Historical order replaced by **Implementation status** at top of this section.
 
 | Piece | Path |
 |--------|------|
-| By-id loader + `cache()` | `utils/server/get-rental-car-by-id.ts` |
-| Server action (fetch) | `actions/get-rental-car-by-id-action.ts`, export in `actions.ts` |
-| Params → drawer | `demo-rsc-index.tsx` → `DemoRscDrawerLayer` |
-| Server drawer shell | `components/drawer-content/demo-rsc-drawer-layer.tsx` |
-| Delete modal (client) | `components/drawer-content/rsc-car-drawer-delete-modal.tsx` |
-| Branch + Suspense | `components/drawer-content/rsc-car-drawer-content.tsx` |
-| Async view + details UI | `components/drawer-content/rsc-car-drawer-view-content.tsx` |
-| Details sections (client) | `components/drawer-content/details-content/details-container.tsx` (+ vehicle / rental children) |
+| By-id loader + `cache()` | `entities/cars-rsc/server/get-rental-car-by-id.ts` |
+| Cross-request `unstable_cache` | `entities/cars-rsc/server/demo-rsc-cached-loaders.ts` (`getRentalCarByIdCached`) |
+| Server action (fetch + prefetch) | `entities/cars-rsc/actions/get-rental-car-by-id-action.ts` |
+| Row hover prefetch | `views/demo-rsc-page/demo-rsc-content.tsx` |
+| Params → drawer | `views/demo-rsc-page/demo-rsc-index.tsx` → `DemoRscDrawerLayer` |
+| Server drawer shell | `views/demo-rsc-page/ui/drawer-content/demo-rsc-drawer-layer.tsx` |
+| Delete modal (client) | `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-delete-modal.tsx` |
+| Branch + Suspense | `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-content.tsx` |
+| Async view + details UI | `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-view-content.tsx` |
+| Details sections (client) | `views/demo-rsc-page/ui/drawer-content/details-content/details-container.tsx` |
 
-This matches the architecture above while fitting **`app/(root)/demo-rsc-page/page.tsx`** → **`DemoRscIndex`** → table vs drawer layout already in the tree.
+This matches the architecture above while fitting
+`app/(root)/demo-rsc-page/page.tsx` → **`DemoRscIndex`** → table vs drawer layout already in the tree.
+
+---
+
+## Key Learnings
+
+- **Drawer detail is its own fetch** — Load by stable `id`; do not depend on the current table page payload.
+- **Portable entry points need by-id** — Deep links, alerts, and other surfaces can open the same drawer with the same loader.
+- **List cache ≠ detail cache** — Different queries; reuse only when intentionally shared.
+- **Prefetch + cross-request cache makes open feel instant** — Hover calls the same `getRentalCarByIdAction` / `getRentalCarByIdCached` path the drawer uses (see `6-2-rsc-bottleneck-by-id-prefetch`).
+- **Suspense keeps the shell usable** — View mode suspends on by-id while the drawer chrome and table stay responsive.

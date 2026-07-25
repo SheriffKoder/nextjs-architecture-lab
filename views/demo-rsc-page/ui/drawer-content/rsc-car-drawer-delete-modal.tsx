@@ -7,7 +7,7 @@
 
 'use client'
 
-import { DeleteActionModal, useDrawerActions } from '@/platform/url-kit/drawer-2'
+import { DeleteActionModal, useDrawerActions } from '@/platform/url-kit/url-drawer'
 
 export default function RscCarDrawerDeleteModal() {
   const { close } = useDrawerActions()

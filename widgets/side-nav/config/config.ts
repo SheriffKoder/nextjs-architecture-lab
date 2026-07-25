@@ -185,166 +185,149 @@
             color: 'secondary',
             size: 'sm'
           },
-          {
-            href: '/demo-client-page-airtable',
-            text: 'Car Rentals (Client/Minimal)',
-            subtext: 'Client-rendered with TanStack Query (AirTable Style)',
-            icon: FolderKanban,
-            // expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          },
-          {
-            href: '/demo-client-page-agent',
-            text: 'Car Rentals (Client/AI)',
-            subtext: 'Client-rendered with TanStack Query (with AI Agent Panel)',
-            icon: FolderKanban,
-            // expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          },
         ]
       },
-      {
-        href: '/external-links',
-        text: 'External Links',
-        subtext: 'Group',
-        icon: Link,
-        expandable: true,
-        children: [
-          {
-            href: 'https://appfolio.com',
-            text: 'Appfolio',
-            subtext: 'Manage my properties',
-            icon: LayoutDashboard,
-            expandable: false,
-            independent: true,
-            // Per-item configuration (overrides global independentButtonConfig)
-            independentConfig: {
-                icon1: {
-                    imageUrl: '/icons/appfolio-logo.png',
-                    color: '#000000', // Blue color in hex
-                    width: 20, // w-10 = 40px
-                    height: 20, // h-10 = 40px
-                    borderRadius: 'rounded-md'
-                    },
-                    icon2: {
-                    imageUrl: '/icons/appfolio-text.png',
-                    color: '#000000', // Green color in hex
-                    width: 60, // w-24 = 96px
-                    height: 25, // h-10 = 40px
-                    borderRadius: 'rounded-md'
-                    },
-                    container: {
-                    backgroundColor: '',
-                    borderColor: 'border',
-                    borderRadius: 'rounded-lg',
-                    padding: 'py-2 px-4',
-                    gap: 'gap-2'
-                    },
-                    // Styling configuration for active/inactive states
-                    styling: {
-                    active: {
-                        dark: 'bg-tertiary/20 border-tertiary/30',
-                        light: 'bg-transparent border-transparent'
-                    },
-                    inactive: {
-                        dark: 'hover:bg-tertiary/10 border-transparent hover:border-tertiary/20',
-                        light: 'bg-gradient-to-r from-transparent hover:from-tertiary/20 to-transparent border-transparent border-r-0'
-                    }
-                    },
-                    subtext: 'Manage my properties'
-                }
-          },
-          {
-            href: 'https://quickbooks.intuit.com',
-            text: 'Quickbooks',
-            subtext: 'Manage my accounting',
-            icon: LayoutDashboard,
-            expandable: false,
-            independent: true,
-            // Another example with different configuration
-            independentConfig: {
-                icon1: {
-                    imageUrl: '/icons/quickbooks-logo.png',
-                    color: '#000000', // Blue color in hex
-                    width: 20, // w-10 = 40px
-                    height: 20, // h-10 = 40px
-                    borderRadius: 'rounded-md'
-                  },
-                  icon2: {
-                    imageUrl: '/icons/quickbooks-text.png',
-                    color: '#000000', // Green color in hex
-                    width: 80, // w-24 = 96px
-                    height: 25, // h-10 = 40px
-                    borderRadius: 'rounded-md'
-                  },
-                  container: {
-                    backgroundColor: '',
-                    borderColor: 'border',
-                    borderRadius: 'rounded-lg',
-                    padding: 'py-2 px-4',
-                    gap: 'gap-2'
-                  },
-                  // Styling configuration for active/inactive states
-                  styling: {
-                    active: {
-                        dark: 'bg-tertiary/20 border-tertiary/30',
-                        light: 'bg-transparent border-transparent'
-                    },
-                    inactive: {
-                        dark: 'hover:bg-tertiary/10 border-transparent hover:border-tertiary/20',
-                        light: 'bg-gradient-to-r from-transparent hover:from-tertiary/20 to-transparent border-transparent border-r-0'
-                    }
-                  },
-                  subtext: 'Manage my accounting'
-                }
-          },
-          {
-            href: 'https://buildertrend.net',
-            text: 'Buildertrend',
-            subtext: 'Manage my projects',
-            icon: LayoutDashboard,
-            expandable: false,
-            independent: true,
-            // Another example with different configuration
-            independentConfig: {
-                icon1: {
-                    imageUrl: '/icons/buildertrend-icon-light.png',
-                    color: '#000000', // Blue color in hex
-                    width: 20, // w-10 = 40px
-                    height: 20, // h-10 = 40px
-                    borderRadius: 'rounded-md'
-                  },
-                  icon2: {
-                    imageUrl: '/icons/buildertrend-text.png',
-                    color: '#000000', // Green color in hex
-                    width: 80, // w-24 = 96px
-                    height: 25, // h-10 = 40px
-                    borderRadius: 'rounded-md'
-                  },
-                  container: {
-                    backgroundColor: '',
-                    borderColor: 'border',
-                    borderRadius: 'rounded-lg',
-                    padding: 'py-2 px-4',
-                    gap: 'gap-2'
-                  },
-                  // Styling configuration for active/inactive states
-                  styling: {
-                    active: {
-                        dark: 'bg-tertiary/20 border-tertiary/30',
-                        light: 'bg-transparent border-transparent'
-                    },
-                    inactive: {
-                        dark: 'hover:bg-tertiary/10 border-transparent hover:border-tertiary/20',
-                        light: 'bg-gradient-to-r from-transparent hover:from-tertiary/20 to-transparent border-transparent border-r-0'
-                    }
-                  },
-                  subtext: 'Manage my projects'
-                }
-          },
-        ]
-      },
+      // External Links
+      // {
+      //   href: '/external-links',
+      //   text: 'External Links',
+      //   subtext: 'Group',
+      //   icon: Link,
+      //   expandable: true,
+      //   children: [
+      //     {
+      //       href: 'https://appfolio.com',
+      //       text: 'Appfolio',
+      //       subtext: 'Manage my properties',
+      //       icon: LayoutDashboard,
+      //       expandable: false,
+      //       independent: true,
+      //       // Per-item configuration (overrides global independentButtonConfig)
+      //       independentConfig: {
+      //           icon1: {
+      //               imageUrl: '/icons/appfolio-logo.png',
+      //               color: '#000000', // Blue color in hex
+      //               width: 20, // w-10 = 40px
+      //               height: 20, // h-10 = 40px
+      //               borderRadius: 'rounded-md'
+      //               },
+      //               icon2: {
+      //               imageUrl: '/icons/appfolio-text.png',
+      //               color: '#000000', // Green color in hex
+      //               width: 60, // w-24 = 96px
+      //               height: 25, // h-10 = 40px
+      //               borderRadius: 'rounded-md'
+      //               },
+      //               container: {
+      //               backgroundColor: '',
+      //               borderColor: 'border',
+      //               borderRadius: 'rounded-lg',
+      //               padding: 'py-2 px-4',
+      //               gap: 'gap-2'
+      //               },
+      //               // Styling configuration for active/inactive states
+      //               styling: {
+      //               active: {
+      //                   dark: 'bg-tertiary/20 border-tertiary/30',
+      //                   light: 'bg-transparent border-transparent'
+      //               },
+      //               inactive: {
+      //                   dark: 'hover:bg-tertiary/10 border-transparent hover:border-tertiary/20',
+      //                   light: 'bg-gradient-to-r from-transparent hover:from-tertiary/20 to-transparent border-transparent border-r-0'
+      //               }
+      //               },
+      //               subtext: 'Manage my properties'
+      //           }
+      //     },
+      //     {
+      //       href: 'https://quickbooks.intuit.com',
+      //       text: 'Quickbooks',
+      //       subtext: 'Manage my accounting',
+      //       icon: LayoutDashboard,
+      //       expandable: false,
+      //       independent: true,
+      //       // Another example with different configuration
+      //       independentConfig: {
+      //           icon1: {
+      //               imageUrl: '/icons/quickbooks-logo.png',
+      //               color: '#000000', // Blue color in hex
+      //               width: 20, // w-10 = 40px
+      //               height: 20, // h-10 = 40px
+      //               borderRadius: 'rounded-md'
+      //             },
+      //             icon2: {
+      //               imageUrl: '/icons/quickbooks-text.png',
+      //               color: '#000000', // Green color in hex
+      //               width: 80, // w-24 = 96px
+      //               height: 25, // h-10 = 40px
+      //               borderRadius: 'rounded-md'
+      //             },
+      //             container: {
+      //               backgroundColor: '',
+      //               borderColor: 'border',
+      //               borderRadius: 'rounded-lg',
+      //               padding: 'py-2 px-4',
+      //               gap: 'gap-2'
+      //             },
+      //             // Styling configuration for active/inactive states
+      //             styling: {
+      //               active: {
+      //                   dark: 'bg-tertiary/20 border-tertiary/30',
+      //                   light: 'bg-transparent border-transparent'
+      //               },
+      //               inactive: {
+      //                   dark: 'hover:bg-tertiary/10 border-transparent hover:border-tertiary/20',
+      //                   light: 'bg-gradient-to-r from-transparent hover:from-tertiary/20 to-transparent border-transparent border-r-0'
+      //               }
+      //             },
+      //             subtext: 'Manage my accounting'
+      //           }
+      //     },
+      //     {
+      //       href: 'https://buildertrend.net',
+      //       text: 'Buildertrend',
+      //       subtext: 'Manage my projects',
+      //       icon: LayoutDashboard,
+      //       expandable: false,
+      //       independent: true,
+      //       // Another example with different configuration
+      //       independentConfig: {
+      //           icon1: {
+      //               imageUrl: '/icons/buildertrend-icon-light.png',
+      //               color: '#000000', // Blue color in hex
+      //               width: 20, // w-10 = 40px
+      //               height: 20, // h-10 = 40px
+      //               borderRadius: 'rounded-md'
+      //             },
+      //             icon2: {
+      //               imageUrl: '/icons/buildertrend-text.png',
+      //               color: '#000000', // Green color in hex
+      //               width: 80, // w-24 = 96px
+      //               height: 25, // h-10 = 40px
+      //               borderRadius: 'rounded-md'
+      //             },
+      //             container: {
+      //               backgroundColor: '',
+      //               borderColor: 'border',
+      //               borderRadius: 'rounded-lg',
+      //               padding: 'py-2 px-4',
+      //               gap: 'gap-2'
+      //             },
+      //             // Styling configuration for active/inactive states
+      //             styling: {
+      //               active: {
+      //                   dark: 'bg-tertiary/20 border-tertiary/30',
+      //                   light: 'bg-transparent border-transparent'
+      //               },
+      //               inactive: {
+      //                   dark: 'hover:bg-tertiary/10 border-transparent hover:border-tertiary/20',
+      //                   light: 'bg-gradient-to-r from-transparent hover:from-tertiary/20 to-transparent border-transparent border-r-0'
+      //               }
+      //             },
+      //             subtext: 'Manage my projects'
+      //           }
+      //     },
+      //   ]
+      // },
     ]
   }

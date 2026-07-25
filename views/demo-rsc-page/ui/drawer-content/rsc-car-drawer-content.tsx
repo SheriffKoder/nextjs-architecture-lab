@@ -7,7 +7,7 @@
  */
 
 import { Suspense } from 'react'
-import { parseDrawerState } from '@/platform/url-kit/drawer-2'
+import { parseDrawerState } from '@/platform/url-kit/url-drawer'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './rsc-car-drawer-constants'
 import RscCarDrawerCreateContent from './rsc-car-drawer-create-content'

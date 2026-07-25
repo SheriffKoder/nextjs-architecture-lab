@@ -15,7 +15,7 @@ import AddCarButton from './add-car-button'
 
 interface ActionButtonsProps {
   exportForMailchimp: () => void | Promise<void>
-  /** When true, renders `AddCarButton` (drawer-2 `openCreate`) after Mailchimp — demo RSC only */
+  /** When true, renders `AddCarButton` (url-drawer `openCreate`) after Mailchimp — demo RSC only */
   showAddCarDrawerButton?: boolean
   /** Classic header “Add car” for client demo (e.g. TanStack drawer). */
   openAddCarModal?: () => void
@@ -31,7 +31,9 @@ export default function ActionButtons({
 }: ActionButtonsProps) {
   return (
     <div className="flex w-full flex-row flex-wrap items-start gap-2 lg:w-auto">
-      <button
+
+      {/* // Custom icon button for export for mailchimp */}
+      {/* <button
         type="button"
         onClick={() => void exportForMailchimp()}
         className="mt-2 cursor-pointer transition-all duration-200 lg:mt-0"
@@ -55,7 +57,7 @@ export default function ActionButtons({
           padding="px-4 py-2"
           gap="gap-3"
         />
-      </button>
+      </button> */}
 
       {showAddCarDrawerButton ? <AddCarButton /> : null}
 

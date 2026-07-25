@@ -36,7 +36,7 @@ function getMdUpServerSnapshot() {
  * Right Drawer — shell only (no built-in title/header row)
  *
  * Purpose: Slide-over panel from the right; content owns header/actions
- * Used in: Car drawer manager, drawer-2 `DrawerWrapper`
+ * Used in: Car drawer manager, url-drawer `DrawerWrapper`
  * Why: Enter/exit via Framer Motion; CSS transitions narrowed so width does not animate (no 100vw → px flash)
  */
 const RightDrawer: React.FC<RightDrawerProps> = ({

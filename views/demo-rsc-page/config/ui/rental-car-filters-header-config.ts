@@ -9,7 +9,7 @@ import type { FiltersHeaderConfig } from '@/platform/url-kit/filters/components/
 export const rentalCarFiltersHeaderConfig: FiltersHeaderConfig = {
   filterType: 'pill', // available types: dropdown-1, dropdown-2, pill
   showSearch: true,
-  showColumnOptions: true,
+  showColumnOptions: false,
   columnOptionsKey: 'status',
   showIndependentDateSelect: true, // Not used for dropdown-2 (designed for the pill filter)
   enabledFilterKeys: ['status', 'make', 'location'],

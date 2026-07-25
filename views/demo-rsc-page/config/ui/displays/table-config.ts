@@ -88,17 +88,17 @@ export const tableHeaderConfig = {
     // Which filters to show per column (optional - shows all matching if not specified)
     // For the table header
     enabledFilterKeys: {
-      'model': ['model'],
-      'status': ['status'],
-      'make': ['make'],
-      'location': ['location'],
-      'year': ['year'],
-      'pricePerDay': ['pricePerDay'],
-      'mileage': ['mileage'],
-      'rentalStartDate': ['rentalStartDate'],
-      'rentalEndDate': ['rentalEndDate'],
-      'licensePlate': ['licensePlate'],
-      'color': ['color'],
+      // 'model': ['model'],
+      // 'status': ['status'],
+      // 'make': ['make'],
+      // 'location': ['location'],
+      // 'year': ['year'],
+      // 'pricePerDay': ['pricePerDay'],
+      // 'mileage': ['mileage'],
+      // 'rentalStartDate': ['rentalStartDate'],
+      // 'rentalEndDate': ['rentalEndDate'],
+      // 'licensePlate': ['licensePlate'],
+      // 'color': ['color'],
     },
     
     // Filter behavior props
@@ -110,17 +110,17 @@ export const tableHeaderConfig = {
   
   // Sort configuration for table header sort buttons
   sortConfig: [
-    { key: 'model', label: 'Model' },
-    { key: 'make', label: 'Make' },
-    { key: 'year', label: 'Year' },
-    { key: 'status', label: 'Status' },
-    { key: 'location', label: 'Location' },
-    { key: 'mileage', label: 'Mileage' },
-    { key: 'pricePerDay', label: 'Price Per Day' },
-    { key: 'rentalStartDate', label: 'Rental Start Date' },
-    { key: 'rentalEndDate', label: 'Rental End Date' },
-    { key: 'licensePlate', label: 'License Plate' },
-    { key: 'color', label: 'Color' },
+    // { key: 'model', label: 'Model' },
+    // { key: 'make', label: 'Make' },
+    // { key: 'year', label: 'Year' },
+    // { key: 'status', label: 'Status' },
+    // { key: 'location', label: 'Location' },
+    // { key: 'mileage', label: 'Mileage' },
+    // { key: 'pricePerDay', label: 'Price Per Day' },
+    // { key: 'rentalStartDate', label: 'Rental Start Date' },
+    // { key: 'rentalEndDate', label: 'Rental End Date' },
+    // { key: 'licensePlate', label: 'License Plate' },
+    // { key: 'color', label: 'Color' },
   ],
 }
 

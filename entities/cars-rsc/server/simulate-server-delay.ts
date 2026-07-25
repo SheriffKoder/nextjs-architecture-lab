@@ -7,10 +7,10 @@
 export const DEMO_RSC_SIMULATE_FILTER_OPTIONS_MS = 0
 
 /** List payload (`getRentalCarsData`). */
-export const DEMO_RSC_SIMULATE_RENTAL_CARS_MS = 5000
+export const DEMO_RSC_SIMULATE_RENTAL_CARS_MS = 500
 
 /** Single-car by id (`getRentalCarById`) — drawer detail / Suspense demos. */
-export const DEMO_RSC_SIMULATE_RENTAL_CAR_BY_ID_MS = 5000
+export const DEMO_RSC_SIMULATE_RENTAL_CAR_BY_ID_MS = 500
 
 export async function simulateServerDelay(ms: number): Promise<void> {
   if (ms <= 0) return

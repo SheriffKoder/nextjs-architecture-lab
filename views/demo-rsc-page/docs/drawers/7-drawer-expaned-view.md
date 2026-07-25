@@ -10,7 +10,7 @@ The filename uses **“expaned”** as a historical typo; the behavior is **expa
 
 1. **`RightDrawer`** (`components/design/right-drawer.tsx`) exposes **`expandToFullScreen`** so the panel can use the full width (e.g. for a two-column details + timeline layout).
 2. The toggle for that mode lives **inside** drawer content (e.g. `TimelineJourney` → “Expand view”), while the flag must be applied on **`RightDrawer`**, which is **above** those children in the tree.
-3. **`DrawerWrapper`** (`features/ui/drawer-2/components/drawer-wrapper.tsx`) only receives **`children`** from the server/RSC shell; it cannot know about journey UI unless we add cross-layer wiring.
+3. **`DrawerWrapper`** (`platform/url-kit/url-drawer/components/drawer-wrapper.tsx`) only receives **`children`** from the server/RSC shell; it cannot know about journey UI unless we add cross-layer wiring.
 
 ---
 
@@ -20,11 +20,11 @@ We introduced a small **React context** scoped to the open drawer session:
 
 | Piece | Location | Role |
 |--------|-----------|------|
-| **Context + hooks** | `features/ui/drawer-2/providers/drawer-chrome-context.tsx` | Holds `isJourneyPanelOpen`, `setIsJourneyPanelOpen`, `toggleJourneyPanel`. |
-| **Owner + provider** | `features/ui/drawer-2/components/drawer-wrapper.tsx` | Owns `useState`, passes **`expandToFullScreen={isJourneyPanelOpen}`** to `RightDrawer`, wraps **`children`** with **`DrawerChromeProvider`** only when the drawer URL says open. |
-| **Consumers** | Any **client** component rendered as `children` (e.g. `details-container.tsx`) | Calls **`useDrawerChrome()`** from `@/features/ui/drawer-2`. |
+| **Context + hooks** | `platform/url-kit/url-drawer/providers/drawer-chrome-context.tsx` | Holds `isJourneyPanelOpen`, `setIsJourneyPanelOpen`, `toggleJourneyPanel`. |
+| **Owner + provider** | `platform/url-kit/url-drawer/components/drawer-wrapper.tsx` | Owns `useState`, passes **`expandToFullScreen={isJourneyPanelOpen}`** to `RightDrawer`, wraps **`children`** with **`DrawerChromeProvider`** only when the drawer URL says open. |
+| **Consumers** | Any **client** component rendered as `children` (e.g. `details-container.tsx`) | Calls **`useDrawerChrome()`** from `@/platform/url-kit/url-drawer`. |
 
-Public re-exports live in **`features/ui/drawer-2/index.ts`** (`useDrawerChrome`, `useDrawerChromeOptional`, `DrawerChromeProvider`, `DrawerChromeContextValue`).
+Public re-exports live in **`platform/url-kit/url-drawer/index.ts`** (`useDrawerChrome`, `useDrawerChromeOptional`, `DrawerChromeProvider`, `DrawerChromeContextValue`).
 
 ---
 
@@ -55,7 +55,7 @@ In `drawer-wrapper.tsx`, context-related blocks are grouped under **`/////////`*
 ## Related files
 
 - `components/design/right-drawer.tsx` — `expandToFullScreen` width behavior
-- `features/ui/drawer-2/providers/drawer-chrome-context.tsx` — context API
-- `features/ui/drawer-2/components/drawer-wrapper.tsx` — state, reset, provider, `RightDrawer` wiring
+- `platform/url-kit/url-drawer/providers/drawer-chrome-context.tsx` — context API
+- `platform/url-kit/url-drawer/components/drawer-wrapper.tsx` — state, reset, provider, `RightDrawer` wiring
 - `features/demo-rsc-page/components/drawer-content/details-content/details-container.tsx` — consumer + layout
 - `features/demo-rsc-page/components/drawer-content/details-content/timeline-journey.tsx` — toggles expand via props from parent

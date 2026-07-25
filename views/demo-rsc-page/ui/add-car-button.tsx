@@ -1,7 +1,7 @@
 /**
  * AddCarButton
  *
- * Purpose: Isolated control that opens the URL-driven car drawer (`drawer-2` + `openCreate`)
+ * Purpose: Isolated control that opens the URL-driven car drawer (`url-drawer` + `openCreate`)
  * Used in: `demo-rsc-index.tsx` header beside `ActionButtons`
  * Used for: Keeps drawer navigation out of shared `action-buttons.tsx`
  */
@@ -10,7 +10,7 @@
 
 import { Plus } from 'lucide-react'
 import PrimaryButton from '@/shared/ui/buttons/primary-button'
-import { useDrawerActions } from '@/platform/url-kit/drawer-2'
+import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './drawer-content/rsc-car-drawer-content'
 
 interface AddCarButtonProps {

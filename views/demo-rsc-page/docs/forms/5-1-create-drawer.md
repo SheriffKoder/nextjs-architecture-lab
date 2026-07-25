@@ -1,47 +1,251 @@
-Recommended plan (create drawer, in order)
+# How to Construct a Create Drawer (RSC + Server Action)
 
-# Schema contract (server + client)
+A repeatable recipe for building a **URL-driven create drawer** like the demo RSC “Add car” flow.
 
-Import from lib/validation/rental-car-create-form-schema.ts in the new client form (stop duplicating the client-page schema for RSC if you want a single source).
-Add a clear create input story: e.g. rentalCarCreateInputSchema = rentalCarFormSchema.omit({ id: true }) (or id optional) and in the action merge id: newId after parse, then rentalCarFormValuesToTableItem (or build the row directly).
+Companion mental model: `5-server-forms.md`.  
+Drawer shell / URL contract: `2-drawer-system.md` (`platform/url-kit/url-drawer`).
 
-# createCarAction (Server Action)
+---
 
-safeParse the payload (objects from RHF are fine; avoid trusting shape).
-On failure: return { error: parsed.error.flatten() } as in the doc.
-On success: append row to your persistence layer, then revalidatePath for /demo-rsc-page (you use React cache() for loaders; path revalidation is the straightforward lever unless you add unstable_cache + tags).
-Return { success: true } (and optionally { id } if useful for UX).
+## 🎯 Goal
 
-# Persistence for the demo
+```text
+openCreate(drawerKey)
+  → mode=create in URL
+  → sticky header (Save / Reset) outside the scrolling form
+  → client form (RHF + Zod UX)
+  → Server Action (authoritative Zod)
+  → toast + close() on success
+```
 
-Introduce a small server-only module (e.g. “append to array” or replace with DB later). Today rentalCars is static — you’ll need either a mutable store (document caveats: dev-only / loses on restart) or redirect to a real DB — otherwise create won’t show after refresh.
+Server validation is the source of truth. Client Zod / RHF is UX only.
 
-# CarFormClient (new client module under demo-rsc-page)
+---
 
-Port field UI from car-add-slider-form.tsx (or extract a shared RentalCarFormFields used by client demo + RSC to avoid drift).
-Keep: RHF, zodResolver, same Controllers/inputs, formatFieldErrors + toast on client validation (optional: also toast on server hard errors if the action returns a non-field formError).
-On submit: startTransition(async () => { const res = await createCarAction(values); … }); map fieldErrors with setError per the doc; on success → toast success + close() from useDrawerActions (URL as source of truth).
-Accept isPending from useTransition for disabled inputs / Save label.
+## 🧱 Pieces to Build
 
-# Header + form wiring (per doc)
+| Layer | Responsibility | Demo location |
+|---|---|---|
+| Schema | Shared Zod contract + defaults + row mapper | `entities/cars-rsc/validation/rental-car-create-form-schema.ts` |
+| Server Action | `safeParse` → persist (or stub) → result union | `entities/cars-rsc/actions/create-rental-car-action.ts` |
+| Drawer branch | `mode=create` → create content | `rsc-car-drawer-content.tsx` |
+| Composition shell | `formId` + `useTransition` + header + form | `rsc-car-drawer-create-content.tsx` |
+| Sticky header | Submit/reset via `form={formId}` | `rsc-car-drawer-sticky-header.tsx` → `RscCarDrawerCreateHeader` |
+| Client form | Fields, submit pipeline, toasts, `close()` | `rsc-car-create-form-client.tsx` |
 
-Define a stable formId (e.g. car-create-form) in the create drawer composition.
-Extend RscCarDrawerCreateHeader to accept optional formId and render type="submit" / type="reset" buttons with form={formId}, matching 5. server-forms.md §Steps 2 & HTML comment (287–285).
-RscCarDrawerCreateContent: composition only — header + <CarFormClient formId={…} submitAction={createCarAction} /> (no business logic in the shell).
+---
 
-# Edge cases
+## 1. Schema contract (entity)
 
-Double submit: guard with isPending + disabled Save (like client isSubmitting).
-Filter options / table: after create, revalidation should refetch; if filter facet counts are cached separately, revalidate the same path or any shared tags you add.
-Future (out of scope for “create only”)
+One Zod schema shared by RHF (`zodResolver`) and the Server Action.
 
-Edit drawer: rental-car-edit-form-schema.ts + smaller form.
-Optional: extract shared form UI to a feature package to share with demo-client-page without copy-paste.
+```ts
+// entities/.../validation/<entity>-create-form-schema.ts
+export const rentalCarFormSchema = z.object({ /* fields */ })
+export type RentalCarFormValues = z.infer<typeof rentalCarFormSchema>
 
+export function defaultRentalCarFormValues(): RentalCarFormValues { ... }
+export function rentalCarFormValuesToTableItem(values): RentalCarTableItem { ... }
+```
 
-# just some confirmations:
-- these are out schemas features\demo-rsc-page\lib\validation
-- place car create action in a new file with proper naming
-- return success, id, and model, make, color, year for toast
-- do not append, keep it commented out until DB is implemented, also i do not mind losing after restart
-- Port field UI from car-add-slider-form.tsx, also toast on server hard errors if the action returns a non-field formError
+Rules:
+
+- Do **not** duplicate the schema in the view
+- Action assigns `id` (e.g. `randomUUID`) — client `id` is not trusted
+- Keep mappers next to the schema so create/edit stay aligned later
+
+---
+
+## 2. Server Action (entity)
+
+```ts
+'use server'
+
+export async function createRentalCarAction(
+  data: unknown
+): Promise<CreateRentalCarActionResult> {
+  const parsed = rentalCarFormSchema.safeParse(data)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.flatten() }
+  }
+
+  try {
+    const id = randomUUID()
+    const row = rentalCarFormValuesToTableItem({ ...parsed.data, id })
+
+    // When DB exists:
+    // await db.insert(...)
+    // revalidatePath('/demo-rsc-page')
+
+    return {
+      success: true,
+      id: row.id,
+      model: row.model,
+      make: row.make,
+      color: row.color,
+      year: row.year,
+    }
+  } catch (e) {
+    return {
+      success: false,
+      formError: e instanceof Error ? e.message : 'Something went wrong.',
+    }
+  }
+}
+```
+
+Result union (what the client branches on):
+
+| Shape | Client behavior |
+|---|---|
+| `{ success: true, id, model, make, color, year }` | Success toast → `close()` |
+| `{ success: false, error: flatten }` | `setError` per field + optional form errors |
+| `{ success: false, formError }` | Hard-error toast (non-field) |
+
+👉 Return a **small success payload for toasts**, not the full row, unless UX needs it.
+
+---
+
+## 3. Open the drawer (URL)
+
+```ts
+const { openCreate } = useDrawerActions()
+openCreate('car') // → ?drawer=car&mode=create
+```
+
+`parseDrawerState` opens create without an `id`. Branch in the RSC/client drawer body:
+
+```ts
+if (state.mode === 'create') {
+  return <RscCarDrawerCreateContent />
+}
+```
+
+---
+
+## 4. Composition shell (view)
+
+Keep the create shell **thin**: transition + `formId` + header + form. No field logic here.
+
+```tsx
+const RSC_CAR_CREATE_FORM_ID = 'rsc-car-create-form'
+
+export default function RscCarDrawerCreateContent() {
+  const [isPending, startTransition] = useTransition()
+  const resetFormRef = useRef<(() => void) | null>(null)
+
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <RscCarDrawerCreateHeader
+        formId={RSC_CAR_CREATE_FORM_ID}
+        isSubmitting={isPending}
+        onResetForm={() => resetFormRef.current?.()}
+      />
+      <RscCarCreateFormClient
+        formId={RSC_CAR_CREATE_FORM_ID}
+        startTransition={startTransition}
+        onRegisterActions={({ resetForm }) => {
+          resetFormRef.current = resetForm
+        }}
+      />
+    </div>
+  )
+}
+```
+
+Why:
+
+- Header Save can sit **outside** the scrolling `<form>` via HTML `form={formId}`
+- One `useTransition` drives both header `isPending` and action submit
+- Reset uses RHF `reset` (native `type="reset"` does not sync controlled fields)
+
+---
+
+## 5. Sticky header ↔ form association
+
+```tsx
+<button type="submit" form={formId} disabled={isSubmitting}>Save</button>
+<button type="button" onClick={onResetForm} disabled={isSubmitting}>Reset</button>
+```
+
+```tsx
+<form id={formId} onSubmit={handleSubmit(onValid, onInvalid)}>...</form>
+```
+
+---
+
+## 6. Client form submit pipeline
+
+```ts
+startTransition(() => {
+  void (async () => {
+    const res = await createRentalCarAction(values)
+
+    if (res.success) {
+      showSuccess(/* id, make, model, color, year */)
+      close() // useDrawerActions — clears URL drawer params
+      return
+    }
+
+    if ('formError' in res && res.formError) {
+      showError(res.formError)
+      return
+    }
+
+    if ('error' in res && res.error) {
+      applyServerFieldErrors(res.error.fieldErrors, setError)
+      // optional: toast formErrors
+    }
+  })()
+})
+```
+
+Rules:
+
+- Call the action with a **plain object** from RHF (not only `FormData`) — still `safeParse` on the server
+- Guard double submit with `isPending` / disabled Save
+- On client validation failure, toast consolidated field messages (UX); server still re-validates
+
+---
+
+## 7. Persistence & revalidation
+
+Today (demo):
+
+- Persistence insert is **commented out** until a DB/repository exists
+- Success still returns toast fields so UX can be exercised
+- Optional demo failure simulation can sit after Zod passes (remove for production)
+
+When DB exists:
+
+```ts
+await db.insert(...)
+revalidatePath('/your-page')
+// or revalidateTag(...) if loaders use tagged unstable_cache
+```
+
+👉 List/facet caches must be invalidated the same way the page loads data — otherwise create succeeds but the table looks stale.
+
+---
+
+## ✅ Checklist (new entity)
+
+1. [ ] Zod schema + defaults + mapper in `entities/<entity>/validation`
+2. [ ] Server Action with discriminated result in `entities/<entity>/actions`
+3. [ ] `openCreate(drawerKey)` from a button / toolbar
+4. [ ] Drawer content branches on `mode=create`
+5. [ ] Shell: shared `formId` + `useTransition` + create header + form client
+6. [ ] Header Save uses `type="submit" form={formId}`; Reset uses RHF reset
+7. [ ] Submit maps success / `formError` / `fieldErrors`; success calls `close()`
+8. [ ] Wire `revalidatePath` / tags when persistence is real
+
+---
+
+## Key Learnings
+
+- **Construct create as layers** — schema → action → URL open → shell → header/form — not one mega component.
+- **Server Action owns truth** — client Zod is optional UX; always `safeParse` on the server.
+- **Shell stays dumb** — composition + transition + `formId`; fields live in the form client.
+- **Associate remote submit** — sticky Save outside the scroll region via `form={formId}`.
+- **Return toast-sized success** — `id` + display fields; close the drawer via URL (`close()`).
+- **Revalidate when you persist** — without path/tag revalidation, RSC list islands stay stale.
