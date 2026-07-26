@@ -5,6 +5,7 @@ import {
   AlignStartHorizontal,
   Calendar,
   LayoutDashboard,
+  LayoutList,
   List,
   ListOrdered,
   Map,
@@ -22,6 +23,7 @@ const VIEW_OPTIONS: Record<string, ViewSwitcherOption> = {
   subheadings: { key: 'subheadings', label: 'SubHeadings', icon: List },
   timeline: { key: 'timeline', label: 'Timeline', icon: AlignStartHorizontal },
   list: { key: 'list', label: 'List', icon: ListOrdered },
+  cards: { key: 'cards', label: 'Cards', icon: LayoutList },
 }
 
 export interface ViewSwitcherWrapperProps {

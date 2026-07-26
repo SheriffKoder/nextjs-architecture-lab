@@ -16,7 +16,7 @@
 
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { LucideIcon } from 'lucide-react'
 import MaskImage from '@/shared/ui/mask-image'
@@ -104,24 +104,11 @@ export default function NavLink({
     }
   }
 
-  // Detect mobile and close sidebar on link click
-  const { setIsSidebarOpen } = useSidebar()
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024) // lg breakpoint
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  // Close mobile drawer on navigate (desktop rail ignores drawer state)
+  const { closeSidebar } = useSidebar()
 
   const handleLinkClick = () => {
-    if (isMobile) {
-      setIsSidebarOpen(false)
-    }
+    closeSidebar()
   }
 
   return (

@@ -65,7 +65,7 @@ export function FilterToolbarDesktop({
 
       <SearchControl config={searchConfig} />
 
-      <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
+      <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-1">
         {resolvedLabelKey ? (
           <LabelFilters
             filterKey={resolvedLabelKey}

@@ -8,6 +8,7 @@ import {
   AlignStartHorizontal,
   Calendar,
   LayoutDashboard,
+  LayoutList,
   List,
   ListOrdered,
   Map,
@@ -23,6 +24,7 @@ export type ViewDisplayOption = {
 export const viewDisplayOptions = {
   table: { key: 'table', label: 'Table', icon: Table },
   list: { key: 'list', label: 'List', icon: ListOrdered },
+  cards: { key: 'cards', label: 'Cards', icon: LayoutList },
   kanban: { key: 'kanban', label: 'Kanban', icon: LayoutDashboard },
   map: { key: 'map', label: 'Map', icon: Map },
   calendar: { key: 'calendar', label: 'Calendar', icon: Calendar },

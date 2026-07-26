@@ -38,6 +38,7 @@ import { mapConfig } from './config/ui/displays/map-config'
 import { timelineConfig } from './config/ui/displays/timeline-config'
 import { subheadingsConfig } from './config/ui/displays/subheadings-config'
 import { listViewConfig } from './config/ui/displays/list-config'
+import { mobileListConfig } from './config/ui/displays/mobile-list-config'
 import { demoRscRowActionConfigs } from './config/ui/demo-rsc-row-action-configs'
 
 // Data
@@ -218,6 +219,10 @@ export default function DemoRscContent({
         }}
         kanbanConfig={kanbanConfig}
         listViewConfig={listViewConfig}
+        mobileListConfig={{
+          ...mobileListConfig,
+          loading,
+        }}
         calendarConfig={calendarConfig}
         mapConfig={mapConfig}
         timelineConfig={timelineConfig}

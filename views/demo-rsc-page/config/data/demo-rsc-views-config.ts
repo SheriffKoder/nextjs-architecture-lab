@@ -12,6 +12,7 @@ export const DEMO_RSC_AVAILABLE_VIEWS = [
   'timeline',
   'subheadings',
   'list',
+  'cards',
 ] as const
 
 /** Views that require the full filtered dataset (`?all=1`). */
@@ -22,6 +23,7 @@ export const DEMO_RSC_USE_ALL_ITEMS_VIEWS = [
   'timeline',
   'subheadings',
 ] as const
+// Note: `cards` uses table-style pagination (page size + `all` option), not useAllItems.
 
 export const DEMO_RSC_DEFAULT_VIEW = 'table'
 

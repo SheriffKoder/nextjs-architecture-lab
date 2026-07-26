@@ -43,7 +43,7 @@ export default function PageHeader({
   className,
 }: PageHeaderProps) {
   const pathname = usePathname()
-  const { toggleSidebar } = useSidebar()
+  const { openSidebar } = useSidebar()
 
   ///////////////////////
   // Parse pathname to extract route segments
@@ -110,9 +110,9 @@ export default function PageHeader({
       {showMenuToggle ? (
         <button
           type="button"
-          onClick={toggleSidebar}
+          onClick={openSidebar}
           className="rounded-md p-2 transition-colors hover:bg-foreground/5 md:hidden"
-          aria-label="Toggle sidebar"
+          aria-label="Open sidebar"
         >
           <Menu className="h-6 w-6 text-foreground" />
         </button>

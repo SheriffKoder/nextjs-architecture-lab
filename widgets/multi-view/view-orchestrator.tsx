@@ -31,10 +31,16 @@ import type { SubheadingsUpdateContext } from "./features/subheadings/dnd";
 import type { ColumnConfig } from "./features/kanban/types/kanban-types";
 import { MapsContainerWithMock } from "@/widgets/maps-view/mock";
 import TimelineWrapper from "./features/timeline-3/timeline-wrapper";
+import {
+  MobileListWrapper,
+  resolveForcedMobileView,
+  type MobileListConfig,
+} from "./features/mobile-list";
 import type { GroupConfig } from "./features/virtualized-list/utils/grouping-utils";
 import type { FilterField } from "@/platform/url-kit/filters/feature-query-builder-filter/types/field";
 import type { SearchConfig } from "@/platform/url-kit/filters/feature-filtering/components/search-types";
 import { useUrlGrouping } from "@/platform/url-kit/minimal-controls";
+import { useIsMobile } from "./hooks/use-is-mobile";
 
 const EMPTY_GROUPING_KEYS: string[] = [];
 // Lazy load DashboardContent to avoid loading it when not on dashboard route
@@ -71,6 +77,8 @@ interface ViewOrchestratorProps<T extends Record<string, any> = Record<string, a
   tableConfig?: TableConfig<T>;
   // List view configuration for grouped table view
   listViewConfig?: GroupConfig;
+  /** Cards / mobile-list view configuration (`?view=cards`) */
+  mobileListConfig?: MobileListConfig<T>;
   // Available view modes to display in switcher (e.g., ['table', 'kanban', 'map'])
   availableViews?: string[];
   /** Views that need the full filtered dataset (`?all=1`, no page/limit) */
@@ -226,6 +234,7 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
   accordionConfig,
   tableConfig,
   listViewConfig,
+  mobileListConfig,
   availableViews = ['table'],
   useAllItems,
   defaultPageSize,
@@ -314,6 +323,8 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
         return timelineConfig !== undefined
       case 'list':
         return listViewConfig !== undefined
+      case 'cards':
+        return mobileListConfig !== undefined
       case 'map':
       case 'table':
         return true
@@ -322,8 +333,15 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
     }
   }
 
-  const renderView =
+  const resolvedView =
     canRenderView(currentView) ? currentView : defaultView
+
+  // Below md: table / list / subheadings → cards (URL unchanged)
+  const isMobile = useIsMobile()
+  const renderView = resolveForcedMobileView(resolvedView, {
+    isMobile,
+    canRenderCards: mobileListConfig !== undefined,
+  })
 
   // Determine which view to render based on resolved + renderable view
   const isKanbanView = renderView === 'kanban' && kanbanConfig !== undefined
@@ -332,9 +350,19 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
   const isSubHeadingsView = renderView === 'subheadings' && subheadingsConfig !== undefined
   const isTimelineView = renderView === 'timeline' && timelineConfig !== undefined
   const isListView = renderView === 'list' && listViewConfig !== undefined
-  const isTableView = renderView === 'table' || (!isKanbanView && !isCalendarView && !isMapView && !isSubHeadingsView && !isTimelineView && !isListView)
+  const isCardsView = renderView === 'cards' && mobileListConfig !== undefined
+  const isTableView =
+    renderView === 'table' ||
+    (!isKanbanView &&
+      !isCalendarView &&
+      !isMapView &&
+      !isSubHeadingsView &&
+      !isTimelineView &&
+      !isListView &&
+      !isCardsView)
 
-  const isScrollableDataView = isTableView || isListView || isSubHeadingsView
+  const isScrollableDataView =
+    isTableView || isListView || isSubHeadingsView || isCardsView
 
   // Children treat URL / legacy grouping as authoritative when either path is active
   const groupingControlsSignal =
@@ -344,7 +372,11 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
     <div
       className="flex flex-col h-full min-h-0 gap-0 p-0 relative"
       data-view-resolution={resolution.status}
+      data-resolved-view={resolvedView}
       data-render-view={renderView}
+      data-mobile-forced={
+        isMobile && resolvedView !== renderView ? 'cards' : undefined
+      }
     >
       {isItemLoading && (
         <div className="flex items-center justify-center h-full absolute inset-0">
@@ -470,6 +502,22 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
             loadingItemIds={subheadingsConfig?.loadingItemIds}
             isManualOnChangeRef={subheadingsConfig?.isManualOnChangeRef}
             listView={subheadingsConfig?.listView}
+          />
+        ) : isCardsView ? (
+          /* Cards / mobile-list View — no hover prefetch */
+          <MobileListWrapper
+            data={data}
+            config={{
+              ...mobileListConfig,
+              loading: isItemLoading ?? mobileListConfig.loading,
+            }}
+            selectedItemId={selectedItemId}
+            onRowClick={onRowClick}
+            onActionClick={onActionClick}
+            actionConfigs={actionConfigs}
+            columnActions={columnActions}
+            onCellValueChange={onCellValueChange}
+            selectedGroupBy={selectedGroupBy}
           />
         ) : (
           /* Table/List View */

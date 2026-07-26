@@ -132,26 +132,12 @@ export default function LogoIconPair({
 
   const icon1ImageUrl = getIcon1ImageUrl()
 
-  ///////////////////////
-  // Detect mobile and close sidebar on link click
-  // Why: Close sidebar on mobile when navigation link is clicked
-  // How: Uses sidebar context and window width detection
-  const { setIsSidebarOpen } = useSidebar()
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024) // lg breakpoint
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  // Close mobile drawer on navigate (desktop rail ignores drawer state)
+  const { closeSidebar } = useSidebar()
 
   const handleLinkClick = () => {
-    if (isMobile && href) {
-      setIsSidebarOpen(false)
+    if (href) {
+      closeSidebar()
     }
   }
 

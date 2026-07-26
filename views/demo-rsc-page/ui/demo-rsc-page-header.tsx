@@ -22,14 +22,14 @@ interface DemoRscPageHeaderProps {
 }
 
 function MobileSidebarToggle() {
-  const { toggleSidebar } = useSidebar()
+  const { openSidebar } = useSidebar()
 
   return (
     <button
       type="button"
-      onClick={toggleSidebar}
+      onClick={openSidebar}
       className="rounded-md p-2 transition-colors hover:bg-foreground/5 md:hidden"
-      aria-label="Toggle sidebar"
+      aria-label="Open sidebar"
     >
       <Menu className="h-6 w-6 text-foreground" />
     </button>

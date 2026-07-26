@@ -58,6 +58,7 @@ export const DEFAULT_SUB_GROUP_BY_PARAM = 'subGroupBy'
 export const DEFAULT_GROUPING_SUPPORTED_VIEWS = [
   'table',
   'list',
+  'cards',
   'subheadings',
   'timeline',
 ] as const

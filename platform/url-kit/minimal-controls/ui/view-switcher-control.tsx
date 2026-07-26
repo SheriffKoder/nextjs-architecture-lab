@@ -19,6 +19,7 @@ import {
   Calendar,
   List,
   AlignStartHorizontal,
+  LayoutList,
   ChevronDown,
   type LucideIcon,
 } from 'lucide-react'
@@ -30,6 +31,7 @@ const VIEW_OPTIONS: Record<
 > = {
   table: { key: 'table', label: 'Table', icon: Table },
   list: { key: 'list', label: 'List', icon: List },
+  cards: { key: 'cards', label: 'Cards', icon: LayoutList },
   kanban: { key: 'kanban', label: 'Kanban', icon: LayoutDashboard },
   map: { key: 'map', label: 'Map', icon: Map },
   calendar: { key: 'calendar', label: 'Calendar', icon: Calendar },

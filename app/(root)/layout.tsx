@@ -16,9 +16,10 @@ interface User {
 
 function SidebarHeaderFallback() {
   // Match defaultCollapsed rail width to avoid load layout jump (see sidebarConfig.defaultCollapsed)
+  // Hidden below md — mobile uses a fixed drawer, not in-flow rail space.
   return (
     <div
-      className="h-full min-h-[700px] w-24 shrink-0 rounded-lg border border-tertiary/10 bg-background/20 backdrop-blur-lg animate-pulse"
+      className="hidden h-full min-h-[700px] w-24 shrink-0 rounded-lg border border-tertiary/10 bg-background/20 backdrop-blur-lg animate-pulse md:block"
       aria-hidden
     />
   )

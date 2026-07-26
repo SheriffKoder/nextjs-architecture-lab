@@ -20,13 +20,29 @@ Prefer the barrel. Do not deep-import `ui/`, `providers/`, `model/`, or `config/
 ```text
 side-nav/
 ├── index.ts
-├── ui/                 # SideNav shell + nav pieces
-├── providers/          # SidebarProvider / useSidebar
-├── model/              # nav config types
-└── config/             # default nav items + theme colors
+├── ui/
+│   ├── side-nav.tsx           # orchestrator (mobile + desktop shells)
+│   ├── shells/
+│   │   ├── mobile-drawer.tsx  # slide-over; always full labels; flexible width
+│   │   ├── desktop-rail.tsx   # dual nav layers + collapse chevron
+│   │   └── nav-items-list.tsx # shared link / group rendering
+│   └── …                      # nav pieces (link, logo, user area, …)
+├── lib/                       # path / active helpers
+├── providers/                 # SidebarProvider / useSidebar
+├── model/                     # nav config types
+└── config/                    # default nav items + theme colors
 ```
 
 `MaskImage` lives in `@/shared/ui/mask-image` — this widget imports it; it does not own a copy.
+
+## Shells
+
+| Shell | Viewport | State | Notes |
+|-------|----------|--------|-------|
+| **Mobile drawer** | `< md` | `isSidebarOpen` | Fixed slide-over + backdrop; full labels; nav list `w-full min-w-0` |
+| **Desktop rail** | `≥ md` | local `isCollapsed` | Dual layers + chevron; ignores drawer open state |
+
+Hamburger should call **`openSidebar()`** (not toggle). Close via X, backdrop, or nav link (`closeSidebar()`).
 
 ## Setup
 
@@ -53,16 +69,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-## Toggle from elsewhere
+## Open from elsewhere (mobile hamburger)
 
 ```tsx
 import { useSidebar } from '@/widgets/side-nav'
 
 function HeaderMenuButton() {
-  const { toggleSidebar } = useSidebar()
-  return <button type="button" onClick={toggleSidebar}>Menu</button>
+  const { openSidebar } = useSidebar()
+  return (
+    <button type="button" onClick={openSidebar} aria-label="Open sidebar">
+      Menu
+    </button>
+  )
 }
 ```
+
+`useSidebar()` also exposes `closeSidebar`, `toggleSidebar`, and `setIsSidebarOpen`.
 
 ## Config
 
@@ -71,13 +93,13 @@ Edit `config/config.ts` for:
 - Logo settings
 - Nav items (links, expandable groups, independent logo-pair buttons)
 - Color theme (light / dark)
-- `defaultCollapsed` — start in the narrow icon-only rail (`true` / `false`)
+- `defaultCollapsed` — start in the narrow icon-only rail on **desktop** (`true` / `false`)
 
 Types live in `model/types.ts`.
 
-Note: `SidebarProvider`’s `defaultOpen` controls mobile drawer open/close, not desktop collapse width.
+Note: `SidebarProvider`’s `defaultOpen` controls **mobile drawer** open/close, not desktop collapse width.
 
-### Dual nav layers
+### Dual nav layers (desktop)
 
 The desktop rail uses two stacked nav layers:
 
@@ -88,6 +110,13 @@ Labels stay on the open layer only, so they do not wrap mid-transition.
 
 ## Changelog
 
+### Mobile / desktop shells
+
+- Split into `MobileDrawer` + `DesktopRail` orchestrated by `side-nav.tsx`
+- Hamburger uses `openSidebar()` so the drawer always opens
+- Mobile nav list uses flexible width (`w-full min-w-0`); no collapsed dual-layer on mobile
+- Backdrop + X / link click call `closeSidebar()`
+
 ### Dual rail + collapse UX
 
 - **`defaultCollapsed`** — `SidebarConfig` / `sidebarConfig` flag so the rail can start in icon-only mode
@@ -96,7 +125,7 @@ Labels stay on the open layer only, so they do not wrap mid-transition.
 - **Open labels don’t reflow** — `whitespace-nowrap` on open-mode titles/subtext
 - **Collapse toggle visible** — shell does not use `overflow-hidden` (clipping stays on the nav viewport when open) so the `-right-6` chevron isn’t clipped
 - **Collapsed tooltips** — `overflow-visible` while collapsed; open panel hard-hidden (`invisible w-0`) so it doesn’t spill; `group` on expandable triggers for hover tooltips
-- **Suspense fallback width** — root layout fallback matched to collapsed `w-24` to avoid a load jump
+- **Suspense fallback width** — root layout fallback matched to collapsed `w-24` to avoid a load jump (desktop only)
 
 ## Pieces also exported
 
