@@ -1217,7 +1217,7 @@ const TimelineContainer = forwardRef<TimelineContainerRef, TimelineContainerProp
         >
           <div className='flex min-h-0 flex-1 flex-col'>
             <DragMonitor onHoveredCell={setHoveredCell} />
-            <div className='m-4 flex min-h-0 flex-1 flex-col rounded-lg border border-border/50'>
+            <div className='flex min-h-0 flex-1 flex-col rounded-lg border border-border/50'>
               {/* Flex container: sidebar + timeline */}
               <div className='flex min-h-0 w-full flex-1'>
 

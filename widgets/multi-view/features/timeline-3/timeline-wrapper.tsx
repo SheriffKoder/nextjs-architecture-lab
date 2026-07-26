@@ -2,14 +2,11 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import TimelineContainer, { TimelineContainerRef } from './timeline-container'
-import { ViewSwitcher } from './components/ui/view-switcher'
 import { MappingKeys } from './utils/mapping/timeline-mapping'
-import ZoomSwitcher from './components/ui/ZoomSwitcher'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Input } from './components/ui/input'
 import { extractDateRange } from './utils/days/day-range-generator'
 import { extractYearRange } from './utils/year-start-end-extractor'
 import { getUserGmtOffset } from './utils/timezone-utils'
+import { HeaderWrapper } from './components/view-header'
 
 /*
 Row 0: "Q2 2024 Development Sprint" (May 1 - June 1, 2024)
@@ -196,77 +193,26 @@ const TimelineWrapper = ({
 
 
   return (
-    <div className='flex h-full min-h-0 w-full flex-col'>
-
-      {/* Header */}
-      <div className='w-full flex justify-between items-center gap-8'>
-
-        {/* Zoom Switcher */}
-        <div className='flex justify-start items-center gap-2'>
-            {/* Zoom switcher - shows factor for current view, persists per-view */}
-            <ZoomSwitcher
-            value={zoomFactors[selectedView]}
-            onChange={(factor) => setZoomFactors(prev => ({ ...prev, [selectedView]: factor }))}
-            />
-        </div>
-
-        {/* Date/Time Selector and Navigation Buttons */}
-        <div className='flex justify-center items-center gap-2'>
-            {/* Navigation Buttons */}
-            <div className='flex justify-center items-center gap-2'>
-
-                <button
-                    onClick={handleScrollLeft}
-                    className='p-1 hover:bg-foreground/5 dark:hover:bg-foreground/10 rounded-md transition-colors'
-                >
-                    <ChevronLeft className='w-4 h-4 text-foreground/70 hover:text-foreground transition-colors duration-200' />
-                </button>
-                <button
-                onClick={handleGoToToday}
-                title={isTodayInRange ? 'Scroll to today' : 'Today is not in the date range'}
-                disabled={!isTodayInRange}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                  isTodayInRange 
-                    ? 'text-foreground/70 hover:text-foreground hover:bg-foreground/5 dark:hover:bg-foreground/10 cursor-pointer' 
-                    : 'text-foreground/30 cursor-not-allowed opacity-50'
-                }`}
-                >
-                    Today
-                </button>
-
-                <button
-                    onClick={handleScrollRight}
-                    className='p-1 hover:bg-foreground/5 dark:hover:bg-foreground/10 rounded-md transition-colors'
-                >
-                    <ChevronRight className='w-4 h-4 text-foreground/70 hover:text-foreground transition-colors duration-200' />
-                </button>
-            </div>
-
-                  <Input 
-                  type='datetime-local'
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  className='w-full'
-                  />
-
-        </div>
-
-        {/* View/Mode Switcher */}
-        <div className='flex justify-end items-center gap-2'>
-            {/* View Switcher */}
-            <ViewSwitcher 
-            views={views}
-            selectedView={selectedView} 
-            onViewChange={(view) => {
-              setSelectedView(view as 'Year' | 'Month' | 'Week' | 'Day')
-              // currentDate will be preserved and scrolled to via useEffect
-            }} 
-            />
-        </div>
-
+    <div className='flex h-full min-h-0 w-full flex-col relative isolate'>
+      <div className='absolute bottom-4 right-4 z-10'>
+      <HeaderWrapper
+        views={views}
+        selectedView={selectedView}
+        onViewChange={setSelectedView}
+        zoomFactor={zoomFactors[selectedView]}
+        onZoomChange={(factor) =>
+          setZoomFactors((prev) => ({ ...prev, [selectedView]: factor }))
+        }
+        selectedDate={selectedDate}
+        onDateChange={handleDateChange}
+        isTodayInRange={isTodayInRange}
+        onGoToToday={handleGoToToday}
+        onScrollLeft={handleScrollLeft}
+        onScrollRight={handleScrollRight}
+      />
       </div>
       {/* Timeline Mapper — min-h-0 so flex-1 can shrink and inner scrollport gets a real height */}
-      <div className='flex min-h-0 w-full flex-1 flex-col'>
+      <div className='flex min-h-0 w-full flex-1 flex-col relative isolate'>
         <TimelineContainer 
           ref={timelineRef}
           data={timelineData} 
