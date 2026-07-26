@@ -13,8 +13,7 @@ import TableSkeleton from '@/shared/ui/loading-skeletons/table/table-skeleton'
 import FilterToolbarSkeleton from '@/shared/ui/loading-skeletons/filters/filter-toolbar-skeleton'
 
 // Layout components
-import PageHeader from '@/shared/ui/page-header/page-header'
-import ActionButtons from './ui/action-buttons'
+import DemoRscPageHeader from './ui/demo-rsc-page-header'
 import DemoRscDrawerLayer from './ui/drawer-content/demo-rsc-drawer-layer'
 import FiltersSection from './ui/layout-sections/filters-section'
 import TableAndPaginationSection from './ui/layout-sections/table-and-pagination-section'
@@ -48,13 +47,11 @@ export default function DemoRscIndex({
       />
       <OfflineDetector />
       <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
-        <header className="flex shrink-0 flex-col items-center justify-between gap-4 border-b border-tertiary/10 p-4 md:flex-row">
-          <PageHeader subTitle="Demo RSC page with server-side data fetching, filtering, and pagination" />
-          <ActionButtons
-            exportForMailchimp={exportForMailchimpAction}
-            showAddCarDrawerButton
-          />
-        </header>
+        <DemoRscPageHeader
+          subTitle="Demo RSC page with server-side data fetching, filtering, and pagination"
+          exportForMailchimp={exportForMailchimpAction}
+          showAddCarDrawerButton
+        />
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pb-0 pt-4">
           <div className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden px-2">

@@ -30,7 +30,7 @@ export default function ActionButtons({
   onGenerateError,
 }: ActionButtonsProps) {
   return (
-    <div className="flex w-full flex-row flex-wrap items-start gap-2 lg:w-auto">
+    <div className="flex shrink-0 flex-row flex-wrap items-center gap-2">
 
       {/* // Custom icon button for export for mailchimp */}
       {/* <button

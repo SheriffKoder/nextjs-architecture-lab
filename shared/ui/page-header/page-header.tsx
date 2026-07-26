@@ -21,9 +21,27 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
+import { cn } from '@/shared/lib/utils'
 import { useSidebar } from '@/widgets/side-nav'
 
-export default function PageHeader({ subTitle }: { subTitle?: string }) {
+export interface PageHeaderProps {
+  subTitle?: string
+  /**
+   * When false, omit the mobile sidebar toggle (e.g. parent places it beside actions).
+   * @default true
+   */
+  showMenuToggle?: boolean
+  /** Hide subtitle below `md` to keep the mobile title row compact */
+  hideSubtitleOnMobile?: boolean
+  className?: string
+}
+
+export default function PageHeader({
+  subTitle,
+  showMenuToggle = true,
+  hideSubtitleOnMobile = false,
+  className,
+}: PageHeaderProps) {
   const pathname = usePathname()
   const { toggleSidebar } = useSidebar()
 
@@ -57,8 +75,13 @@ export default function PageHeader({ subTitle }: { subTitle?: string }) {
   }
 
   return (
-    <div className="flex items-center gap-4 justify-between w-full md:w-fit">
-      <div className="flex flex-col gap-1 flex-1">
+    <div
+      className={cn(
+        'flex w-full items-center justify-between gap-4 md:w-fit',
+        className,
+      )}
+    >
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
         {/* Parent route - small text (only shown if parent exists) */}
         {parentRoute && (
           <span className="text-sm text-foreground/40">
@@ -67,25 +90,33 @@ export default function PageHeader({ subTitle }: { subTitle?: string }) {
         )}
         
         {/* Current page - bold text */}
-        <h1 className="text-3xl font-bold text-foreground">
+        <h1 className="truncate text-2xl font-bold text-foreground md:text-3xl">
           {formatText(currentPage)}
         </h1>
 
         {subTitle && (
-          <span className="text-sm text-foreground/40">
+          <span
+            className={cn(
+              'text-sm text-foreground/40',
+              hideSubtitleOnMobile && 'hidden md:inline',
+            )}
+          >
             {subTitle}
           </span>
         )}
       </div>
 
       {/* Hamburger Menu - Mobile Only */}
-      <button
-        onClick={toggleSidebar}
-        className="md:hidden p-2 rounded-md hover:bg-foreground/5 transition-colors"
-        aria-label="Toggle sidebar"
-      >
-        <Menu className="w-6 h-6 text-foreground" />
-      </button>
+      {showMenuToggle ? (
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="rounded-md p-2 transition-colors hover:bg-foreground/5 md:hidden"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="h-6 w-6 text-foreground" />
+        </button>
+      ) : null}
     </div>
   )
 }

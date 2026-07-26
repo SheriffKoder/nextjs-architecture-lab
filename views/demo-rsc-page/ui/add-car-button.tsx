@@ -2,8 +2,10 @@
  * AddCarButton
  *
  * Purpose: Isolated control that opens the URL-driven car drawer (`url-drawer` + `openCreate`)
- * Used in: `demo-rsc-index.tsx` header beside `ActionButtons`
+ * Used in: `demo-rsc-page-header` / `ActionButtons`
  * Used for: Keeps drawer navigation out of shared `action-buttons.tsx`
+ *
+ * Mobile: icon-only `[+]`. Desktop: icon + “Add Car” label.
  */
 
 'use client'
@@ -20,17 +22,32 @@ interface AddCarButtonProps {
 
 export default function AddCarButton({ drawerKey = DEMO_RSC_CAR_DRAWER_KEY }: AddCarButtonProps) {
   const { openCreate } = useDrawerActions()
+  const open = () => openCreate(drawerKey)
 
   return (
-    <PrimaryButton
-      type="button"
-      onClick={() => openCreate(drawerKey)}
-      icon={Plus}
-      iconPosition="left"
-      buttonClassName="border border-input bg-background text-foreground whitespace-nowrap"
-      size="default"
-    >
-      Add Car
-    </PrimaryButton>
+    <>
+      <button
+        type="button"
+        onClick={open}
+        className="inline-flex size-10 items-center justify-center rounded-md border border-input bg-background text-foreground transition-colors hover:bg-foreground/5 md:hidden"
+        aria-label="Add Car"
+        title="Add Car"
+      >
+        <Plus className="h-5 w-5" strokeWidth={2} />
+      </button>
+
+      <div className="hidden md:block">
+        <PrimaryButton
+          type="button"
+          onClick={open}
+          icon={Plus}
+          iconPosition="left"
+          buttonClassName="border border-input bg-background text-foreground whitespace-nowrap"
+          size="default"
+        >
+          Add Car
+        </PrimaryButton>
+      </div>
+    </>
   )
 }

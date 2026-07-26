@@ -14,11 +14,11 @@ import PageHeaderSkeleton from '@/shared/ui/loading-skeletons/page-header-skelet
 export default function DemoRscLoading() {
   return (
     <div className="flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden">
-      <header className="flex shrink-0 flex-col items-center justify-between gap-4 border-b border-tertiary/10 p-4 md:flex-row">
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-tertiary/10 p-4">
         <PageHeaderSkeleton showSubtitle={true} />
-        <div className="flex w-full flex-row items-start gap-2 lg:w-auto">
-          <div className="h-10 w-32 animate-pulse rounded-md bg-muted" />
-          <div className="h-10 w-28 animate-pulse rounded-md bg-muted" />
+        <div className="flex shrink-0 items-center gap-1 md:gap-2">
+          <div className="size-10 animate-pulse rounded-md bg-muted md:h-10 md:w-28" />
+          <div className="size-10 animate-pulse rounded-md bg-muted md:hidden" />
         </div>
       </header>
 
