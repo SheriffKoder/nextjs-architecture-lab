@@ -53,8 +53,8 @@ export default function DemoRscIndex({
           showAddCarDrawerButton
         />
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pb-0 pt-4">
-          <div className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden px-2">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pb-0 pt-0 md:pt-4">
+          <div className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden md:px-2">
             <Suspense fallback={<FiltersSkeleton buttonCount={2} pillFilter={true} buttonWidthPx="md:w-[200px]" />}>
               <FiltersSection params={params} />
             </Suspense>

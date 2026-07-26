@@ -1,8 +1,13 @@
 /**
  * url-kit / filter-toolbar
  *
- * One-row filter chrome:
+ * Desktop (one row):
  * [filter] [group]  [search……] ---- [label filters] [view] [date]
+ *
+ * Mobile (two rows):
+ * [search……] ---- [filter] [group] [label] [date]
+ * ──── separator ────
+ * [view pills…]
  *
  * Decoupled from `FiltersHeader` and `MinimalControls`. Owns chrome + URL hooks.
  * Reuses only low-level engines under `filters/feature-filtering` (pill panel
@@ -26,6 +31,9 @@ export type { LabelFiltersProps } from './ui/label-filters'
 
 export { ViewControl } from './ui/view-control/view-control'
 export type { ViewControlProps } from './ui/view-control/view-control'
+
+export { ViewPills } from './ui/view-control/view-pills'
+export type { ViewPillsProps } from './ui/view-control/view-pills'
 
 export { DateControl } from './ui/date-control/date-control'
 export type { DateControlProps } from './ui/date-control/date-control'

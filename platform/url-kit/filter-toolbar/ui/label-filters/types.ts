@@ -5,6 +5,8 @@ export interface LabelFiltersProps {
   filterOptions: FilterConfig[]
   selectType?: 'multi-select' | 'single-select'
   showInitialCount?: boolean
+  /** Icon-only trigger (no label text / chevron) — mobile toolbar */
+  iconOnly?: boolean
 }
 
 export type LabelFilterOption = NonNullable<FilterConfig['options']>[number]

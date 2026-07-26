@@ -30,7 +30,13 @@ export function SearchControl({ config, className }: SearchControlProps) {
     >
       <SearchBar
         config={config}
-        className="min-w-0 flex-1 !opacity-100 [&>input]:bg-transparent [&>input]:border-0 [&>input]:shadow-none h-8"
+        className={cn(
+          'h-8 min-w-0 flex-1 !opacity-100',
+          '[&>input]:border-0 [&>input]:bg-transparent [&>input]:shadow-none',
+          // Smaller placeholder / typed text on mobile toolbar
+          '[&>input]:text-xs [&>input]:placeholder:text-xs',
+          'md:[&>input]:text-sm md:[&>input]:placeholder:text-sm',
+        )}
       />
     </div>
   )

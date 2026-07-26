@@ -1,28 +1,25 @@
 /**
- * FilterToolbar — one-row chrome:
- * [filter] [group]  [search……] ---- [label filters] [view] [date]
+ * FilterToolbar — orchestrates desktop (one row) + mobile (two rows) layouts.
+ *
+ * Desktop: [filter] [group]  [search……] ---- [label filters] [view] [date]
+ * Mobile:
+ *   Row 1: [search……] ---- [filter] [group] [label] [date]
+ *   ──── separator ────
+ *   Row 2: [view pills…]
  *
  * Decoupled from FiltersHeader / MinimalControls. Owns its own URL hooks + chrome.
- * Only reuses low-level filter engines (pill panel pieces, SearchBar, FilterOptionsButtons, date dropdown).
  */
 
 'use client'
 
 import { Suspense } from 'react'
-import { cn } from '@/shared/lib/utils'
 import type { FilterToolbarProps } from '../model/types'
-import {
-  DEFAULT_GROUPING_SUPPORTED_VIEWS,
-  FILTER_TOOLBAR_PANEL_SURFACE_CLASS,
-} from '../config/chrome'
+import { DEFAULT_GROUPING_SUPPORTED_VIEWS } from '../config/chrome'
 import { useUrlGrouping } from '../hooks/use-url-grouping'
 import { useViewResolution } from '../hooks/use-view-resolution'
-import { FilterControl } from './filter-control/filter-control'
-import { GroupControl } from './group-control/group-control'
-import { SearchControl } from './search-control/search-control'
-import { LabelFilters } from './label-filters'
-import { ViewControl } from './view-control/view-control'
-import { DateControl } from './date-control/date-control'
+import { FilterToolbarDesktop } from './filter-toolbar-desktop'
+import { FilterToolbarMobile } from './filter-toolbar-mobile'
+import type { FilterToolbarLayoutProps } from './filter-toolbar-layout-types'
 
 export type { FilterToolbarProps }
 
@@ -70,60 +67,33 @@ function FilterToolbarInner({
       ? filters.find((f) => f.key === dateFilterKey)?.label
       : undefined
 
+  const layoutProps: FilterToolbarLayoutProps = {
+    displayedFilters,
+    filters,
+    searchConfig,
+    showInitialCount,
+    groupableFields,
+    groupBy,
+    subGroupBy,
+    setGroupBy,
+    setSubGroupBy,
+    currentView,
+    setView,
+    groupingSupportedViews,
+    resolvedLabelKey,
+    labelSelectType,
+    availableViews,
+    dateFilterKey,
+    dateFilterLabel,
+    dateFilterButtonText,
+    className,
+  }
+
   return (
-    <div
-      className={cn(
-        'flex w-full flex-wrap items-center gap-2 px-2 py-2',
-        className
-      )}
-    >
-      <div className="flex shrink-0 items-center gap-1">
-        <FilterControl
-          filters={displayedFilters}
-          showInitialCount={showInitialCount}
-          panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
-        />
-        {groupableFields.length > 0 && (
-          <GroupControl
-            fields={groupableFields}
-            selectedGroupBy={groupBy}
-            selectedSubGroupBy={subGroupBy}
-            onGroupByChange={setGroupBy}
-            onSubGroupByChange={setSubGroupBy}
-            currentView={currentView}
-            groupingSupportedViews={groupingSupportedViews}
-          />
-        )}
-      </div>
-
-      <SearchControl config={searchConfig} />
-
-      <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
-        {resolvedLabelKey ? (
-          <LabelFilters
-            filterKey={resolvedLabelKey}
-            filterOptions={filters}
-            selectType={labelSelectType}
-            showInitialCount={showInitialCount}
-          />
-        ) : null}
-        {availableViews.length > 0 ? (
-          <ViewControl
-            availableViews={availableViews}
-            currentView={currentView}
-            onViewChange={setView}
-          />
-        ) : null}
-        {dateFilterKey ? (
-          <DateControl
-            filterKey={dateFilterKey}
-            filterLabel={dateFilterLabel}
-            buttonText={dateFilterButtonText}
-            panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
-          />
-        ) : null}
-      </div>
-    </div>
+    <>
+      <FilterToolbarDesktop {...layoutProps} />
+      <FilterToolbarMobile {...layoutProps} />
+    </>
   )
 }
 

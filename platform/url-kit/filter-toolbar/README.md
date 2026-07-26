@@ -1,10 +1,23 @@
 # filter-toolbar
 
-One-row URL filter chrome for list pages.
+URL filter chrome for list pages. Desktop and mobile are separate layout components
+(`filter-toolbar-desktop.tsx` / `filter-toolbar-mobile.tsx`); hooks live in the orchestrator.
+
+**Desktop (`md+`) — one row**
 
 ```text
 [ filter ] [ grouped ]   [ search …… ] ---- [ label filters ] [ view ] [ date ]
 ```
+
+**Mobile (`< md`) — two rows**
+
+```text
+[ search …… ] ---- [ filter ] [ group ] [ label ] [ date ]
+──────────────── separator ────────────────
+[ view pills … ]
+```
+
+View pills (and the separator) render only when more than one available view is configured.
 
 ## Dependencies
 
@@ -60,7 +73,9 @@ filter-toolbar
 | `ui/group-control/` | Icon → groupBy / subGroupBy menu |
 | `ui/search-control/` | Wide search (`max-w` + opacity surface) |
 | `ui/label-filters/` | Option chips at `xl+`; compact icon+label dropdown below `xl` |
-| `ui/view-control/` | Icon → view menu |
+| `ui/view-control/` | Desktop: icon → view menu. Mobile: `ViewPills` row |
+| `ui/filter-toolbar-desktop.tsx` | One-row layout (`md+`) |
+| `ui/filter-toolbar-mobile.tsx` | Two-row layout (`< md`) |
 | `ui/date-control/` | Icon → date range dropdown |
 
 ## Usage

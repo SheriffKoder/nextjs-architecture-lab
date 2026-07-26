@@ -26,6 +26,7 @@ export function LabelFilters({
   filterOptions,
   selectType = 'single-select',
   showInitialCount = true,
+  iconOnly = false,
 }: LabelFiltersProps) {
   const foundFilter = filterOptions.find((f) => f.key === filterKey)
 
@@ -44,18 +45,21 @@ export function LabelFilters({
 
   return (
     <>
-      <LabelFilterChipsRow
-        filter={filter}
-        showInitialCount={showInitialCount}
-        isSelected={isSelected}
-        onSelect={handleOptionClick}
-      />
+      {!iconOnly ? (
+        <LabelFilterChipsRow
+          filter={filter}
+          showInitialCount={showInitialCount}
+          isSelected={isSelected}
+          onSelect={handleOptionClick}
+        />
+      ) : null}
       <LabelFilterDropdown
         filter={filter}
         selectedCount={selectedCount}
         showInitialCount={showInitialCount}
         isSelected={isSelected}
         onSelect={handleOptionClick}
+        iconOnly={iconOnly}
       />
     </>
   )

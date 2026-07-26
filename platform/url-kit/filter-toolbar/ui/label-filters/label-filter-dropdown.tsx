@@ -1,5 +1,6 @@
 /**
  * Below-xl label filters — compact icon + label trigger + checkbox dropdown.
+ * When `iconOnly`, matches other toolbar icon triggers (no text / chevron).
  */
 
 'use client'
@@ -19,6 +20,7 @@ import {
   FILTER_TOOLBAR_COMPACT_LABEL_TRIGGER_CLASS,
   FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS,
 } from '../../config/chrome'
+import { IconTriggerButton } from '../shared/icon-trigger-button'
 import {
   formatLabelFilterCount,
   labelFilterOptionTitle,
@@ -30,6 +32,8 @@ export interface LabelFilterDropdownProps {
   showInitialCount: boolean
   isSelected: (value: string) => boolean
   onSelect: (value: string) => void
+  /** Square Tags icon only — used by the mobile toolbar row */
+  iconOnly?: boolean
 }
 
 export function LabelFilterDropdown({
@@ -38,6 +42,7 @@ export function LabelFilterDropdown({
   showInitialCount,
   isSelected,
   onSelect,
+  iconOnly = false,
 }: LabelFilterDropdownProps) {
   const options = filter.options ?? []
   const triggerTitle =
@@ -45,34 +50,51 @@ export function LabelFilterDropdown({
       ? `${filter.label} (${selectedCount} selected)`
       : `Filter by ${filter.label}`
 
+  const trigger = iconOnly ? (
+    <IconTriggerButton
+      active={selectedCount > 0}
+      title={triggerTitle}
+      aria-label={triggerTitle}
+      aria-haspopup="menu"
+      className="relative"
+    >
+      <Tags aria-hidden className="h-4 w-4" />
+      {selectedCount > 0 ? (
+        <span className="absolute -right-0.5 -top-0.5 z-20 flex h-3 min-w-3 items-center justify-center rounded-full bg-tertiary px-0.5 text-[8px] font-medium text-background">
+          {selectedCount > 9 ? '9+' : selectedCount}
+        </span>
+      ) : null}
+    </IconTriggerButton>
+  ) : (
+    <button
+      type="button"
+      title={triggerTitle}
+      aria-label={triggerTitle}
+      aria-haspopup="menu"
+      className={cn(
+        FILTER_TOOLBAR_COMPACT_LABEL_TRIGGER_CLASS,
+        selectedCount > 0 && 'text-tertiary'
+      )}
+    >
+      <span
+        className={FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS}
+        aria-hidden
+      />
+      <span className="relative z-10 inline-flex items-center gap-1.5">
+        <Tags aria-hidden className="size-3.5" />
+        <span>
+          {filter.label}
+          {selectedCount > 0 ? ` (${selectedCount})` : ''}
+        </span>
+        <ChevronDown aria-hidden className="size-3.5 opacity-60" />
+      </span>
+    </button>
+  )
+
   return (
     <div className="xl:hidden">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            title={triggerTitle}
-            aria-label={triggerTitle}
-            aria-haspopup="menu"
-            className={cn(
-              FILTER_TOOLBAR_COMPACT_LABEL_TRIGGER_CLASS,
-              selectedCount > 0 && 'text-tertiary'
-            )}
-          >
-            <span
-              className={FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS}
-              aria-hidden
-            />
-            <span className="relative z-10 inline-flex items-center gap-1.5">
-              <Tags aria-hidden className="size-3.5" />
-              <span>
-                {filter.label}
-                {selectedCount > 0 ? ` (${selectedCount})` : ''}
-              </span>
-              <ChevronDown aria-hidden className="size-3.5 opacity-60" />
-            </span>
-          </button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>{filter.label}</DropdownMenuLabel>
           <DropdownMenuSeparator />

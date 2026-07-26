@@ -29,11 +29,11 @@ export default function AddCarButton({ drawerKey = DEMO_RSC_CAR_DRAWER_KEY }: Ad
       <button
         type="button"
         onClick={open}
-        className="inline-flex size-10 items-center justify-center rounded-md border border-input bg-background text-foreground transition-colors hover:bg-foreground/5 md:hidden"
+        className="inline-flex size-8 items-center justify-center rounded-md border border-input bg-background text-foreground transition-colors hover:bg-foreground/5 md:hidden"
         aria-label="Add Car"
         title="Add Car"
       >
-        <Plus className="h-5 w-5" strokeWidth={2} />
+        <Plus className="h-4 w-4" strokeWidth={2} />
       </button>
 
       <div className="hidden md:block">

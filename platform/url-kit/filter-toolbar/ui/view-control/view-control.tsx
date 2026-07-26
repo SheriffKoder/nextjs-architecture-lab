@@ -1,5 +1,5 @@
 /**
- * Icon → view dropdown.
+ * ViewControl — icon trigger → view dropdown (desktop).
  */
 
 'use client'
@@ -12,33 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Table,
-  LayoutDashboard,
-  Map,
-  Calendar,
-  List,
-  AlignStartHorizontal,
-  type LucideIcon,
-} from 'lucide-react'
+import { Table } from 'lucide-react'
 import { IconTriggerButton } from '../shared/icon-trigger-button'
-
-const VIEW_OPTIONS: Record<
-  string,
-  { key: string; label: string; icon: LucideIcon }
-> = {
-  table: { key: 'table', label: 'Table', icon: Table },
-  list: { key: 'list', label: 'List', icon: List },
-  kanban: { key: 'kanban', label: 'Kanban', icon: LayoutDashboard },
-  map: { key: 'map', label: 'Map', icon: Map },
-  calendar: { key: 'calendar', label: 'Calendar', icon: Calendar },
-  subheadings: { key: 'subheadings', label: 'SubHeadings', icon: List },
-  timeline: {
-    key: 'timeline',
-    label: 'Timeline',
-    icon: AlignStartHorizontal,
-  },
-}
+import { VIEW_OPTIONS, resolveViewOptions } from './view-options'
 
 export interface ViewControlProps {
   availableViews: readonly string[]
@@ -55,12 +31,7 @@ export function ViewControl({
   className,
   disabled = false,
 }: ViewControlProps) {
-  const options = availableViews
-    .map((key) => VIEW_OPTIONS[key])
-    .filter(
-      (option): option is { key: string; label: string; icon: LucideIcon } =>
-        option !== undefined
-    )
+  const options = resolveViewOptions(availableViews)
 
   if (options.length <= 1) return null
 
