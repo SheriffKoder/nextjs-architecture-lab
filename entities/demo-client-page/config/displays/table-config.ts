@@ -11,7 +11,7 @@
  * It should only describe columns, cell renderers, and which props they expect.
  */
 
-import type { TableConfig } from "@/widgets/multi-view/types";
+import type { TableConfig, HeaderFilterConfig } from "@/widgets/multi-view/types";
 import type { RentalCarTableItem } from '../../types/rental-car-table-item'
 import { demoRscEditableColumnKeys } from '../cells/rental-car-location-options'
 
@@ -104,7 +104,8 @@ export const tableHeaderConfig = {
     showBadges: true,
     defaultRangeExpanded: false,
     showInitialCount: true,
-  },
+    sortPlacement: 'dropdown',
+  } as HeaderFilterConfig,
   
   // Sort configuration for table header sort buttons
   sortConfig: [

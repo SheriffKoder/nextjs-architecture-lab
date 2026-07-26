@@ -120,7 +120,8 @@ export function FilterBoxButton({
    * WHY: Toggle expanded state and call external onClick
    * HOW: Updates local state and calls prop handler
    */
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setIsExpanded(!isExpanded)
     
     // Call external onClick handler if provided

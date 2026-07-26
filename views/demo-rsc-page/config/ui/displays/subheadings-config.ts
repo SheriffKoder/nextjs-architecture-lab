@@ -147,6 +147,7 @@ export const subheadingsHeaderConfig = {
     showBadges: true,
     defaultRangeExpanded: false,
     showInitialCount: true,
+    sortPlacement: 'dropdown',
   } as HeaderFilterConfig,
   
   // Sort configuration for table header sort buttons

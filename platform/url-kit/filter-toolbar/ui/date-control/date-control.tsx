@@ -1,11 +1,11 @@
 /**
  * Icon trigger → date range dropdown (ReactDateFilterDropDown).
- * Panel placement lives in `use-anchored-panel-position`.
+ * Panel placement: `@/platform/url-kit/filters/lib/use-anchored-panel-position`.
  */
 
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type Ref } from 'react'
 import { createPortal } from 'react-dom'
 import { Calendar } from 'lucide-react'
 import ReactDateFilterDropDown from '@/platform/url-kit/filters/feature-filtering/components/single-date-filter/ReactDateFilterDropDown'
@@ -15,7 +15,7 @@ import {
   type DateFilterMode,
 } from '@/platform/url-kit/filters/feature-filtering/components/single-date-filter/date-display-utils'
 import { IconTriggerButton } from '../shared/icon-trigger-button'
-import { useAnchoredPanelPosition } from './use-anchored-panel-position'
+import { useAnchoredPanelPosition } from '@/platform/url-kit/filters/lib/use-anchored-panel-position'
 
 export interface DateControlProps {
   filterKey: string
@@ -124,7 +124,7 @@ export function DateControl({
   return (
     <div className="relative">
       <IconTriggerButton
-        ref={triggerRef}
+        ref={triggerRef as Ref<HTMLButtonElement>}
         active={hasActiveFilters || isDropdownOpen}
         onClick={() => setIsDropdownOpen((v) => !v)}
         title={triggerTitle}

@@ -16,8 +16,6 @@
 import React, { useState, useEffect } from "react";
 // Import types from new types folder structure
 import { TableColumn, type AccordionConfig } from "../types";
-// Import Lucide icons for better maintainability
-import { ArrowUp, ArrowDown, MoveUp, MoveDown } from "lucide-react";
 // Import width calculation utility
 import { calculateColumnWidth } from "../features/virtualized-table/utils/column-width-calculator";
 // Import sticky column utilities
@@ -35,8 +33,8 @@ import { AccordionLine } from "../features/virtualized-table/components/accordio
 import { DropdownFilter } from "@/platform/url-kit/filters/feature-filtering/components/dropdown-filter";
 import type { FilterConfig } from "@/platform/url-kit/filters/feature-filtering/components/filter-types";
 import type { HeaderFilterConfig } from "../types";
-import { SortButton } from "@/platform/url-kit/filters/feature-sorting/components/sort-button";
 import type { SortConfig } from "@/platform/url-kit/filters/feature-sorting/types";
+import { ColumnHeaderChrome } from "./column-header-chrome";
 
 ////////////////////////////////////
 // Type Definitions: Component props and interfaces
@@ -372,6 +370,16 @@ function VirtualizedTableHeader<T>({
     
     const columnFilters = getColumnFilters(column)
     if (columnFilters.length === 0) return null
+
+    const sortPlacement = headerFilterConfig.sortPlacement ?? 'header'
+    const sortEntry = sortConfig?.find((s) => s.key === column.key)
+    const columnSort =
+      sortPlacement === 'dropdown' && sortEntry
+        ? {
+            key: sortEntry.key,
+            label: sortEntry.label || column.name,
+          }
+        : null
     
     // Render all matching filters for this column
     return (
@@ -385,37 +393,14 @@ function VirtualizedTableHeader<T>({
             useFilterIcon={true}
             defaultRangeExpanded={headerFilterConfig.defaultRangeExpanded ?? false}
             showInitialCount={headerFilterConfig.showInitialCount ?? false}
+            columnSort={columnSort}
           />
         ))}
       </>
     )
   }
 
-  ////////////////////////////////////
-  // Sort Button Renderer: Interactive sort controls
-  ////////////////////////////////////
-  
-  /**
-   * Render sort button using SortButton component
-   * Sort keys and labels come from sortConfig only (e.g. table-config.sortConfig).
-   *
-   * @param {TableColumn<T>} column - Column definition for sort button
-   * @returns {JSX.Element | null} Sort button or null if sortConfig omits this column
-   */
-  const renderSortButton = (column: TableColumn<T>) => {
-    if (!sortConfig || sortConfig.length === 0) return null
-
-    const config = sortConfig.find((s) => s.key === column.key)
-    if (!config) return null
-
-    return (
-      <SortButton
-        sortKey={column.key}
-        label={config.label || column.name}
-        showPriority={true}
-      />
-    )
-  }
+  const sortPlacement = headerFilterConfig?.sortPlacement ?? 'header'
 
   ////////////////////////////////////
   // Main Render: Complete header structure with columns and controls
@@ -505,6 +490,8 @@ function VirtualizedTableHeader<T>({
           }
         };
 
+        const sortEntry = sortConfig?.find((s) => s.key === column.key);
+
         
         return (
           <div
@@ -539,25 +526,17 @@ function VirtualizedTableHeader<T>({
               aria-hidden
             />
           ) : null}
-          {/* Column header content with name and controls */}
-          <div className={`relative z-10 flex items-center ${useEqualWidths ? 'w-full min-w-0' : ''}`}>
-            {/* Column name display */}
-            {showFilterTitle ? (
-              <span className="tableTitleClass transition-colors duration-200">{column.name}</span>
-            ) : null}
-            
-
-            
-            {/* Controls container: filters and sort buttons */}
-            <div className={`flex items-center gap-1 ${showFilterTitle ? "ml-2" : ""} ${useEqualWidths ? 'w-full min-w-0' : ''}
-            ${isSubHeadingsView && !isHeadLevel ? 'hidden' : ''}
-            `}>
-              {/* Render filter dropdown for this column */}
-              {renderColumnFilter(column)}
-              
-              {showSortButton ? renderSortButton(column) : null}
-            </div>
-          </div>
+          <ColumnHeaderChrome
+            label={column.name}
+            showLabel={showFilterTitle}
+            sortPlacement={sortPlacement}
+            sortKey={sortEntry?.key}
+            sortLabel={sortEntry?.label || column.name}
+            showHeaderSortButton={showSortButton}
+            filter={renderColumnFilter(column)}
+            className={useEqualWidths ? 'w-full min-w-0' : undefined}
+            hidden={isSubHeadingsView && !isHeadLevel}
+          />
 
 
           {/* Accordion Toggle Button: Show expand/collapse buttons for grouped columns */}

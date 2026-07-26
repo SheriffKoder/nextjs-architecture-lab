@@ -9,9 +9,14 @@
 'use client'
 
 import * as React from "react"
+import { useEffect, useRef, useState } from "react"
 import { FixedSizeList as List } from "react-window"
 import { Check } from "lucide-react"
 import type { DropdownFilterOption } from "../types"
+
+/** Fallback when the flex parent has not measured yet (matches prior fixed list height). */
+const FALLBACK_LIST_HEIGHT = 224
+const ITEM_SIZE = 35
 
 //////////////////////////////////
 // Type Definitions
@@ -89,20 +94,44 @@ export function FilterOptionsList({
   isOptionsLoaded,
   showInitialCount = false
 }: FilterOptionsListProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [listHeight, setListHeight] = useState(FALLBACK_LIST_HEIGHT)
+
+  // Size the virtual list to the flex slot so the footer stays below (never overlays).
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    const update = () => {
+      const next = Math.floor(el.getBoundingClientRect().height)
+      if (next > 0) setListHeight(next)
+    }
+
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isOptionsLoaded, options.length])
+
   // Show loading state
   if (!isOptionsLoaded) {
     return (
-      <div className="p-4 text-center text-muted-foreground text-xs">Loading options...</div>
+      <div className="p-4 text-center text-xs text-muted-foreground">Loading options...</div>
     )
   }
-  
+
   // Show empty state
   if (options.length === 0) {
     return (
-      <div className="p-4 text-center text-muted-foreground text-xs">No results found</div>
+      <div className="p-4 text-center text-xs text-muted-foreground">No results found</div>
     )
   }
-  
+
+  const preferredHeight = Math.min(
+    options.length * ITEM_SIZE,
+    FALLBACK_LIST_HEIGHT,
+  )
+
   // Render list item
   const renderItem = ({ index, style }: { index: number; style: React.CSSProperties }) => {
     const option = options[index]
@@ -168,14 +197,19 @@ export function FilterOptionsList({
   }
   
   return (
-    <div className="flex-1 min-h-0 p-2">
-      <div className="h-[28vh] max-h-[224px]">
+    // Preferred height when unconstrained; min-h-0 + flex parent max-h lets this shrink
+    // so Clear/Cancel/Apply stay pinned below the scrollport instead of covering it.
+    <div
+      className="relative min-h-0 w-full flex-1 p-2"
+      style={{ height: preferredHeight, maxHeight: '100%' }}
+    >
+      <div ref={containerRef} className="absolute inset-2">
         <List
-          height={224}
+          height={listHeight}
           itemCount={options.length}
-          itemSize={35}
+          itemSize={ITEM_SIZE}
           width="100%"
-          className="overflow-y-auto"
+          className="overflow-y-auto custom-scrollbar"
         >
           {renderItem}
         </List>

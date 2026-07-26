@@ -4,7 +4,9 @@
 
 A reusable sorting system that supports single and multi-level sorting with URL-based state management. Designed for clean separation from filtering logic and maximum flexibility.
 
-**Architecture**: All sorting-related files are self-contained in `app/development/filters/sorting-feature/` for clear separation, easy reuse, and maintainability.
+**Architecture**: Sorting lives under `platform/url-kit/filters/feature-sorting/` (URL state via `useUrlSorting`, `SortButton` / `SortButtons`, and in-dropdown controls).
+
+**Related:** [Dropdown sort controls — how to use & plan](./DROPDOWN_SORT_CONTROLS_PLAN.md) (`sortPlacement: 'dropdown'` inside header filter menus).
 
 ## 1. Hook: `useUrlSorting`
 

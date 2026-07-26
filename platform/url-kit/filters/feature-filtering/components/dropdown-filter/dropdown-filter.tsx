@@ -18,6 +18,7 @@
 
 import * as React from "react"
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
+import { createPortal } from "react-dom"
 import { useSearchParams } from "next/navigation"
 import { ListFilter, X } from "lucide-react"
 import { useUrlFilters } from "../../hooks/useUrlFilters"
@@ -25,6 +26,7 @@ import {
   decodeUrlParamListWithKnownMultiSelect,
   encodeUrlParamList,
 } from '@/platform/url-kit/filters/feature-filtering/utils/url-param-list-codec'
+import { useAnchoredPanelPosition } from '@/platform/url-kit/filters/lib/use-anchored-panel-position'
 import type { DropdownFilterProps, DropdownFilterOption } from "./types"
 import type { FilterConfig } from "../filter-types"
 import { DropdownHeader } from "./components/dropdown-header"
@@ -38,6 +40,7 @@ import { DateRangeFilterDropdown } from "./range-filters/date-range-filter-dropd
 import { NumberRangeFilterDropdown } from "./range-filters/number-range-filter-dropdown"
 import { RangeQuickSelectList } from "./components/range-quick-select-list"
 import { QuickSelectCollapsibleSection } from "./components/quick-select-collapsible-section"
+import { DropdownSortRow } from "@/platform/url-kit/filters/feature-sorting/components"
 
 //////////////////////////////////
 // Component Implementation
@@ -66,7 +69,8 @@ export function DropdownFilter({
   filterIcon,
   defaultRangeExpanded = false,
   showInitialCount = false,
-  iconConfig
+  iconConfig,
+  columnSort = null,
 }: DropdownFilterProps) {
   //////////////////////////////////
   // State Management
@@ -102,7 +106,6 @@ export function DropdownFilter({
   const [pendingRangeSelectedValues, setPendingRangeSelectedValues] = useState<string[]>([])
   
   // Refs
-  const dropdownRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   
   // URL filters hook
@@ -490,23 +493,6 @@ export function DropdownFilter({
     }
   }, [isOpen, filter.showOptionSearch])
   
-  // Click outside to close
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        handleClose()
-      }
-    }
-    
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen])
-  
   //////////////////////////////////
   // Event Handlers
   //////////////////////////////////
@@ -531,6 +517,13 @@ export function DropdownFilter({
     }
     handleOpenChange(false)
   }, [isControlled, handleOpenChange, autoApply, filter.type, rangeSelectedValues])
+
+  const { triggerRef, panelRef, position, hasPositioned } =
+    useAnchoredPanelPosition({
+      isOpen,
+      align: isLastColumn ? 'end' : 'start',
+      onClose: handleClose,
+    })
   
   const toggleOption = useCallback((value: string) => {
     setPendingSelections(prev => {
@@ -765,187 +758,223 @@ export function DropdownFilter({
   //////////////////////////////////
   // Render
   //////////////////////////////////
-  
-  return (
-    <div className="relative inline-block w-full lg:w-auto">
-      {/* Trigger Button */}
-      {!isOpen && (
-        !useFilterIcon ? (
-          <FilterBoxButton
-            buttonText={useFilterIconText || `Filter ${filter.label}`}
-            isActive={isFilterActive}
-            isOpen={false}
-            width={useFilterIconWidth}
-            icon={filterIcon || (iconConfig && iconConfig[filter.key])}
-            onClick={handleToggle}
-          />
-        ) : (
-          <button
-            onClick={handleToggle}
-            className={`relative p-1 rounded-md hover:bg-foreground/10 focus:outline-none ${
-              isFilterActive ? 'text-tertiary' : 'text-tertiary'
-            }`}
-            title={`Filter ${filter.label}`}
+
+  const panel =
+    isOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            ref={panelRef}
+            className="fixed z-50 flex max-h-[min(70vh,28rem)] min-h-0 w-64 flex-col overflow-hidden rounded border border-border bg-background/90 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-background/70"
+            style={{
+              top: position.top,
+              left: position.left,
+              visibility: hasPositioned ? 'visible' : 'hidden',
+            }}
           >
-            <ListFilter 
-              strokeWidth={isFilterActive ? 2.5 : 2} 
-              size={14} 
-              className={isFilterActive ? 'fill-tertiary/20 text-tertiary' : 'text-tertiary'} 
-            />
-            {filterCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-tertiary text-background text-[8px] font-medium rounded-full h-3 w-3 flex items-center justify-center">
-                {filterCount > 9 ? '9+' : filterCount}
-              </span>
-            )}
-          </button>
-        )
-      )}
-      
-      {/* Close Button */}
-      {isOpen && (
-        !useFilterIcon ? (
-          <FilterBoxButton
-            buttonText="Close Filter"
-            isActive={isFilterActive}
-            isOpen={true}
-            width={useFilterIconWidth}
-            icon={filterIcon || (iconConfig && iconConfig[filter.key])}
-            onClick={handleClose}
-          />
-        ) : (
-          <button
-            onClick={handleClose}
-            className={`cursor-pointer p-1 rounded-md hover:bg-tertiary/10 focus:outline-none ${
-              isFilterActive ? 'text-blue-600' : 'text-gray-500'
-            }`}
-            title={`Filter ${filter.label}`}
-          >
-            <X size={14} className={isFilterActive ? 'fill-tertiary/20 text-tertiary' : 'text-tertiary'} />
-          </button>
-        )
-      )}
-      
-      {/* Dropdown */}
-      {isOpen && (
-        <div
-          ref={dropdownRef}
-          className={`absolute z-30 mt-1 flex max-h-[min(70vh,28rem)] min-h-0 w-64 flex-col overflow-hidden rounded border border-border bg-background/90 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-background/70 ${
-            isLastColumn ? 'right-0' : 'left-0'
-          }`}
-        >
-          <div className="shrink-0">
-            <DropdownHeader
-              filterLabel={filter.label}
-              selectedCount={itemCounts.selectedCount}
-              availableCount={itemCounts.availableCount}
-              sortDirection={sortDirection}
-              onToggleSort={toggleSort}
-            />
-          </div>
-          
-          {isFilterActive && (
             <div className="shrink-0">
-              <ActiveFiltersSection
-                activeFilters={activeFilters}
-                filteredOptions={filteredOptions}
-                formatDisplayValue={formatDisplayValue}
-                onRemoveFilter={removeFilter}
-                onClearFilters={clearFilters}
-                showBadges={showBadges}
+              <DropdownHeader
+                filterLabel={filter.label}
+                selectedCount={itemCounts.selectedCount}
+                availableCount={itemCounts.availableCount}
+                sortDirection={sortDirection}
+                onToggleSort={toggleSort}
               />
             </div>
-          )}
-          
-          {isRangeFilter && (
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {/* Single scroll region: range inputs + quick select; footer stays pinned (see app/development/dropdown-filter) */}
-              <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
-                <RangeFilterSection
-                  rangeFilterContent={renderRangeFilterContent()}
-                  isExpanded={rangeExpanded}
-                  onExpandedChange={handleRangeExpandedChange}
+
+            {isFilterActive && (
+              <div className="shrink-0">
+                <ActiveFiltersSection
+                  activeFilters={activeFilters}
+                  filteredOptions={filteredOptions}
+                  formatDisplayValue={formatDisplayValue}
+                  onRemoveFilter={removeFilter}
+                  onClearFilters={clearFilters}
+                  showBadges={showBadges}
                 />
-                {filter.showQuickSelect ? (
-                  filter.quickSelectOptionsExpanded === false ? (
-                    <QuickSelectCollapsibleSection
-                      isExpanded={isQuickSelectExpanded}
-                      onExpandedChange={setIsQuickSelectExpanded}
-                    >
+              </div>
+            )}
+
+            {columnSort ? (
+              <DropdownSortRow
+                sortKey={columnSort.key}
+                label={columnSort.label}
+              />
+            ) : null}
+
+            {isRangeFilter && (
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+                  <RangeFilterSection
+                    rangeFilterContent={renderRangeFilterContent()}
+                    isExpanded={rangeExpanded}
+                    onExpandedChange={handleRangeExpandedChange}
+                  />
+                  {filter.showQuickSelect ? (
+                    filter.quickSelectOptionsExpanded === false ? (
+                      <QuickSelectCollapsibleSection
+                        isExpanded={isQuickSelectExpanded}
+                        onExpandedChange={setIsQuickSelectExpanded}
+                      >
+                        <RangeQuickSelectList
+                          filter={filter}
+                          selectedValues={
+                            autoApply
+                              ? rangeSelectedValues
+                              : pendingRangeSelectedValues
+                          }
+                          onToggle={handleRangeToggle}
+                          sortDirection={sortDirection}
+                          showInitialCount={showInitialCount}
+                          showSectionHeading={false}
+                        />
+                      </QuickSelectCollapsibleSection>
+                    ) : (
                       <RangeQuickSelectList
                         filter={filter}
                         selectedValues={
-                          autoApply ? rangeSelectedValues : pendingRangeSelectedValues
+                          autoApply
+                            ? rangeSelectedValues
+                            : pendingRangeSelectedValues
                         }
                         onToggle={handleRangeToggle}
                         sortDirection={sortDirection}
                         showInitialCount={showInitialCount}
-                        showSectionHeading={false}
                       />
-                    </QuickSelectCollapsibleSection>
-                  ) : (
-                    <RangeQuickSelectList
-                      filter={filter}
-                      selectedValues={
-                        autoApply ? rangeSelectedValues : pendingRangeSelectedValues
-                      }
-                      onToggle={handleRangeToggle}
-                      sortDirection={sortDirection}
-                      showInitialCount={showInitialCount}
-                    />
-                  )
-                ) : null}
-              </div>
-              <DropdownFooter
-                pendingSelections={pendingRangeSelectedValues}
-                isFilterActive={isFilterActive}
-                autoApply={autoApply}
-                onClearFilters={clearFilters}
-                onCancel={handleClose}
-                onApplyFilters={applyFilters}
-              />
-            </div>
-          )}
-          
-          {(filter.type === "multi-select" || filter.type === "single-select") && (
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {filter.showOptionSearch !== false ? (
-                <div className="shrink-0">
-                  <SearchInput
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
-                    inputRef={searchInputRef}
-                  />
+                    )
+                  ) : null}
                 </div>
-              ) : null}
-              <div
-                className={
-                  filter.showOptionSearch === false
-                    ? "min-h-0 flex-1 overflow-hidden"
-                    : "min-h-0 flex-1 overflow-hidden"
-                }
-              >
-                <FilterOptionsList
-                  options={filteredOptions}
-                  pendingSelections={pendingSelections}
-                  onToggleOption={toggleOption}
-                  formatDisplayValue={formatDisplayValue}
-                  hasOtherColumnFilters={hasOtherColumnFilters}
-                  isOptionsLoaded={isOptionsLoaded}
-                  showInitialCount={showInitialCount}
+                <DropdownFooter
+                  pendingSelections={pendingRangeSelectedValues}
+                  isFilterActive={isFilterActive}
+                  autoApply={autoApply}
+                  onClearFilters={clearFilters}
+                  onCancel={handleClose}
+                  onApplyFilters={applyFilters}
                 />
               </div>
-              <DropdownFooter
-                pendingSelections={pendingSelections}
-                isFilterActive={isFilterActive}
-                autoApply={autoApply}
-                onClearFilters={clearFilters}
-                onCancel={handleClose}
-                onApplyFilters={applyFilters}
+            )}
+
+            {(filter.type === 'multi-select' ||
+              filter.type === 'single-select') && (
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                {filter.showOptionSearch !== false ? (
+                  <div className="shrink-0">
+                    <SearchInput
+                      searchTerm={searchTerm}
+                      onSearchChange={setSearchTerm}
+                      inputRef={searchInputRef}
+                    />
+                  </div>
+                ) : null}
+                <div className="min-h-0 flex-1 overflow-hidden">
+                  <FilterOptionsList
+                    options={filteredOptions}
+                    pendingSelections={pendingSelections}
+                    onToggleOption={toggleOption}
+                    formatDisplayValue={formatDisplayValue}
+                    hasOtherColumnFilters={hasOtherColumnFilters}
+                    isOptionsLoaded={isOptionsLoaded}
+                    showInitialCount={showInitialCount}
+                  />
+                </div>
+                <DropdownFooter
+                  pendingSelections={pendingSelections}
+                  isFilterActive={isFilterActive}
+                  autoApply={autoApply}
+                  onClearFilters={clearFilters}
+                  onCancel={handleClose}
+                  onApplyFilters={applyFilters}
+                />
+              </div>
+            )}
+          </div>,
+          document.body,
+        )
+      : null
+
+  return (
+    <div className="relative inline-block w-full lg:w-auto">
+      <div ref={triggerRef as React.Ref<HTMLDivElement>} className="inline-block">
+        {/* Trigger Button */}
+        {!isOpen &&
+          (!useFilterIcon ? (
+            <FilterBoxButton
+              buttonText={useFilterIconText || `Filter ${filter.label}`}
+              isActive={isFilterActive}
+              isOpen={false}
+              width={useFilterIconWidth}
+              icon={filterIcon || (iconConfig && iconConfig[filter.key])}
+              onClick={handleToggle}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleToggle()
+              }}
+              className={`relative rounded-md p-1 hover:bg-foreground/10 focus:outline-none ${
+                isFilterActive ? 'text-tertiary' : 'text-tertiary'
+              }`}
+              title={`Filter ${filter.label}`}
+              aria-expanded={false}
+              aria-haspopup="dialog"
+            >
+              <ListFilter
+                strokeWidth={isFilterActive ? 2.5 : 2}
+                size={14}
+                className={
+                  isFilterActive
+                    ? 'fill-tertiary/20 text-tertiary'
+                    : 'text-tertiary'
+                }
               />
-            </div>
-          )}
-        </div>
-      )}
+              {filterCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-tertiary text-[8px] font-medium text-background">
+                  {filterCount > 9 ? '9+' : filterCount}
+                </span>
+              )}
+            </button>
+          ))}
+
+        {/* Close Button */}
+        {isOpen &&
+          (!useFilterIcon ? (
+            <FilterBoxButton
+              buttonText="Close Filter"
+              isActive={isFilterActive}
+              isOpen={true}
+              width={useFilterIconWidth}
+              icon={filterIcon || (iconConfig && iconConfig[filter.key])}
+              onClick={handleClose}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleClose()
+              }}
+              className={`cursor-pointer rounded-md p-1 hover:bg-tertiary/10 focus:outline-none ${
+                isFilterActive ? 'text-blue-600' : 'text-gray-500'
+              }`}
+              title={`Filter ${filter.label}`}
+              aria-expanded={true}
+              aria-haspopup="dialog"
+            >
+              <X
+                size={14}
+                className={
+                  isFilterActive
+                    ? 'fill-tertiary/20 text-tertiary'
+                    : 'text-tertiary'
+                }
+              />
+            </button>
+          ))}
+      </div>
+
+      {panel}
     </div>
   )
 }

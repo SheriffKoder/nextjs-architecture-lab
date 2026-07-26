@@ -78,7 +78,7 @@ export function DropdownFooter({
   onApplyFilters
 }: DropdownFooterProps) {
   return (
-    <div className="p-3 border-t border-border dark:border-border/50 bg-foreground/5 flex justify-between items-center z-10">
+    <div className="flex shrink-0 items-center justify-between border-t border-border bg-foreground/5 p-3 dark:border-border/50">
       <button
         onClick={onClearFilters}
         className="cursor-pointer text-sm text-muted-foreground hover:text-foreground px-2 py-1 rounded hover:bg-background"

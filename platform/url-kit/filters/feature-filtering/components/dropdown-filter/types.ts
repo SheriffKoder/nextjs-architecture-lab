@@ -154,4 +154,11 @@ export interface DropdownFilterProps {
    * HOW: Object mapping filter key strings to Lucide icon components
    */
   iconConfig?: Record<string, LucideIcon>
+
+  /**
+   * When set, shows the URL column-sort strip (Asc/Desc/None/Clear all)
+   * above option search. Omit / null keeps the dropdown filter-only.
+   * @see feature-sorting/docs/DROPDOWN_SORT_CONTROLS_PLAN.md
+   */
+  columnSort?: { key: string; label: string } | null
 }

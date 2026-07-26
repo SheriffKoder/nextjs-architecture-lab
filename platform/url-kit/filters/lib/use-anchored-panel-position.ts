@@ -1,6 +1,6 @@
 /**
  * Anchors a fixed panel to a trigger and clamps it to the viewport.
- * Prefer end-align (panel right = trigger right) for right-edge toolbar icons.
+ * Used by filter-toolbar date-control and feature-filtering DropdownFilter.
  */
 
 'use client'
@@ -22,15 +22,23 @@ export type PanelPosition = {
   left: number
 }
 
+export type PanelAlign = 'start' | 'end'
+
 export interface UseAnchoredPanelPositionOptions {
   isOpen: boolean
-  /** Re-run layout when this changes (e.g. calendar mode width). */
+  /**
+   * Horizontal alignment to the trigger.
+   * - `end` (default): panel right edge aligns to trigger right (toolbar icons)
+   * - `start`: panel left edge aligns to trigger left (table header filters)
+   */
+  align?: PanelAlign
+  /** Re-run layout when this changes (e.g. calendar mode / filter content). */
   repositionKey?: string | number | boolean | null
   onClose?: () => void
 }
 
 export interface UseAnchoredPanelPositionReturn {
-  triggerRef: RefObject<HTMLButtonElement | null>
+  triggerRef: RefObject<HTMLElement | null>
   panelRef: RefObject<HTMLDivElement | null>
   position: PanelPosition
   hasPositioned: boolean
@@ -38,12 +46,13 @@ export interface UseAnchoredPanelPositionReturn {
 
 export function useAnchoredPanelPosition({
   isOpen,
+  align = 'end',
   repositionKey,
   onClose,
 }: UseAnchoredPanelPositionOptions): UseAnchoredPanelPositionReturn {
   const [position, setPosition] = useState<PanelPosition>({ top: 0, left: 0 })
   const [hasPositioned, setHasPositioned] = useState(false)
-  const triggerRef = useRef<HTMLButtonElement>(null)
+  const triggerRef = useRef<HTMLElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const updatePosition = useCallback(() => {
@@ -56,7 +65,11 @@ export function useAnchoredPanelPosition({
     const panelWidth = panelRect.width || 300
     const panelHeight = panelRect.height || 320
 
-    let left = triggerRect.right - panelWidth
+    let left =
+      align === 'start'
+        ? triggerRect.left
+        : triggerRect.right - panelWidth
+
     const maxLeft = window.innerWidth - panelWidth - VIEWPORT_PAD
     left = Math.min(
       Math.max(left, VIEWPORT_PAD),
@@ -77,7 +90,7 @@ export function useAnchoredPanelPosition({
 
     setPosition({ top, left })
     setHasPositioned(true)
-  }, [])
+  }, [align])
 
   useEffect(() => {
     if (!isOpen) setHasPositioned(false)

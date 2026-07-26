@@ -1,21 +1,8 @@
-/**
- * SortButton Component
- * 
- * Purpose: Single reusable sort button that toggles sort state
- * Used in: Anywhere sorting is needed for a specific field
- * Why: Provides simple toggle functionality for individual sort fields
- * 
- * Features:
- * - Toggles through: none → asc → desc → none
- * - Shows active state with highlighted arrows
- * - Accessible with aria-label
- * - Matches styling from filtering-table-header
- */
-
 'use client'
 
 import React from 'react'
 import { MoveUp, MoveDown } from 'lucide-react'
+import { cn } from '@/shared/lib/utils'
 import { useUrlSorting } from '../hooks/useUrlSorting'
 import type { SortButtonProps } from '../types'
 
@@ -45,31 +32,31 @@ export function SortButton({
   
   return (
     <button
-      className={`ml-1 -mt-0.5 p-1 rounded transition-colors hover:bg-foreground/10 ${className}`}
+      className={cn(
+        'ml-1 -mt-0.5 rounded p-1 transition-colors hover:bg-foreground/10',
+        className,
+      )}
       onClick={handleClick}
       aria-label={`Sort by ${label || sortKey}`}
       title={`Sort by ${label || sortKey}`}
     >
-      <div className="flex flex-row items-center gap-0 relative">
-        {/* Up arrow */}
+      <div className="relative flex flex-row items-center gap-0">
         <MoveUp 
           size={12} 
           strokeWidth={2.5}
-          className={`transition-colors -mr-0.25 ${
+          className={`-mr-0.25 transition-colors ${
             isAscending ? "text-primary" : "text-tertiary"
           }`}
         />
-        {/* Down arrow */}
         <MoveDown 
           size={12} 
           strokeWidth={2.5}
-          className={`transition-colors -ml-1 ${
+          className={`-ml-1 transition-colors ${
             isDescending ? "text-primary" : "text-tertiary"
           }`}
         />
-        {/* Priority badge (shows sort level: 1, 2, 3, etc.) */}
         {showPriority && priority !== null && (
-          <span className="absolute -top-2 -right-0.5 bg-tertiary text-background text-[8px] font-medium rounded-full h-3 w-3 flex items-center justify-center">
+          <span className="absolute -right-0.5 -top-2 flex h-3 w-3 items-center justify-center rounded-full bg-tertiary text-[8px] font-medium text-background">
             {priority + 1}
           </span>
         )}

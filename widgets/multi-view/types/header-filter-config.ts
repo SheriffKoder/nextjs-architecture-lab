@@ -33,4 +33,13 @@ export interface HeaderFilterConfig {
   showBadges?: boolean
   defaultRangeExpanded?: boolean
   showInitialCount?: boolean
+
+  /**
+   * Where column URL sort controls appear for header columns.
+   * - `header` (default): dual-arrow SortButton beside the filter icon
+   * - `dropdown`: Asc/Desc/None/Clear-all strip inside DropdownFilter;
+   *   cell shows direction + level indicator left of the label instead
+   * @see platform/url-kit/filters/feature-sorting/docs/DROPDOWN_SORT_CONTROLS_PLAN.md
+   */
+  sortPlacement?: 'header' | 'dropdown'
 }

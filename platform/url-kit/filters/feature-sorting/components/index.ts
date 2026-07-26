@@ -8,6 +8,18 @@
 
 export { SortButton } from './sort-button'
 export { SortButtons } from './sort-buttons'
+export { SortStatusIndicator } from './sort-status-indicator'
+export type { SortStatusIndicatorProps } from './sort-status-indicator'
+export {
+  DropdownSortRow,
+  SortStatusPill,
+  SortDirectionActions,
+} from './dropdown-sort-row'
+export type {
+  DropdownSortRowProps,
+  SortStatusPillProps,
+  SortDirectionActionsProps,
+} from './dropdown-sort-row'
 export type { 
   SortConfig, 
   SortDirection, 
