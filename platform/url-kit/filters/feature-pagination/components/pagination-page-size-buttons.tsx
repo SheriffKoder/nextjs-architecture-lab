@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/lib/utils'
 
 export interface PaginationPageSizeButtonsProps {
@@ -8,7 +9,6 @@ export interface PaginationPageSizeButtonsProps {
   limit: number
   onLimitChange: (limit: number) => void
   className?: string
-  /** When true, all preset buttons are non-interactive */
   disabled?: boolean
   allowShowAll?: boolean
   isShowAll?: boolean
@@ -17,7 +17,7 @@ export interface PaginationPageSizeButtonsProps {
 }
 
 /**
- * URL-driven page size presets (e.g. 10 / 20 / 50). Pairs with useUrlPagination `setLimit`.
+ * URL-driven page size presets — **selection** variant.
  */
 export function PaginationPageSizeButtons({
   options,
@@ -32,15 +32,6 @@ export function PaginationPageSizeButtons({
 }: PaginationPageSizeButtonsProps) {
   if (options.length === 0 && !allowShowAll) return null
 
-  const presetButtonClass = (active: boolean) =>
-    cn(
-      'rounded-md border px-2 py-1 text-xs font-medium transition-colors',
-      active
-        ? 'border-primary bg-primary text-white'
-        : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50 dark:border-border dark:bg-background dark:text-foreground',
-      disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
-    )
-
   return (
     <div
       className={cn('flex flex-wrap items-center gap-1', className)}
@@ -50,30 +41,36 @@ export function PaginationPageSizeButtons({
       {options.map((n) => {
         const isActive = !isShowAll && limit === n
         return (
-          <button
+          <Button
             key={n}
             type="button"
+            variant="selection"
+            size="sm"
+            selected={isActive}
             disabled={disabled}
             onClick={() => onLimitChange(n)}
-            className={presetButtonClass(isActive)}
+            className="min-w-8 px-2"
             aria-pressed={isActive}
             aria-label={`${n} items per page`}
           >
             {n}
-          </button>
+          </Button>
         )
       })}
       {allowShowAll && onShowAll ? (
-        <button
+        <Button
           type="button"
+          variant="selection"
+          size="sm"
+          selected={isShowAll}
           disabled={disabled}
           onClick={onShowAll}
-          className={presetButtonClass(isShowAll)}
+          className="px-2"
           aria-pressed={isShowAll}
           aria-label="Show all items"
         >
           {showAllLabel}
-        </button>
+        </Button>
       ) : null}
     </div>
   )

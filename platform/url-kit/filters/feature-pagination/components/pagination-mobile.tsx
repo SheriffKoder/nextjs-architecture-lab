@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/lib/utils'
 import { useUrlPagination } from '../hooks'
 import { shouldHidePaginationForUseAllView } from '../utils'
@@ -93,7 +94,7 @@ export function PaginationMobile({
         className
       )}
     >
-      <span className="min-w-0 truncate text-xs text-muted-foreground px-2">
+      <span className="min-w-0 truncate px-2 text-xs text-muted-foreground">
         {rangeLabel}
       </span>
 
@@ -101,18 +102,16 @@ export function PaginationMobile({
         {showPageSizeSelector ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button
+              <Button
                 type="button"
-                className={cn(
-                  'inline-flex h-8 items-center gap-1 rounded-md border border-input px-2 text-xs font-medium',
-                  'bg-background text-foreground hover:bg-foreground/5',
-                  'focus:outline-none focus-visible:ring-1 focus-visible:ring-ring'
-                )}
+                variant="control"
+                size="compact"
+                className="gap-1 px-2"
                 aria-label={`Rows per page: ${pageSizeLabel}`}
               >
                 {pageSizeLabel}
                 <ChevronDown className="size-3.5 opacity-60" aria-hidden />
-              </button>
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[4.5rem]">
               {(config?.pageSizeOptions ?? []).map((n) => (
@@ -140,19 +139,16 @@ export function PaginationMobile({
 
         {!isShowAll && totalPages > 1 ? (
           <div className="flex items-center gap-1">
-            <button
+            <Button
               type="button"
+              variant="control"
+              size="icon-sm"
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={isFirst}
-              className={cn(
-                'inline-flex size-8 items-center justify-center rounded-md border border-input',
-                'bg-background text-foreground hover:bg-foreground/5',
-                'disabled:cursor-not-allowed disabled:opacity-40'
-              )}
               aria-label="Previous page"
             >
               <ChevronLeft className="size-4" aria-hidden />
-            </button>
+            </Button>
 
             <span
               className="min-w-[2.75rem] text-center text-xs font-medium tabular-nums text-foreground"
@@ -161,19 +157,16 @@ export function PaginationMobile({
               {page}/{totalPages}
             </span>
 
-            <button
+            <Button
               type="button"
+              variant="control"
+              size="icon-sm"
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={isLast}
-              className={cn(
-                'inline-flex size-8 items-center justify-center rounded-md border border-input',
-                'bg-background text-foreground hover:bg-foreground/5',
-                'disabled:cursor-not-allowed disabled:opacity-40'
-              )}
               aria-label="Next page"
             >
               <ChevronRight className="size-4" aria-hidden />
-            </button>
+            </Button>
           </div>
         ) : null}
       </div>

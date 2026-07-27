@@ -5,6 +5,7 @@
 
 import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
 import type { SearchConfig } from '@/platform/url-kit/filters/feature-filtering/components/search-types'
+import type { PlaceholderMarqueeProp } from '@/platform/url-kit/filters/feature-filtering/features/placeholder-marquee'
 
 export type GroupableField = {
   key: string
@@ -33,5 +34,11 @@ export interface FilterToolbarProps {
   defaultPageSize?: number
   enabledFilterKeys?: readonly string[]
   showInitialCount?: boolean
+  /**
+   * Scroll overflowing search placeholder on narrow fields.
+   * `true` / shared config → both shells; `{ desktop, mobile }` → per shell.
+   * See `features/placeholder-marquee`.
+   */
+  placeholderMarquee?: PlaceholderMarqueeProp
   className?: string
 }

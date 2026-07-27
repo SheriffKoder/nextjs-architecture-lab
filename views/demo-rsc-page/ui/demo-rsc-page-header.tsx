@@ -11,6 +11,7 @@
 'use client'
 
 import { Menu } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import PageHeader from '@/shared/ui/page-header/page-header'
 import { useSidebar } from '@/widgets/side-nav'
 import ActionButtons from './action-buttons'
@@ -25,14 +26,16 @@ function MobileSidebarToggle() {
   const { openSidebar } = useSidebar()
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="icon-sm"
       onClick={openSidebar}
-      className="rounded-md p-2 transition-colors hover:bg-foreground/5 md:hidden"
+      className="md:hidden"
       aria-label="Open sidebar"
     >
       <Menu className="h-6 w-6 text-foreground" />
-    </button>
+    </Button>
   )
 }
 

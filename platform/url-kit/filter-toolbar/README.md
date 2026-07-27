@@ -93,5 +93,19 @@ import { FilterToolbar } from '@/platform/url-kit/filter-toolbar'
   defaultView="table"
   useAllItems={[…]}
   enabledFilterKeys={['status', 'make', 'location']}
+  placeholderMarquee={{ desktop: true, mobile: true }}
 />
 ```
+
+### `placeholderMarquee`
+
+Optional. Scrolls overflowing search placeholder text.
+
+| Value | Effect |
+|-------|--------|
+| omitted / `false` | off |
+| `true` | desktop + mobile |
+| `{ cycleMs: 12000 }` | both, shared timing |
+| `{ mobile: true }` | mobile only |
+| `{ desktop: true, mobile: true }` | both |
+| `{ desktop: false, mobile: { cycleMs: 8000 } }` | mobile only, custom cycle |

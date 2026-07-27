@@ -8,6 +8,7 @@
 import { Tags, ChevronDown } from 'lucide-react'
 import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
 import { cn } from '@/shared/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -16,10 +17,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import {
-  FILTER_TOOLBAR_COMPACT_LABEL_TRIGGER_CLASS,
-  FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS,
-} from '../../config/chrome'
 import { IconTriggerButton } from '../shared/icon-trigger-button'
 import {
   formatLabelFilterCount,
@@ -66,29 +63,22 @@ export function LabelFilterDropdown({
       ) : null}
     </IconTriggerButton>
   ) : (
-    <button
+    <Button
       type="button"
+      variant="control"
+      size="compact"
+      active={selectedCount > 0}
       title={triggerTitle}
       aria-label={triggerTitle}
       aria-haspopup="menu"
-      className={cn(
-        FILTER_TOOLBAR_COMPACT_LABEL_TRIGGER_CLASS,
-        selectedCount > 0 && 'text-tertiary'
-      )}
     >
-      <span
-        className={FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS}
-        aria-hidden
-      />
-      <span className="relative z-10 inline-flex items-center gap-1.5">
-        <Tags aria-hidden className="size-3.5" />
-        <span>
-          {filter.label}
-          {selectedCount > 0 ? ` (${selectedCount})` : ''}
-        </span>
-        <ChevronDown aria-hidden className="size-3.5 opacity-60" />
+      <Tags aria-hidden className="size-3.5" />
+      <span>
+        {filter.label}
+        {selectedCount > 0 ? ` (${selectedCount})` : ''}
       </span>
-    </button>
+      <ChevronDown aria-hidden className="size-3.5 opacity-60" />
+    </Button>
   )
 
   return (

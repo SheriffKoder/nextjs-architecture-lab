@@ -15,7 +15,10 @@ import {
   type DateFilterMode,
 } from '@/platform/url-kit/filters/feature-filtering/components/single-date-filter/date-display-utils'
 import { IconTriggerButton } from '../shared/icon-trigger-button'
-import { useAnchoredPanelPosition } from '@/platform/url-kit/filters/lib/use-anchored-panel-position'
+import {
+  useAnchoredPanelPosition,
+  type PanelAlign,
+} from '@/platform/url-kit/filters/lib/use-anchored-panel-position'
 
 export interface DateControlProps {
   filterKey: string
@@ -25,6 +28,12 @@ export interface DateControlProps {
   showDateFilterHeader?: boolean
   /** Dropdown panel surface (e.g. `bg-background`). */
   panelClassName?: string
+  /**
+   * Horizontal anchor to the trigger.
+   * Left-cluster icons (filter/calendar/group): `start`.
+   * @default 'end'
+   */
+  panelAlign?: PanelAlign
 }
 
 export function DateControl({
@@ -33,6 +42,7 @@ export function DateControl({
   buttonText,
   showDateFilterHeader = true,
   panelClassName,
+  panelAlign = 'end',
 }: DateControlProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedMode, setSelectedMode] = useState<DateFilterMode>('day')
@@ -41,6 +51,7 @@ export function DateControl({
   const { triggerRef, panelRef, position, hasPositioned } =
     useAnchoredPanelPosition({
       isOpen: isDropdownOpen,
+      align: panelAlign,
       repositionKey: selectedMode,
       onClose: closeDropdown,
     })
@@ -93,7 +104,7 @@ export function DateControl({
       ? createPortal(
           <div
             ref={panelRef}
-            className="fixed z-50"
+            className="fixed z-50 max-w-[calc(100vw-1rem)]"
             style={{
               top: position.top,
               left: position.left,

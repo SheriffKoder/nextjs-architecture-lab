@@ -6,6 +6,7 @@
 
 import { SearchBar } from '@/platform/url-kit/filters/feature-filtering/components/search-bar'
 import type { SearchConfig } from '@/platform/url-kit/filters/feature-filtering/components/search-types'
+import type { PlaceholderMarqueeConfig } from '@/platform/url-kit/filters/feature-filtering/features/placeholder-marquee'
 import { cn } from '@/shared/lib/utils'
 import {
   FILTER_TOOLBAR_SEARCH_CLASS,
@@ -16,9 +17,15 @@ export interface SearchControlProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches SearchBar
   config: SearchConfig<any>
   className?: string
+  /** See features/placeholder-marquee — scrolls clipped placeholder on narrow inputs. */
+  placeholderMarquee?: boolean | PlaceholderMarqueeConfig
 }
 
-export function SearchControl({ config, className }: SearchControlProps) {
+export function SearchControl({
+  config,
+  className,
+  placeholderMarquee,
+}: SearchControlProps) {
   return (
     <div
       className={cn(
@@ -30,6 +37,8 @@ export function SearchControl({ config, className }: SearchControlProps) {
     >
       <SearchBar
         config={config}
+        placeholderMarquee={placeholderMarquee}
+        placeholderClassName="text-xs md:text-sm"
         className={cn(
           'h-8 min-w-0 flex-1 !opacity-100',
           '[&>input]:border-0 [&>input]:bg-transparent [&>input]:shadow-none',

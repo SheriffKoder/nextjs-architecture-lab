@@ -1,25 +1,17 @@
 /**
- * Square icon trigger with solid surface behind the icon.
- * Always exposes native `title` for hover tooltips; syncs from `aria-label` when omitted.
+ * Square toolbar icon trigger — thin wrapper over `Button` variant **control**.
  */
 
 'use client'
 
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
-import { cn } from '@/shared/lib/utils'
-import {
-  FILTER_TOOLBAR_ICON_TRIGGER_CLASS,
-  FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS,
-} from '../../config/chrome'
+import { forwardRef, type Ref } from 'react'
+import { Button, type ButtonProps } from '@/components/ui/button'
 
-export interface IconTriggerButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode
-  /** When true, tint icon/text tertiary (active state). */
+export interface IconTriggerButtonProps extends Omit<ButtonProps, 'variant' | 'size'> {
+  /** When true, tint icon/text tertiary (active URL state). */
   active?: boolean
   /**
    * Accessible name. Also used as `title` when `title` is omitted.
-   * Prefer setting both `aria-label` and `title` explicitly at call sites.
    */
   'aria-label': string
 }
@@ -37,30 +29,23 @@ export const IconTriggerButton = forwardRef<
     'aria-label': ariaLabel,
     ...props
   },
-  ref
+  ref,
 ) {
   const resolvedTitle = title ?? ariaLabel
 
   return (
-    <button
-      ref={ref}
+    <Button
+      ref={ref as Ref<HTMLButtonElement>}
       type={type}
+      variant="control"
+      size="icon-sm"
+      active={active}
       title={resolvedTitle}
       aria-label={ariaLabel}
-      className={cn(
-        FILTER_TOOLBAR_ICON_TRIGGER_CLASS,
-        active && 'text-tertiary',
-        className
-      )}
+      className={className}
       {...props}
     >
-      <span
-        className={FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS}
-        aria-hidden
-      />
-      <span className="relative z-10 inline-flex items-center justify-center">
-        {children}
-      </span>
-    </button>
+      {children}
+    </Button>
   )
 })

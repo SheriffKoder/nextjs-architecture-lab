@@ -22,6 +22,7 @@ import React from 'react'
 import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { Button } from '@/components/ui/button'
 import { useSidebar } from '@/widgets/side-nav'
 
 export interface PageHeaderProps {
@@ -108,14 +109,16 @@ export default function PageHeader({
 
       {/* Hamburger Menu - Mobile Only */}
       {showMenuToggle ? (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={openSidebar}
-          className="rounded-md p-2 transition-colors hover:bg-foreground/5 md:hidden"
+          className="md:hidden"
           aria-label="Open sidebar"
         >
           <Menu className="h-6 w-6 text-foreground" />
-        </button>
+        </Button>
       ) : null}
     </div>
   )

@@ -1,6 +1,9 @@
 /**
  * Desktop filter-toolbar layout (one row):
- * [filter] [group]  [search……] ---- [label filters] [view] [date]
+ * [filter] [date] [group]  [search……] ---- [label filters] [view]
+ *
+ * Left cluster = “what I want to see” (filter / calendar / group).
+ * Search is the hero; statuses (label filters) second; view stands alone on the right.
  */
 
 'use client'
@@ -34,6 +37,7 @@ export function FilterToolbarDesktop({
   dateFilterKey,
   dateFilterLabel,
   dateFilterButtonText,
+  placeholderMarquee,
   className,
 }: FilterToolbarLayoutProps) {
   return (
@@ -50,6 +54,15 @@ export function FilterToolbarDesktop({
           panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
           panelAlign="start"
         />
+        {dateFilterKey ? (
+          <DateControl
+            filterKey={dateFilterKey}
+            filterLabel={dateFilterLabel}
+            buttonText={dateFilterButtonText}
+            panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
+            panelAlign="start"
+          />
+        ) : null}
         {groupableFields.length > 0 && (
           <GroupControl
             fields={groupableFields}
@@ -63,7 +76,10 @@ export function FilterToolbarDesktop({
         )}
       </div>
 
-      <SearchControl config={searchConfig} />
+      <SearchControl
+        config={searchConfig}
+        placeholderMarquee={placeholderMarquee}
+      />
 
       <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-1">
         {resolvedLabelKey ? (
@@ -79,14 +95,6 @@ export function FilterToolbarDesktop({
             availableViews={availableViews}
             currentView={currentView}
             onViewChange={setView}
-          />
-        ) : null}
-        {dateFilterKey ? (
-          <DateControl
-            filterKey={dateFilterKey}
-            filterLabel={dateFilterLabel}
-            buttonText={dateFilterButtonText}
-            panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
           />
         ) : null}
       </div>

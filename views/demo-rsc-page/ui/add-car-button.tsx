@@ -3,15 +3,15 @@
  *
  * Purpose: Isolated control that opens the URL-driven car drawer (`url-drawer` + `openCreate`)
  * Used in: `demo-rsc-page-header` / `ActionButtons`
- * Used for: Keeps drawer navigation out of shared `action-buttons.tsx`
  *
  * Mobile: icon-only `[+]`. Desktop: icon + “Add Car” label.
+ * Uses `Button` variant **action**.
  */
 
 'use client'
 
 import { Plus } from 'lucide-react'
-import PrimaryButton from '@/shared/ui/buttons/primary-button'
+import { Button } from '@/components/ui/button'
 import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 import { DEMO_RSC_CAR_DRAWER_KEY } from './drawer-content/rsc-car-drawer-content'
 
@@ -26,28 +26,28 @@ export default function AddCarButton({ drawerKey = DEMO_RSC_CAR_DRAWER_KEY }: Ad
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="action"
+        size="icon-sm"
         onClick={open}
-        className="inline-flex size-8 items-center justify-center rounded-md border border-input bg-background text-foreground transition-colors hover:bg-foreground/5 md:hidden"
+        className="md:hidden"
         aria-label="Add Car"
         title="Add Car"
       >
         <Plus className="h-4 w-4" strokeWidth={2} />
-      </button>
+      </Button>
 
-      <div className="hidden md:block">
-        <PrimaryButton
-          type="button"
-          onClick={open}
-          icon={Plus}
-          iconPosition="left"
-          buttonClassName="border border-input bg-background text-foreground whitespace-nowrap"
-          size="default"
-        >
-          Add Car
-        </PrimaryButton>
-      </div>
+      <Button
+        type="button"
+        variant="action"
+        size="default"
+        onClick={open}
+        className="hidden md:inline-flex h-auto py-2.5 [&_svg]:size-5"
+      >
+        <Plus strokeWidth={2} />
+        Add Car
+      </Button>
     </>
   )
 }

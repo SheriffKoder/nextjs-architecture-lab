@@ -17,6 +17,7 @@ import type { FilterToolbarProps } from '../model/types'
 import { DEFAULT_GROUPING_SUPPORTED_VIEWS } from '../config/chrome'
 import { useUrlGrouping } from '../hooks/use-url-grouping'
 import { useViewResolution } from '../hooks/use-view-resolution'
+import { resolvePlaceholderMarqueeForViewport } from '@/platform/url-kit/filters/feature-filtering/features/placeholder-marquee'
 import { FilterToolbarDesktop } from './filter-toolbar-desktop'
 import { FilterToolbarMobile } from './filter-toolbar-mobile'
 import type { FilterToolbarLayoutProps } from './filter-toolbar-layout-types'
@@ -38,6 +39,7 @@ function FilterToolbarInner({
   defaultPageSize = 10,
   enabledFilterKeys,
   showInitialCount = false,
+  placeholderMarquee,
   className,
 }: FilterToolbarProps) {
   const displayedFilters = enabledFilterKeys
@@ -67,7 +69,7 @@ function FilterToolbarInner({
       ? filters.find((f) => f.key === dateFilterKey)?.label
       : undefined
 
-  const layoutProps: FilterToolbarLayoutProps = {
+  const sharedLayoutProps: Omit<FilterToolbarLayoutProps, 'placeholderMarquee'> = {
     displayedFilters,
     filters,
     searchConfig,
@@ -91,8 +93,20 @@ function FilterToolbarInner({
 
   return (
     <>
-      <FilterToolbarDesktop {...layoutProps} />
-      <FilterToolbarMobile {...layoutProps} />
+      <FilterToolbarDesktop
+        {...sharedLayoutProps}
+        placeholderMarquee={resolvePlaceholderMarqueeForViewport(
+          placeholderMarquee,
+          'desktop'
+        )}
+      />
+      <FilterToolbarMobile
+        {...sharedLayoutProps}
+        placeholderMarquee={resolvePlaceholderMarqueeForViewport(
+          placeholderMarquee,
+          'mobile'
+        )}
+      />
     </>
   )
 }

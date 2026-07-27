@@ -1,9 +1,10 @@
 /**
- * Single option chip for the xl+ label-filters row.
+ * Single option chip for the xl+ label-filters row — **selection** variant.
  */
 
 'use client'
 
+import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/lib/utils'
 import type { LabelFilterOption } from './types'
 import {
@@ -29,20 +30,19 @@ export function LabelFilterOptionChip({
   const countText = formatLabelFilterCount(option, showInitialCount)
 
   return (
-    <button
+    <Button
       type="button"
+      variant="selection"
+      size="sm"
+      selected={selected}
       title={labelFilterOptionTitle(option, showInitialCount, isDisabled)}
       aria-label={labelFilterOptionAriaLabel(option, isDisabled, selected)}
       aria-pressed={selected}
       onClick={() => !isDisabled && onSelect(option.value)}
       disabled={isDisabled}
       className={cn(
-        'px-3 py-1.5 text-xs rounded-md transition-colors font-medium',
-        isDisabled
-          ? 'opacity-50 cursor-not-allowed bg-muted text-muted-foreground'
-          : selected
-            ? 'bg-tertiary text-background hover:bg-tertiary/90'
-            : 'bg-muted text-foreground hover:bg-muted/80'
+        'px-3 py-1.5 font-medium',
+        isDisabled && 'opacity-50',
       )}
     >
       <span>{option.label}</span>
@@ -53,13 +53,13 @@ export function LabelFilterOptionChip({
             isDisabled
               ? 'text-muted-foreground'
               : selected
-                ? 'text-background/80'
+                ? 'text-tertiary/80'
                 : 'text-muted-foreground'
           )}
         >
           ({countText})
         </span>
       )}
-    </button>
+    </Button>
   )
 }

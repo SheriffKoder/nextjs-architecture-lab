@@ -395,11 +395,11 @@ export default function DateSelectorDropdown({
   return (
     <div className="relative" ref={dropdownRef} style={{ width }}>
         <div
-          className={`mt-1 border border-border rounded-lg shadow-lg z-50 ${panelClassName}`}
+          className={`mt-1 w-full max-w-[calc(100vw-1rem)] border border-border rounded-lg shadow-lg z-50 ${panelClassName}`}
           style={{
           width: mode === 'range' || showDateFilterHeader ? 'fit-content' : '250px'
         }}>
-          <div className="p-1 lg:p-4 flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center p-3 md:p-4">
             {/* Header */}
             <div className={`mr-auto mb-2 w-full ${showDateFilterHeader ? 'block' : 'hidden'}`}>
               <p className="text-xs font-medium">

@@ -1,6 +1,6 @@
 /**
- * Shared chrome for filter-toolbar icon triggers and search surface.
- * Owned by this kit — do not import minimal-controls defaults.
+ * Shared chrome for filter-toolbar search surface and panel tokens.
+ * Icon triggers use `@/components/ui/button` variant **control** — see that file’s header map.
  */
 
 export const FILTER_TOOLBAR_SURFACE_BG = 'bg-white dark:bg-[#000000]'
@@ -12,11 +12,12 @@ export const FILTER_TOOLBAR_PANEL_SURFACE_CLASS = 'bg-background'
 export const FILTER_TOOLBAR_SEARCH_SURFACE_BG =
   'bg-white/50 dark:bg-[#000000]/50'
 
+/** @deprecated Use `Button` variant **control** size **icon-sm**. */
 export const FILTER_TOOLBAR_ICON_TRIGGER_CLASS = [
   'relative inline-flex items-center justify-center',
   'h-8 w-8 shrink-0 rounded-md',
   'border border-input text-foreground',
-  'bg-transparent',
+  'bg-background',
   'hover:text-tertiary',
   'focus:outline-none focus-visible:outline-none',
   'focus-visible:ring-0 focus-visible:ring-offset-0',
@@ -24,10 +25,8 @@ export const FILTER_TOOLBAR_ICON_TRIGGER_CLASS = [
   '[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
 ].join(' ')
 
-export const FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS = [
-  'absolute inset-px z-0 rounded-[calc(0.5rem-1px)] pointer-events-none',
-  FILTER_TOOLBAR_SURFACE_BG,
-].join(' ')
+/** @deprecated Inset surface removed — use **control** variant directly. */
+export const FILTER_TOOLBAR_ICON_TRIGGER_SURFACE_CLASS = ''
 
 /** Grow within the row but cap width; muted surface. */
 export const FILTER_TOOLBAR_SEARCH_CLASS = [
@@ -35,15 +34,12 @@ export const FILTER_TOOLBAR_SEARCH_CLASS = [
   'opacity-80',
 ].join(' ')
 
-/**
- * Compact label+icon+chevron trigger for label-filters below `xl`
- * (not the large outline Button from FilterOptionsButtons).
- */
+/** @deprecated Use `Button` variant **control** size **compact**. */
 export const FILTER_TOOLBAR_COMPACT_LABEL_TRIGGER_CLASS = [
   'relative inline-flex items-center justify-center gap-1.5',
   'h-8 shrink-0 rounded-md px-2.5',
   'border border-input text-foreground text-xs font-medium',
-  'bg-transparent',
+  'bg-background',
   'hover:text-tertiary',
   'focus:outline-none focus-visible:outline-none',
   'focus-visible:ring-0 focus-visible:ring-offset-0',

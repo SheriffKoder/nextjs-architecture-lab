@@ -23,6 +23,7 @@ import {
 import { rentalCarSearchConfig } from '../../config/data/rental-car-search-config'
 import { rentalCarFiltersHeaderConfig } from '../../config/ui/rental-car-filters-header-config'
 import { demoRscMinimalControlsConfig } from '../../config/ui/demo-rsc-minimal-controls-config'
+import { DEMO_RSC_PLACEHOLDER_MARQUEE } from '../../config/ui/demo-rsc-filter-toolbar-config'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
 import { getFilters } from '../../../../entities/cars-rsc/server/demo-rsc-cached-loaders'
 import { demoRscDataParamsToCacheKey } from '../../lib/demo-rsc-search-params-cache-key'
@@ -70,6 +71,7 @@ export default async function FiltersSection({
         useAllItems={demoRscMinimalControlsConfig.useAllItems}
         defaultPageSize={demoRscMinimalControlsConfig.defaultPageSize}
         enabledFilterKeys={rentalCarFiltersHeaderConfig.enabledFilterKeys}
+        placeholderMarquee={DEMO_RSC_PLACEHOLDER_MARQUEE}
         showInitialCount
       />
 

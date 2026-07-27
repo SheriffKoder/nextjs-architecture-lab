@@ -1,8 +1,10 @@
 /**
  * Mobile filter-toolbar layout (two rows):
- * Row 1: [search……] ---- [filter] [group] [label] [date]
+ * Row 1: [filter] [date] [group]  [search……]  [status]
  * ──────── separator ────────
  * Row 2: [view pills…]
+ *
+ * Left cluster = “what I want to see”; search is the hero; status sits alone on the right.
  */
 
 'use client'
@@ -37,26 +39,31 @@ export function FilterToolbarMobile({
   dateFilterKey,
   dateFilterLabel,
   dateFilterButtonText,
+  placeholderMarquee,
   className,
 }: FilterToolbarLayoutProps) {
   const showViewPills = resolveViewOptions(availableViews).length > 1
 
   return (
     <div className={cn('flex w-full flex-col md:hidden', className)}>
-      {/* Row 1 — search + icons */}
+      {/* Row 1 — filter/date/group · search · status */}
       <div className="flex w-full items-center gap-2 px-2 py-2">
-        <SearchControl
-          config={searchConfig}
-          className="min-w-0 max-w-none flex-1"
-        />
-
         <div className="flex shrink-0 items-center gap-1">
           <FilterControl
             filters={displayedFilters}
             showInitialCount={showInitialCount}
             panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
-            panelAlign="end"
+            panelAlign="start"
           />
+          {dateFilterKey ? (
+            <DateControl
+              filterKey={dateFilterKey}
+              filterLabel={dateFilterLabel}
+              buttonText={dateFilterButtonText}
+              panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
+              panelAlign="start"
+            />
+          ) : null}
           {groupableFields.length > 0 && (
             <GroupControl
               fields={groupableFields}
@@ -68,7 +75,16 @@ export function FilterToolbarMobile({
               groupingSupportedViews={groupingSupportedViews}
             />
           )}
-          {resolvedLabelKey ? (
+        </div>
+
+        <SearchControl
+          config={searchConfig}
+          placeholderMarquee={placeholderMarquee}
+          className="min-w-0 max-w-none flex-1"
+        />
+
+        {resolvedLabelKey ? (
+          <div className="flex shrink-0 items-center">
             <LabelFilters
               filterKey={resolvedLabelKey}
               filterOptions={filters}
@@ -76,16 +92,8 @@ export function FilterToolbarMobile({
               showInitialCount={showInitialCount}
               iconOnly
             />
-          ) : null}
-          {dateFilterKey ? (
-            <DateControl
-              filterKey={dateFilterKey}
-              filterLabel={dateFilterLabel}
-              buttonText={dateFilterButtonText}
-              panelClassName={FILTER_TOOLBAR_PANEL_SURFACE_CLASS}
-            />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </div>
 
       {showViewPills ? (

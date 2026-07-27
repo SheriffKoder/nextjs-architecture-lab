@@ -9,8 +9,7 @@
 'use client'
 
 import React from 'react'
-import PrimaryButton from '@/shared/ui/buttons/primary-button'
-import { LogoIconPair } from '@/widgets/side-nav'
+import { Button } from '@/components/ui/button'
 import AddCarButton from './add-car-button'
 
 interface ActionButtonsProps {
@@ -62,25 +61,27 @@ export default function ActionButtons({
       {showAddCarDrawerButton ? <AddCarButton /> : null}
 
       {openAddCarModal ? (
-        <PrimaryButton
+        <Button
           type="button"
-          onClick={openAddCarModal}
-          buttonClassName="border border-input bg-background text-foreground whitespace-nowrap"
+          variant="action"
           size="default"
+          onClick={openAddCarModal}
+          className="h-auto whitespace-nowrap py-2.5"
         >
           Add car
-        </PrimaryButton>
+        </Button>
       ) : null}
 
       {onGenerateError ? (
-        <PrimaryButton
+        <Button
           type="button"
+          variant="action"
+          size="sm"
           onClick={() => void onGenerateError()}
-          buttonClassName="border border-destructive/50 bg-background text-destructive hover:bg-destructive/10 whitespace-nowrap"
-          size="default"
+          className="whitespace-nowrap border-destructive/50 text-destructive hover:bg-destructive/10"
         >
           Generate Error
-        </PrimaryButton>
+        </Button>
       ) : null}
     </div>
   )

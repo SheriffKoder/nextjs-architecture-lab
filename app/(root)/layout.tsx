@@ -54,7 +54,7 @@ function LayoutContent({ children, user }: { children: React.ReactNode; user: Us
     <div className='flex flex-row w-full min-w-0 h-screen overflow-hidden'>
 
         {/* <div className='absolute inset-0 login-background-light dark:hidden z-0 left-[30%] blur-3xl opacity-40 lg:opacity-70'></div> */}
-        <div className='absolute inset-0 main-background opacity-25 dark:opacity-15 block z-0 pointer-events-none'></div>
+        <div className='absolute inset-0 main-background opacity-25 dark:opacity-15 block pointer-events-none z-[-1]'></div>
         
         {/* Affects right side width on expand/collapse */}
         {/* SidebarHeader uses usePathname — must be under Suspense for Cache Components prerender */}

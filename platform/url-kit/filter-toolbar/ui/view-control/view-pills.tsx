@@ -1,9 +1,11 @@
 /**
  * Horizontal view pills — used on the mobile filter-toolbar row.
+ * **selection** variant, pill shape.
  */
 
 'use client'
 
+import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/lib/utils'
 import { resolveViewOptions } from './view-options'
 
@@ -40,25 +42,21 @@ export function ViewPills({
         const selected = currentView === option.key
 
         return (
-          <button
+          <Button
             key={option.key}
             type="button"
             role="tab"
-            aria-selected={selected}
+            variant="selection"
+            size="sm"
+            selected={selected}
             disabled={disabled}
             onClick={() => onViewChange(option.key)}
-            className={cn(
-              'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-              'focus:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-              'disabled:pointer-events-none disabled:opacity-50',
-              selected
-                ? 'border-tertiary/40 bg-tertiary/15 text-tertiary'
-                : 'border-input bg-transparent text-foreground/70 hover:bg-foreground/5 hover:text-foreground'
-            )}
+            aria-selected={selected}
+            className="shrink-0 gap-1.5 rounded-full px-3 py-1.5"
           >
             <Icon aria-hidden className="size-3.5 shrink-0" />
             {option.label}
-          </button>
+          </Button>
         )
       })}
     </div>

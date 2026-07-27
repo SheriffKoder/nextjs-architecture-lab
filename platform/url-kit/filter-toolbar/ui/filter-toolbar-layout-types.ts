@@ -5,6 +5,7 @@
 
 import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
 import type { SearchConfig } from '@/platform/url-kit/filters/feature-filtering/components/search-types'
+import type { PlaceholderMarqueeConfig } from '@/platform/url-kit/filters/feature-filtering/features/placeholder-marquee'
 import type { GroupableField } from '../model/types'
 
 export interface FilterToolbarLayoutProps {
@@ -27,5 +28,7 @@ export interface FilterToolbarLayoutProps {
   dateFilterKey?: string
   dateFilterLabel?: string
   dateFilterButtonText?: string
+  /** Already resolved for this shell (desktop or mobile). */
+  placeholderMarquee?: boolean | PlaceholderMarqueeConfig
   className?: string
 }
