@@ -48,7 +48,7 @@ export default function PageHeaderSkeleton({
         {/* Page title skeleton - bold text */}
         {/* Why: Match PageHeader title display */}
         {/* How: Large width LoadingValue for title */}
-        <LoadingValue className="h-9 w-48" />
+        <LoadingValue className="h-7 w-48" />
 
         {/* Subtitle skeleton */}
         {/* Why: Match PageHeader subtitle display */}

@@ -83,7 +83,7 @@ export function CardActions<T>({
             type="button"
             aria-label="Open"
             title="Open"
-            className="rounded-md p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="rounded-md bg-card/10 p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             onClick={(e) => {
               stopCardInteractionPropagation(e)
               onOpen(item)

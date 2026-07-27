@@ -1,11 +1,14 @@
 /**
  * @file views/demo-hybrid-page/ui/add-car-button.tsx
  * Header CTA — opens create drawer via URL (`drawer=car&mode=create`).
+ *
+ * Mobile: icon-only `[+]`. Desktop: icon + “Add car” label.
  */
 
 'use client'
 
 import { Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 import { DEMO_HYBRID_CAR_DRAWER_KEY } from './drawer'
 
@@ -17,15 +20,32 @@ export default function AddCarButton({
   drawerKey = DEMO_HYBRID_CAR_DRAWER_KEY,
 }: AddCarButtonProps) {
   const { openCreate } = useDrawerActions()
+  const open = () => openCreate(drawerKey)
 
   return (
-    <button
-      type="button"
-      onClick={() => openCreate(drawerKey)}
-      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-    >
-      <Plus className="size-4" aria-hidden />
-      Add car
-    </button>
+    <>
+      <Button
+        type="button"
+        variant="action"
+        size="icon-sm"
+        onClick={open}
+        className="md:hidden"
+        aria-label="Add car"
+        title="Add car"
+      >
+        <Plus className="h-4 w-4" strokeWidth={2} />
+      </Button>
+
+      <Button
+        type="button"
+        variant="action"
+        size="default"
+        onClick={open}
+        className="hidden h-auto py-2.5 md:inline-flex [&_svg]:size-5"
+      >
+        <Plus strokeWidth={2} />
+        Add car
+      </Button>
+    </>
   )
 }

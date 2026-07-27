@@ -90,8 +90,8 @@ export default function PageHeader({
           </span>
         )}
         
-        {/* Current page - bold text */}
-        <h1 className="truncate text-2xl font-bold text-foreground md:text-3xl">
+        {/* Current page — compact title (matches hybrid demo header scale) */}
+        <h1 className="truncate text-lg font-semibold tracking-tight text-foreground">
           {formatText(currentPage)}
         </h1>
 
