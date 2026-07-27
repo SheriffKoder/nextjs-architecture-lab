@@ -63,6 +63,12 @@ export enum ToastStacking {
   PUSH_DOWN = 'push-down'  // New toasts push existing ones down
 }
 
+/** Optional action button (e.g. Retry) shown below the toast message */
+export type ToastAction = {
+  label: string
+  onClick: () => void
+}
+
 /**
  * Toast props interface
  * @interface ToastProps
@@ -75,6 +81,8 @@ export interface ToastProps {
   duration?: number // in milliseconds, 0 = no auto-dismiss
   /** Optional bucket for bulk dismiss (e.g. `connectivity`) via `clearToastsByGroup` */
   group?: string
+  /** Optional action button below the message */
+  action?: ToastAction
   position?: ToastPosition
   stacking?: ToastStacking
   onClose?: (id?: string) => void
@@ -88,7 +96,7 @@ export interface ToastProps {
 /** Payload for `addToast` / `useToast().addToast` */
 export type AddToastPayload = Pick<
   ToastProps,
-  'type' | 'title' | 'message' | 'duration' | 'group'
+  'type' | 'title' | 'message' | 'duration' | 'group' | 'action'
 >
 
 /**
@@ -155,6 +163,7 @@ export default function Toast({
   title,
   message,
   duration = 3000,
+  action,
   position = ToastPosition.TOP_RIGHT,
   stacking = ToastStacking.NONE,
   onClose,
@@ -266,6 +275,15 @@ export default function Toast({
             <p className={`text-sm ${colors.text}`}>
               {message}
             </p>
+            {action ? (
+              <button
+                type="button"
+                onClick={action.onClick}
+                className={`mt-2 text-sm font-medium underline underline-offset-2 hover:opacity-80 ${colors.text}`}
+              >
+                {action.label}
+              </button>
+            ) : null}
           </div>
           
           {/* Close Button */}
