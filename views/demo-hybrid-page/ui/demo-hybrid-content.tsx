@@ -1,81 +1,100 @@
 /**
  * @file views/demo-hybrid-page/ui/demo-hybrid-content.tsx
- * Phase 1 list surface: hover detail prefetch + selectedId state (no drawer panel yet).
+ * Hybrid table surface: ViewOrchestrator + detail hover prefetch + selectedId.
  *
- * Purpose: Prove TanStack detail cache — hover `prefetchQuery` and click `useRentalCarDetail`
- *          share the same key/`queryFn` so open after hover is a cache hit.
- * Used in: `demo-hybrid-page.tsx` after list hydration
- * Used for: Phase 1 bottleneck fix; Phase 3 replaces `selectedId` with the drawer store
+ * Purpose: Render list rows from TanStack data; warm detail cache on hover; select on click
+ * Used in: `demo-hybrid-page.tsx`
+ * Used for: Table UX without drawer panel (drawer arrives later); list data is client-driven
  *
  * Function Index:
- * - DemoHybridContent — row list with pointer-enter prefetch and click selection
+ * - DemoHybridContent — ViewOrchestrator + prefetch/selection handlers
  *
  * Steps:
- * 1. Hold local `selectedId` (URL drawer params deferred to Phase 3).
- * 2. Subscribe with `useRentalCarDetail(selectedId)` so open reads the same cache as prefetch.
- * 3. On row pointer enter, fire-and-forget `prefetchQuery` with matching key + `fetchRentalCarById`.
- * 4. On row click, set `selectedId` only — no detail panel until Phase 3.
- * 5. Render a simple row list (scaffold until Phase 2 ViewOrchestrator).
+ * 1. Hold local `selectedId` (drawer store deferred).
+ * 2. Subscribe with `useRentalCarDetail(selectedId)` so open shares hover cache.
+ * 3. Prefetch detail on row pointer enter (same key/`queryFn` as the hook).
+ * 4. Click sets `selectedId` only — no panel yet.
+ * 5. Render `ViewOrchestrator` inside `FetchPendingDimmer` while placeholder rows fetch.
  */
 
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { ViewOrchestrator } from '@/widgets/multi-view/view-orchestrator'
+import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
 import { rentalCarKeys } from '@/entities/demo-hybrid-cars/cache/rental-car-keys'
 import { fetchRentalCarById } from '@/entities/demo-hybrid-cars/client'
 import { useRentalCarDetail } from '@/entities/demo-hybrid-cars/queries'
 import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
+import { tableDisplayConfig } from '@/views/demo-hybrid-page/config/ui/displays/table-config'
+import { tableColumns } from '@/views/demo-hybrid-page/config/ui/columns'
+import { listViewConfig } from '@/views/demo-hybrid-page/config/ui/displays/list-config'
+import { DEMO_RSC_DEFAULT_GROUPS_EXPANDED } from '@/views/demo-hybrid-page/config/data/demo-rsc-grouping-config'
+import { DEMO_RSC_GROUPING_ALLOWED_KEYS } from '@/views/demo-hybrid-page/config/ui/demo-rsc-minimal-controls-config'
+import { FetchPendingDimmer } from './fetch-pending-dimmer'
 
-/** Matches `useRentalCarDetail` / list hooks so prefetch stays warm on open. */
+/** Matches `useRentalCarDetail` / hover prefetch staleTime. */
 const DETAIL_STALE_TIME_MS = 5 * 60 * 1000
 
 type DemoHybridContentProps = {
-  /** Current page rows from the hydrated list query */
   cars: RentalCarTableItem[]
+  filters?: FilterConfig[]
+  /**
+   * True while showing previous rows during a list refetch
+   * (`isFetching && isPlaceholderData` from `useRentalCars`).
+   */
+  isListPending?: boolean
 }
 
 /**
- * Minimal row list for Phase 1 detail prefetch.
- * Drawer / detail panel arrives in Phase 3 — selection is local state only.
- *
- * @param props.cars - Rows from `useRentalCars` (already on the page)
+ * Table + detail selection surface for the hybrid page.
  */
-export function DemoHybridContent({ cars }: DemoHybridContentProps) {
+export function DemoHybridContent({
+  cars,
+  filters,
+  isListPending = false,
+}: DemoHybridContentProps) {
   const queryClient = useQueryClient()
+  const [tableData, setTableData] = useState(cars)
 
-  // Step 1: local selection only (no panel, no URL drawer params)
+  // Step 1: local selection only (drawer in a later phase)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  // Step 2: subscribe — after hover, click should show isFetching: false (cache hit)
+  // Step 2: subscribe — hover then click should be a cache hit
   const detailQuery = useRentalCarDetail(selectedId)
 
-  /**
-   * Step 3: warm detail cache on hover (fire-and-forget; never blocks UI).
-   * Same `queryKey` + `queryFn` as `useRentalCarDetail`.
-   */
-  const handleRowPointerEnter = (row: RentalCarTableItem) => {
-    void queryClient.prefetchQuery({
-      queryKey: rentalCarKeys.detail(row.id),
-      queryFn: () => fetchRentalCarById(row.id),
-      staleTime: DETAIL_STALE_TIME_MS,
-    })
-  }
+  useEffect(() => {
+    setTableData(cars)
+  }, [cars])
 
-  // Step 4: click selects id only — Phase 3 opens the drawer from this same cache
-  const handleRowClick = (row: RentalCarTableItem) => {
+  // Step 3: warm detail cache on hover
+  const handleRowPointerEnter = useCallback(
+    (row: RentalCarTableItem) => {
+      void queryClient.prefetchQuery({
+        queryKey: rentalCarKeys.detail(row.id),
+        queryFn: () => fetchRentalCarById(row.id),
+        staleTime: DETAIL_STALE_TIME_MS,
+      })
+    },
+    [queryClient]
+  )
+
+  // Step 4: click selects id only
+  const handleRowClick = useCallback((row: RentalCarTableItem) => {
     setSelectedId(row.id)
-  }
+  }, [])
 
-  // Step 5: scaffold list (replaced by ViewOrchestrator in Phase 2)
+  // Step 5: ViewOrchestrator — table only so view chrome does not call router.replace
   return (
-    <div className="flex flex-col gap-3">
-      <div className="rounded-lg border border-border bg-card p-3 text-sm text-muted-foreground">
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
+      <div className="rounded-md border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
         {selectedId == null ? (
           <p>No row selected. Hover to prefetch · click to set selectedId.</p>
         ) : (
           <p>
-            selectedId: <span className="font-mono text-foreground">{selectedId}</span>
+            selectedId:{' '}
+            <span className="font-mono text-foreground">{selectedId}</span>
             {' · '}
             detail:{' '}
             {detailQuery.isFetching
@@ -92,30 +111,25 @@ export function DemoHybridContent({ cars }: DemoHybridContentProps) {
         )}
       </div>
 
-      <ul className="divide-y divide-border rounded-lg border border-border">
-        {cars.map((car) => {
-          const isSelected = car.id === selectedId
-          return (
-            <li key={car.id}>
-              <button
-                type="button"
-                className={`flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm transition-colors hover:bg-muted/50 ${
-                  isSelected ? 'bg-muted/40' : ''
-                }`}
-                onPointerEnter={() => handleRowPointerEnter(car)}
-                onClick={() => handleRowClick(car)}
-              >
-                <span className="font-medium">
-                  {car.make} {car.model}
-                </span>
-                <span className="font-mono text-xs text-muted-foreground">
-                  {car.id}
-                </span>
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+      <FetchPendingDimmer
+        pending={isListPending}
+        className="flex min-h-0 flex-1 flex-col"
+      >
+        <ViewOrchestrator
+          data={tableData}
+          columns={tableColumns}
+          filters={filters}
+          onRowClick={handleRowClick}
+          onRowPointerEnter={handleRowPointerEnter}
+          externalUrlControls
+          urlGroupingAllowedKeys={DEMO_RSC_GROUPING_ALLOWED_KEYS}
+          defaultGroupsExpanded={DEMO_RSC_DEFAULT_GROUPS_EXPANDED}
+          defaultPageSize={10}
+          availableViews={['table']}
+          tableConfig={tableDisplayConfig}
+          listViewConfig={listViewConfig}
+        />
+      </FetchPendingDimmer>
     </div>
   )
 }

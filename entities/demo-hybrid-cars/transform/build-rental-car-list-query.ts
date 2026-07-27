@@ -2,8 +2,8 @@
  * @file entities/demo-hybrid-cars/transform/build-rental-car-list-query.ts
  * URL search params ↔ `RentalCarListQuery` transform (no React hooks).
  *
- * Purpose: Single mapping shared by RSC route, API routes, prefetch, and future shallow URL hook
- * Used in: `app/(root)/demo-hybrid-page/page.tsx`, `app/api/demo-hybrid-page/cars/route.ts`, `hydration/prefetch-rental-car-page.ts`
+ * Purpose: Single mapping shared by RSC route, API routes, prefetch, and shallow URL hook
+ * Used in: `parse-list-query-from-search-params.ts`, API routes, `hydration/prefetch-rental-car-page.ts`
  * Used for: Typed list state at every boundary without duplicating URL parsing logic
  *
  * Function Index:
