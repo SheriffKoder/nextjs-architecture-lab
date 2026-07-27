@@ -3,7 +3,7 @@
  * RSC-style delayed dim while TanStack refetches list data (no route navigation).
  *
  * Purpose: Mirror `NavigationPendingDimmer` UX for client-side `isFetching` + placeholder rows
- * Used in: `demo-hybrid-content.tsx`
+ * Used in: `layout-sections/table-and-pagination-section.tsx`
  * Used for: Signal stale rows during shallow URL changes without table loading shimmer
  *
  * Function Index:

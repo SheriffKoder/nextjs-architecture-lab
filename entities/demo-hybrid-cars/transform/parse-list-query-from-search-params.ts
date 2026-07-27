@@ -3,7 +3,7 @@
  * Shared list-query parser for RSC prefetch and client shallow URL state.
  *
  * Purpose: One parse path for `searchParams` / `URLSearchParams` / query strings → `RentalCarListQuery`
- * Used in: `app/(root)/demo-hybrid-page/page.tsx`, `views/demo-hybrid-page/hooks/use-shallow-list-params.ts`
+ * Used in: `app/(root)/demo-hybrid-page/page.tsx`, `views/demo-hybrid-page/hooks/use-list-query-from-url.ts`
  * Used for: Cold-load hydration keys must match client mount keys (no double-fetch mismatch)
  *
  * Function Index:
@@ -49,7 +49,7 @@ export function urlSearchParamsToPageRecord(
 /**
  * Parse list/filter/pagination state from any common URL param shape.
  *
- * RSC route and `useShallowListParams` must call this (or the same underlying
+ * RSC route and `useListQueryFromUrl` must call this (or the same underlying
  * `buildRentalCarListQuery`) so dehydrated TanStack keys match client state.
  *
  * @param input - Query string, `URLSearchParams`, or Next flat `searchParams`

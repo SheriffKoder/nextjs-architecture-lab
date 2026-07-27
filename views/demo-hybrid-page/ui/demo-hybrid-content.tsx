@@ -1,20 +1,6 @@
 /**
  * @file views/demo-hybrid-page/ui/demo-hybrid-content.tsx
  * Hybrid table surface: ViewOrchestrator + detail hover prefetch + selectedId.
- *
- * Purpose: Render list rows from TanStack data; warm detail cache on hover; select on click
- * Used in: `demo-hybrid-page.tsx`
- * Used for: Table UX without drawer panel (drawer arrives later); list data is client-driven
- *
- * Function Index:
- * - DemoHybridContent — ViewOrchestrator + prefetch/selection handlers
- *
- * Steps:
- * 1. Hold local `selectedId` (drawer store deferred).
- * 2. Subscribe with `useRentalCarDetail(selectedId)` so open shares hover cache.
- * 3. Prefetch detail on row pointer enter (same key/`queryFn` as the hook).
- * 4. Click sets `selectedId` only — no panel yet.
- * 5. Render `ViewOrchestrator` inside `FetchPendingDimmer` while placeholder rows fetch.
  */
 
 'use client'
@@ -27,48 +13,45 @@ import { rentalCarKeys } from '@/entities/demo-hybrid-cars/cache/rental-car-keys
 import { fetchRentalCarById } from '@/entities/demo-hybrid-cars/client'
 import { useRentalCarDetail } from '@/entities/demo-hybrid-cars/queries'
 import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
-import { tableDisplayConfig } from '@/views/demo-hybrid-page/config/ui/displays/table-config'
-import { tableColumns } from '@/views/demo-hybrid-page/config/ui/columns'
-import { listViewConfig } from '@/views/demo-hybrid-page/config/ui/displays/list-config'
+import type { SubheadingsUpdateContext } from '@/widgets/multi-view/features/subheadings/dnd'
+import {
+  DEMO_RSC_AVAILABLE_VIEWS,
+  DEMO_RSC_USE_ALL_ITEMS_VIEWS,
+} from '@/views/demo-hybrid-page/config/data/demo-rsc-views-config'
 import { DEMO_RSC_DEFAULT_GROUPS_EXPANDED } from '@/views/demo-hybrid-page/config/data/demo-rsc-grouping-config'
 import { DEMO_RSC_GROUPING_ALLOWED_KEYS } from '@/views/demo-hybrid-page/config/ui/demo-rsc-minimal-controls-config'
-import { FetchPendingDimmer } from './fetch-pending-dimmer'
+import { accordionConfig } from '@/views/demo-hybrid-page/config/ui/accordion-config'
+import { tableConfig } from '@/views/demo-hybrid-page/config/ui/displays/table-config'
+import { tableColumns } from '@/views/demo-hybrid-page/config/ui/columns'
+import { kanbanConfig } from '@/views/demo-hybrid-page/config/ui/displays/kanban-config'
+import { calendarConfig } from '@/views/demo-hybrid-page/config/ui/displays/calendar-config'
+import { mapConfig } from '@/views/demo-hybrid-page/config/ui/displays/map-config'
+import { timelineConfig } from '@/views/demo-hybrid-page/config/ui/displays/timeline-config'
+import { subheadingsConfig } from '@/views/demo-hybrid-page/config/ui/displays/subheadings-config'
+import { listViewConfig } from '@/views/demo-hybrid-page/config/ui/displays/list-config'
+import { mobileListConfig } from '@/views/demo-hybrid-page/config/ui/displays/mobile-list-config'
 
-/** Matches `useRentalCarDetail` / hover prefetch staleTime. */
 const DETAIL_STALE_TIME_MS = 5 * 60 * 1000
 
 type DemoHybridContentProps = {
   cars: RentalCarTableItem[]
   filters?: FilterConfig[]
-  /**
-   * True while showing previous rows during a list refetch
-   * (`isFetching && isPlaceholderData` from `useRentalCars`).
-   */
-  isListPending?: boolean
 }
 
-/**
- * Table + detail selection surface for the hybrid page.
- */
 export function DemoHybridContent({
   cars,
   filters,
-  isListPending = false,
 }: DemoHybridContentProps) {
   const queryClient = useQueryClient()
   const [tableData, setTableData] = useState(cars)
-
-  // Step 1: local selection only (drawer in a later phase)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  // Step 2: subscribe — hover then click should be a cache hit
   const detailQuery = useRentalCarDetail(selectedId)
 
   useEffect(() => {
     setTableData(cars)
   }, [cars])
 
-  // Step 3: warm detail cache on hover
   const handleRowPointerEnter = useCallback(
     (row: RentalCarTableItem) => {
       void queryClient.prefetchQuery({
@@ -80,12 +63,21 @@ export function DemoHybridContent({
     [queryClient]
   )
 
-  // Step 4: click selects id only
   const handleRowClick = useCallback((row: RentalCarTableItem) => {
     setSelectedId(row.id)
   }, [])
 
-  // Step 5: ViewOrchestrator — table only so view chrome does not call router.replace
+  const subheadingsDragEnd = useCallback((updatedData: RentalCarTableItem[]) => {
+    setTableData(updatedData)
+  }, [])
+
+  const onSubheadingsItemUpdate = useCallback(
+    (ctx: SubheadingsUpdateContext<RentalCarTableItem>) => {
+      setTableData(ctx.data)
+    },
+    [],
+  )
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
       <div className="rounded-md border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
@@ -111,25 +103,33 @@ export function DemoHybridContent({
         )}
       </div>
 
-      <FetchPendingDimmer
-        pending={isListPending}
-        className="flex min-h-0 flex-1 flex-col"
-      >
-        <ViewOrchestrator
-          data={tableData}
-          columns={tableColumns}
-          filters={filters}
-          onRowClick={handleRowClick}
-          onRowPointerEnter={handleRowPointerEnter}
-          externalUrlControls
-          urlGroupingAllowedKeys={DEMO_RSC_GROUPING_ALLOWED_KEYS}
-          defaultGroupsExpanded={DEMO_RSC_DEFAULT_GROUPS_EXPANDED}
-          defaultPageSize={10}
-          availableViews={['table']}
-          tableConfig={tableDisplayConfig}
-          listViewConfig={listViewConfig}
-        />
-      </FetchPendingDimmer>
+      <ViewOrchestrator
+        data={tableData}
+        columns={tableColumns}
+        accordionConfig={accordionConfig}
+        filters={filters}
+        onRowClick={handleRowClick}
+        onRowPointerEnter={handleRowPointerEnter}
+        externalUrlControls
+        urlGroupingAllowedKeys={DEMO_RSC_GROUPING_ALLOWED_KEYS}
+        defaultGroupsExpanded={DEMO_RSC_DEFAULT_GROUPS_EXPANDED}
+        useAllItems={[...DEMO_RSC_USE_ALL_ITEMS_VIEWS]}
+        defaultPageSize={10}
+        availableViews={[...DEMO_RSC_AVAILABLE_VIEWS]}
+        tableConfig={tableConfig}
+        kanbanConfig={kanbanConfig}
+        listViewConfig={listViewConfig}
+        mobileListConfig={mobileListConfig}
+        calendarConfig={calendarConfig}
+        mapConfig={mapConfig}
+        timelineConfig={timelineConfig}
+        subheadingsConfig={{
+          ...subheadingsConfig,
+          headerFilters: subheadingsConfig.headerFilters,
+          subheadingsDragEnd,
+          onSubheadingsItemUpdate,
+        }}
+      />
     </div>
   )
 }

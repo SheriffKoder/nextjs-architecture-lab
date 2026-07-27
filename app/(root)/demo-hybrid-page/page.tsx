@@ -21,6 +21,7 @@ import { QueryClient } from '@tanstack/react-query'
 import { DemoHybridPage } from '@/views/demo-hybrid-page'
 import { parseListQueryFromSearchParams } from '@/entities/demo-hybrid-cars/transform/parse-list-query-from-search-params'
 import { prefetchRentalCarPage } from '@/entities/demo-hybrid-cars/hydration/prefetch-rental-car-page'
+import { searchParamsToSnapshot } from '@/views/demo-hybrid-page/lib/search-params-to-snapshot'
 
 /** Resolved query string shape after `await searchParams`. */
 export type DemoHybridPageSearchParams = Record<
@@ -45,6 +46,7 @@ export default async function DemoHybridPageRoute({
   const params = normalizeParams(raw)
   // Step 2: typed list query shared by prefetch + client shallow hook
   const query = parseListQueryFromSearchParams(params)
+  const initialSnapshot = searchParamsToSnapshot(params)
 
   // Step 3: server-side TanStack prefetch (separate QueryClient from browser)
   const queryClient = new QueryClient()
@@ -52,6 +54,9 @@ export default async function DemoHybridPageRoute({
 
   // Step 4: pass dehydrated state — `QueryProvider` wraps `HydrationBoundary` in the view
   return (
-    <DemoHybridPage initialQuery={query} dehydratedState={dehydratedState} />
+    <DemoHybridPage
+      initialSnapshot={initialSnapshot}
+      dehydratedState={dehydratedState}
+    />
   )
 }
