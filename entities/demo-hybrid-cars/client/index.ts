@@ -7,3 +7,10 @@ export { fetchRentalCars, type RentalCarsPageResponse } from './fetch-rental-car
 export { fetchRentalCarById } from './fetch-rental-car-by-id'
 export { fetchRentalCarFilterOptions } from './fetch-filter-options'
 export { buildRentalCarApiUrl } from './build-rental-car-api-url'
+export {
+  createRentalCar,
+  updateRentalCarPartial,
+  patchRentalCarRowStatus,
+  deleteRentalCar,
+  type CreateRentalCarInput,
+} from './mutate-rental-cars'

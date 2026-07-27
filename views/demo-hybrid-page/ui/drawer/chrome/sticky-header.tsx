@@ -112,9 +112,19 @@ const deleteToolbarBtnClass =
   'rounded-md bg-foreground/5 p-2 text-destructive transition-colors duration-200 hover:bg-destructive/10 disabled:opacity-50 dark:bg-transparent dark:hover:bg-destructive/15'
 
 //////////////////////////////////
-// Edit mode toolbar — view shortcut + destructive trigger wired to URL confirm flow.
+// Edit mode toolbar — view + delete (URL confirm) + reset/save for the form.
 //////////////////////////////////
-export function CarDrawerEditHeader({ id }: { id: string }) {
+export function CarDrawerEditHeader({
+  id,
+  formId,
+  isSubmitting = false,
+  onResetForm,
+}: {
+  id: string
+  formId: string
+  isSubmitting?: boolean
+  onResetForm?: () => void
+}) {
   const { openView, triggerDelete } = useDrawerActions()
 
   return (
@@ -134,12 +144,31 @@ export function CarDrawerEditHeader({ id }: { id: string }) {
           <button
             type="button"
             onClick={() => triggerDelete()}
+            disabled={isSubmitting}
             className={deleteToolbarBtnClass}
             aria-label="Delete car"
             title="Delete"
           >
             <Trash2 size={18} />
           </button>
+          <CarDrawerToolbarButton
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => onResetForm?.()}
+            aria-label="Reset form"
+            title="Reset"
+          >
+            <RotateCcw size={18} />
+          </CarDrawerToolbarButton>
+          <CarDrawerToolbarButton
+            type="submit"
+            form={formId}
+            disabled={isSubmitting}
+            aria-label="Save changes"
+            title="Save"
+          >
+            <Save size={18} />
+          </CarDrawerToolbarButton>
         </>
       }
     />

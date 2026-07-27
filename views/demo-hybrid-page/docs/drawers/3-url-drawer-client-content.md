@@ -40,10 +40,13 @@ Deep link example:
 
 ## Verify in DevTools
 
-1. **Hover row** — `GET /api/demo-hybrid-page/cars/:id` (prefetch).
-2. **Click row** — drawer opens; detail request is a **cache hit** when warm (no duplicate GET).
-3. **Open/close drawer** — address bar updates; list/options queries do **not** refetch (UI-only keys).
-4. **Paste deep link** with drawer + filters — both apply; list key ignores `drawer`/`mode`/`id`/`action`.
+1. **Hover / click a visible row** — no `GET …/cars/:id` (detail seeded from list).
+2. **Open drawer** — view panel shows data immediately from `detail(id)` / list `initialData`.
+3. **Deep link** to an id not on the current list page — one by-id GET, then cached.
+4. **Open/close drawer** — address bar updates; list/options queries do **not** refetch (UI-only keys).
+5. **Paste deep link** with drawer + filters — both apply; list key ignores `drawer`/`mode`/`id`/`action`.
+
+See also [1-detail-prefetch.md](../ui/1-detail-prefetch.md) (list seed vs fetch on miss).
 
 ## Why list stays stable
 

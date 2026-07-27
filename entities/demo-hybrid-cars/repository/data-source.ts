@@ -4,7 +4,7 @@
  *
  * Purpose: Stand-in database until a real persistence layer is wired
  * Used in: `server/get-rental-cars-data.ts`, `server/get-filter-options-server.ts`, `server/get-rental-car-by-id.ts`
- * Used for: Mutable mock store for list, facets, and detail reads (mutations in Phase 4)
+ * Used for: Mutable mock store for list, facets, detail, and Phase 4 CRUD mutations
  */
 
 import type { RentalCarTableItem } from '../model/rental-car-table-item'

@@ -1,7 +1,5 @@
 /**
  * Static dropdown option vocab for create/edit forms until facets load from the server.
- *
- * Replace with live facet / lookup options — see `config/mocks/responsibilities.md`.
  */
 
 import type { DropdownItem } from '@/shared/ui/multi-select'

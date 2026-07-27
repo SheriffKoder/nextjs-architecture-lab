@@ -1,6 +1,6 @@
 /**
  * @file views/demo-hybrid-page/ui/demo-hybrid-content.tsx
- * Hybrid table surface: ViewOrchestrator + detail hover prefetch + URL drawer actions.
+ * Hybrid table surface: ViewOrchestrator + detail seed + URL drawer + activity toggle.
  */
 
 'use client'
@@ -10,10 +10,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 import { ViewOrchestrator } from '@/widgets/multi-view/view-orchestrator'
 import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
-import { rentalCarKeys } from '@/entities/demo-hybrid-cars/cache/rental-car-keys'
-import { fetchRentalCarById } from '@/entities/demo-hybrid-cars/client'
+import { seedRentalCarDetailFromRow } from '@/entities/demo-hybrid-cars/cache/seed-rental-car-detail'
+import { useToggleRentalCarActivity } from '@/entities/demo-hybrid-cars/mutations'
+import { formatActivityStatusLabel } from '@/entities/demo-hybrid-cars/lib/rental-car-activity-status'
+import type { RentalCarStatusValue } from '@/entities/demo-hybrid-cars/model/rental-car-status'
 import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
 import type { SubheadingsUpdateContext } from '@/widgets/multi-view/features/subheadings/dnd'
+import { useToast } from '@/shared/ui/toast/use-toast'
 import {
   DEMO_RSC_AVAILABLE_VIEWS,
   DEMO_RSC_USE_ALL_ITEMS_VIEWS,
@@ -33,8 +36,6 @@ import { mobileListConfig } from '@/views/demo-hybrid-page/config/ui/displays/mo
 import { demoRscRowActionConfigs } from '@/views/demo-hybrid-page/config/ui/demo-rsc-row-action-configs'
 import { DEMO_HYBRID_CAR_DRAWER_KEY } from './drawer'
 
-const DETAIL_STALE_TIME_MS = 5 * 60 * 1000
-
 type DemoHybridContentProps = {
   cars: RentalCarTableItem[]
   filters?: FilterConfig[]
@@ -47,40 +48,42 @@ export function DemoHybridContent({
   const queryClient = useQueryClient()
   const [tableData, setTableData] = useState(cars)
   const { openView, openEdit, openRowDeleteConfirm } = useDrawerActions()
+  const toggleActivity = useToggleRentalCarActivity()
+  const { showError, showSuccess } = useToast()
 
   useEffect(() => {
     setTableData(cars)
   }, [cars])
 
+  /** Seed detail key from the list row — no network when shapes match. */
   const handleRowPointerEnter = useCallback(
     (row: RentalCarTableItem) => {
-      void queryClient.prefetchQuery({
-        queryKey: rentalCarKeys.detail(row.id),
-        queryFn: () => fetchRentalCarById(row.id),
-        staleTime: DETAIL_STALE_TIME_MS,
-      })
+      seedRentalCarDetailFromRow(queryClient, row)
     },
-    [queryClient]
+    [queryClient],
   )
 
   const handleRowClick = useCallback(
     (row: RentalCarTableItem) => {
+      seedRentalCarDetailFromRow(queryClient, row)
       openView(DEMO_HYBRID_CAR_DRAWER_KEY, row.id)
     },
-    [openView],
+    [openView, queryClient],
   )
 
   const onActionClick = useCallback(
     (action: string, row: RentalCarTableItem) => {
       if (action === 'view') {
+        seedRentalCarDetailFromRow(queryClient, row)
         openView(DEMO_HYBRID_CAR_DRAWER_KEY, row.id)
         return
       }
       if (action === 'edit') {
+        seedRentalCarDetailFromRow(queryClient, row)
         openEdit(DEMO_HYBRID_CAR_DRAWER_KEY, row.id)
       }
     },
-    [openEdit, openView],
+    [openEdit, openView, queryClient],
   )
 
   const handleDeleteColumnAction = useCallback(
@@ -88,6 +91,31 @@ export function DemoHybridContent({
       openRowDeleteConfirm(DEMO_HYBRID_CAR_DRAWER_KEY, item.id)
     },
     [openRowDeleteConfirm],
+  )
+
+  const handleSetActivityColumnAction = useCallback(
+    (item: RentalCarTableItem) => {
+      toggleActivity.mutate(
+        { id: item.id, currentStatus: String(item.status ?? '') },
+        {
+          onSuccess: (car) => {
+            showSuccess(
+              `Status is now ${formatActivityStatusLabel(car.status as RentalCarStatusValue)}.`,
+              'Activity updated',
+              6000,
+            )
+          },
+          onError: (e) => {
+            showError(
+              e instanceof Error ? e.message : 'Could not update activity',
+              'Could not update activity',
+              10000,
+            )
+          },
+        },
+      )
+    },
+    [showError, showSuccess, toggleActivity],
   )
 
   const getRowActionConfigs = useCallback(
@@ -119,6 +147,7 @@ export function DemoHybridContent({
         actionConfigs={getRowActionConfigs}
         columnActions={{
           delete: (item) => handleDeleteColumnAction(item),
+          setActivity: (item) => handleSetActivityColumnAction(item),
         }}
         externalUrlControls
         urlGroupingAllowedKeys={DEMO_RSC_GROUPING_ALLOWED_KEYS}
