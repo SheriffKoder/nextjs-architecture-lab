@@ -27,6 +27,11 @@ import { Input } from "./ui/input"
 import { Search } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import type { SearchConfig } from "./search-types"
+import {
+  ScrollingPlaceholderOverlay,
+  resolvePlaceholderMarqueeConfig,
+  type PlaceholderMarqueeConfig,
+} from "../features/placeholder-marquee"
 
 //////////////////////////////////
 // Component Props
@@ -53,6 +58,15 @@ interface SearchBarProps<T extends Record<string, any>> {
    * HOW: Merged with default classes
    */
   className?: string
+
+  /**
+   * Scroll overflowing placeholder text horizontally (see features/placeholder-marquee).
+   * Useful on narrow inputs where the hint would otherwise be clipped.
+   */
+  placeholderMarquee?: boolean | PlaceholderMarqueeConfig
+
+  /** Typography for faux placeholder overlay (should match input placeholder classes). */
+  placeholderClassName?: string
 }
 
 /**
@@ -66,6 +80,8 @@ export function SearchBar<T extends Record<string, any>>({
   config, 
   debounceMs = 300,
   className,
+  placeholderMarquee,
+  placeholderClassName,
 }: SearchBarProps<T>) {
   // Get search functions from useUrlFilters hook
   // WHY: Provides setSearch function for URL state management
@@ -127,7 +143,13 @@ export function SearchBar<T extends Record<string, any>>({
   const handleChange = (value: string) => {
     setLocalValue(value)
   }
-  
+
+  const placeholderText = config.placeholder || 'Search...'
+  const marquee = resolvePlaceholderMarqueeConfig(placeholderMarquee)
+  const useMarqueePlaceholder = marquee.enabled
+  const [isFocused, setIsFocused] = useState(false)
+  const hasValue = localValue.length > 0
+
   return (
     <div className={cn("relative min-w-[300px] flex-1", className)}>
       {/* Search icon */}
@@ -140,11 +162,24 @@ export function SearchBar<T extends Record<string, any>>({
       {/* HOW: Controlled input with debounced URL updates */}
       <Input
         type="text"
-        placeholder={config.placeholder || "Search..."}
+        placeholder={useMarqueePlaceholder ? '' : placeholderText}
+        aria-label={useMarqueePlaceholder ? placeholderText : undefined}
         value={localValue}
         onChange={(e) => handleChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         className="pl-9 w-full"
       />
+
+      {useMarqueePlaceholder ? (
+        <ScrollingPlaceholderOverlay
+          text={placeholderText}
+          marquee={marquee}
+          hasValue={hasValue}
+          isFocused={isFocused}
+          textClassName={cn('text-muted-foreground', placeholderClassName)}
+        />
+      ) : null}
     </div>
   )
 }

@@ -1,0 +1,56 @@
+@keyframes search-placeholder-marquee {
+  /* Hold at start */
+  0%,
+  25% {
+    transform: translateX(0);
+    opacity: 1;
+    animation-timing-function: ease-in-out;
+  }
+
+  /* Scroll forward to reveal clipped text */
+  50% {
+    transform: translateX(calc(-1 * var(--marquee-distance, 0px)));
+    opacity: 1;
+    animation-timing-function: ease-in-out;
+  }
+
+  /* Hold at end before resetting */
+  50.01%,
+  75% {
+    transform: translateX(calc(-1 * var(--marquee-distance, 0px)));
+    opacity: 1;
+    animation-timing-function: ease-in-out;
+  }
+
+  /* Soft fade at end (stays partially visible) */
+  81% {
+    transform: translateX(calc(-1 * var(--marquee-distance, 0px)));
+    opacity: var(--marquee-reset-opacity, 0.55);
+    animation-timing-function: step-end;
+  }
+
+  /* Snap to start while dimmed */
+  81.01%,
+  83% {
+    transform: translateX(0);
+    opacity: var(--marquee-reset-opacity, 0.55);
+    animation-timing-function: ease-in-out;
+  }
+
+  /* Ease back to full opacity, then hold until next cycle */
+  88%,
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.search-placeholder-marquee-animate {
+  animation: search-placeholder-marquee var(--marquee-duration, 10000ms) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-placeholder-marquee-animate {
+    animation: none;
+  }
+}
