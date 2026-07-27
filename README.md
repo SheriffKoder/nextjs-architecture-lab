@@ -201,6 +201,8 @@ Detail: [`docs/reflections/9-rsc-conclusion.md`](views/demo-rsc-page/docs/reflec
 
 ## Phase 2 — Hybrid RSC + TanStack (planned)
 
+**Implementation playbook:** [app/development/hybrid-migration/README.md](app/development/hybrid-migration/README.md) — phased steps, decisions (URL state, pagination), reference files per step.
+
 Goal:
 Keep server-first rendering while improving interactivity.
 

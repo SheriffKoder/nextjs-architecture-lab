@@ -186,6 +186,14 @@
             color: 'secondary',
             size: 'sm'
           },
+          {
+            href: '/demo-hybrid-page',
+            text: 'Car Rentals (Hybrid)',
+            subtext: 'RSC prefetch + TanStack hydration',
+            icon: FolderKanban,
+            color: 'secondary',
+            size: 'sm'
+          },
         ]
       },
       // External Links
