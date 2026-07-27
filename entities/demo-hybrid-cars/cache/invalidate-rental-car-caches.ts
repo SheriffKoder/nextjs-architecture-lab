@@ -9,7 +9,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { rentalCarKeys } from './rental-car-keys'
 
-/** Invalidate every list + infinite cache (prep for Phase 5 infinite scroll). */
+/** Invalidate every list + infinite cache (seeded list pages clear with `lists()`). */
 export function invalidateRentalCarListCaches(queryClient: QueryClient): void {
   void queryClient.invalidateQueries({ queryKey: rentalCarKeys.lists() })
   void queryClient.invalidateQueries({ queryKey: rentalCarKeys.infinites() })

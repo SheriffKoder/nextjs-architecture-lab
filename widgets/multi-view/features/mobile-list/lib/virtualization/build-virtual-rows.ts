@@ -66,5 +66,7 @@ export function estimateVirtualRowSize(
   row: MobileListVirtualRow | undefined
 ): number {
   if (!row) return 68
-  return row.kind === 'group-header' ? 36 : 68
+  if (row.kind === 'group-header') return 36
+  if (row.kind === 'end-slot') return 40
+  return 68
 }

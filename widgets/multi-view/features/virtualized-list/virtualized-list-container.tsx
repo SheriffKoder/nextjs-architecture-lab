@@ -95,6 +95,16 @@ interface VirtualizedTableComponentProps<T = any> {
   };
   // Filter props for header filters
   filters?: FilterConfig[];
+  /**
+   * Optional trailing virtualized row (e.g. infinite load-more sentinel).
+   * Renders as `itemCount = data.length + 1` — not treated as row data.
+   */
+  listEndRow?: React.ReactNode;
+  /**
+   * Height for `listEndRow`. Defaults to the view’s measured/configured row height
+   * (`calculatedRowHeight` / `rowHeight`) so it matches data rows.
+   */
+  listEndRowHeight?: number;
 };
 ////////////////////////////////////
 // Component Implementation: Main table logic
@@ -142,6 +152,8 @@ export function VirtualizedTableComponent<T = any>({
   defaultGroupsExpanded = false,
   minimalControlsConfig,
   filters,
+  listEndRow,
+  listEndRowHeight,
 }: VirtualizedTableComponentProps<T>) {
   // Extract props from tableConfig
   const {
@@ -309,6 +321,12 @@ export function VirtualizedTableComponent<T = any>({
     return data;
   }, [data, flattenedRows]);
 
+  // Calculate item count for react-window
+  // for the infinite load-more sentinel
+  const dataItemCount = displayData.length;
+  const hasListEndRow = listEndRow != null;
+  const itemCount = dataItemCount + (hasListEndRow ? 1 : 0);
+
   /**
    * Real data rows only for height measurement.
    * Flattened rows (headers/spacers) must not be passed to TableRowMeasurer —
@@ -342,6 +360,11 @@ export function VirtualizedTableComponent<T = any>({
    * Also handles different row types when grouping is enabled
    */
   const calculateRowHeight = useCallback((index: number): number => {
+    // Trailing load-more / footer slot — match data row height unless overridden
+    if (hasListEndRow && index === dataItemCount) {
+      return listEndRowHeight ?? calculatedRowHeight;
+    }
+
     // If grouping is enabled, check row type
     if (flattenedRows && flattenedRows[index]) {
       const flattenedRow = flattenedRows[index];
@@ -412,7 +435,7 @@ export function VirtualizedTableComponent<T = any>({
     
     // Default: return base height
     return baseHeight;
-  }, [calculatedRowHeight, rowExpansionEnabled, displayData, isRowExpanded, getChildren, flattenedRows, tableConfig]);
+  }, [calculatedRowHeight, rowExpansionEnabled, displayData, isRowExpanded, getChildren, flattenedRows, tableConfig, hasListEndRow, dataItemCount, listEndRowHeight]);
 
 
   const { containerRef: bodyMeasureRef, height: measuredBodyHeight } =
@@ -446,6 +469,18 @@ export function VirtualizedTableComponent<T = any>({
    * Also handles different row types when grouping is enabled
    */
   const rowRenderer = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) => {
+    // Trailing infinite / footer slot
+    if (hasListEndRow && index === dataItemCount) {
+      return (
+        <div
+          style={style}
+          className="flex h-full w-full items-center justify-center"
+        >
+          {listEndRow}
+        </div>
+      );
+    }
+
     // If grouping is enabled, handle different row types
     if (flattenedRows && flattenedRows[index]) {
       const flattenedRow = flattenedRows[index];
@@ -548,7 +583,7 @@ export function VirtualizedTableComponent<T = any>({
                 onRowClick={onRowClick}
                 onRowPointerEnter={onRowPointerEnter}
                 style={{ height: style.height, width: '100%' }}
-                isLastRow={index === flattenedRows.length - 1}
+                isLastRow={index === dataItemCount - 1}
                 onActionClick={onActionClick}
                 actionMode={actionMode}
                 actionClickConfigs={actionConfigs?.(item as T)}
@@ -595,7 +630,7 @@ export function VirtualizedTableComponent<T = any>({
         onRowClick={onRowClick}
         onRowPointerEnter={onRowPointerEnter}
         style={style}
-        isLastRow={index === displayData.length - 1}
+        isLastRow={index === dataItemCount - 1}
         onActionClick={onActionClick}
         actionMode={actionMode}
         actionClickConfigs={actionConfigs?.(item)}
@@ -620,7 +655,7 @@ export function VirtualizedTableComponent<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, flattenedRows, groupState, groupSortState, transparentHeader]);
+  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, flattenedRows, groupState, groupSortState, transparentHeader, hasListEndRow, dataItemCount, listEndRow, calculatedRowHeight, filters, headerFilters, sortConfig, effectiveGroupBy, effectiveSubGroupBy]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED
@@ -694,11 +729,11 @@ export function VirtualizedTableComponent<T = any>({
                   </div>
                 ) : displayData.length > 0 ? (
                   <div className="h-full relative">
-                    {dynamicRowHeight ? (
+                    {dynamicRowHeight || hasListEndRow ? (
                       <VariableSizeList
                         // Remount when height or grouping mode changes so react-window
                         // does not keep stale per-index sizes (causes vertical row shift).
-                        key={`table-${calculatedRowHeight}-${flattenedRows ? 'grouped' : 'ungrouped'}`}
+                        key={`table-${calculatedRowHeight}-${flattenedRows ? 'grouped' : 'ungrouped'}-${hasListEndRow ? 'end' : 'plain'}`}
                         ref={(ref: any) => {
                           listRef.current = ref;
                           if (rowExpansionEnabled) {
@@ -707,7 +742,7 @@ export function VirtualizedTableComponent<T = any>({
                         }}
                         height={listViewportHeight}
                         width="100%"
-                        itemCount={displayData.length}
+                        itemCount={itemCount}
                         itemSize={calculateRowHeight}
                         className="tertiary-scrollbar"
                       >
@@ -718,7 +753,7 @@ export function VirtualizedTableComponent<T = any>({
                         ref={listRef as React.RefObject<FixedSizeList>}
                         height={listViewportHeight}
                         width="100%"
-                        itemCount={displayData.length}
+                        itemCount={itemCount}
                         itemSize={rowHeight}
                         className="tertiary-scrollbar"
                       >

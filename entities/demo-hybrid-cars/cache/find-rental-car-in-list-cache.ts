@@ -6,15 +6,15 @@
  * Used in: `useRentalCarDetail`, `seedRentalCarDetailFromRow` callers
  */
 
-import type { QueryClient } from '@tanstack/react-query'
+import type { InfiniteData, QueryClient } from '@tanstack/react-query'
 import type { RentalCarsPageResponse } from '@/entities/demo-hybrid-cars/client/fetch-rental-cars'
 import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
 import { rentalCarKeys } from './rental-car-keys'
 
 /**
- * Find a car in any cached list (or infinite) page response.
+ * Find a car in any cached list or infinite page response.
  *
- * @returns The row if present in client list cache; otherwise `undefined`
+ * @returns The row if present in client list/infinite cache; otherwise `undefined`
  */
 export function findRentalCarInListCache(
   queryClient: QueryClient,
@@ -30,6 +30,19 @@ export function findRentalCarInListCache(
   for (const [, data] of listEntries) {
     const match = data?.cars?.find((car) => car.id === trimmed)
     if (match) return match
+  }
+
+  const infiniteEntries = queryClient.getQueriesData<
+    InfiniteData<RentalCarsPageResponse>
+  >({
+    queryKey: rentalCarKeys.infinites(),
+  })
+
+  for (const [, data] of infiniteEntries) {
+    for (const page of data?.pages ?? []) {
+      const match = page.cars?.find((car) => car.id === trimmed)
+      if (match) return match
+    }
   }
 
   return undefined

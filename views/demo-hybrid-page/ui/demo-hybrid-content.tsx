@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 import { ViewOrchestrator } from '@/widgets/multi-view/view-orchestrator'
@@ -39,11 +39,14 @@ import { DEMO_HYBRID_CAR_DRAWER_KEY } from './drawer'
 type DemoHybridContentProps = {
   cars: RentalCarTableItem[]
   filters?: FilterConfig[]
+  /** Trailing virtualized row for table / list / cards (infinite load-more). */
+  listEndRow?: ReactNode
 }
 
 export function DemoHybridContent({
   cars,
   filters,
+  listEndRow,
 }: DemoHybridContentProps) {
   const queryClient = useQueryClient()
   const [tableData, setTableData] = useState(cars)
@@ -158,6 +161,7 @@ export function DemoHybridContent({
         tableConfig={tableConfig}
         kanbanConfig={kanbanConfig}
         listViewConfig={listViewConfig}
+        listEndRow={listEndRow}
         mobileListConfig={mobileListConfig}
         calendarConfig={calendarConfig}
         mapConfig={mapConfig}

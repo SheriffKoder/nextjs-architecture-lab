@@ -14,7 +14,7 @@
  * - rentalCarKeys.optionsAll — prefix to invalidate every options query
  * - rentalCarKeys.detail — single row by id
  * - rentalCarKeys.details — prefix for all detail queries
- * - rentalCarKeys.infinite / infinites — reserved for Phase 5 infinite scroll
+ * - rentalCarKeys.infinite / infinites — page-based infinite scroll (`useInfiniteRentalCars`)
  */
 
 import type { RentalCarListQuery } from '@/entities/demo-hybrid-cars/model/rental-car-list-query'
@@ -40,7 +40,7 @@ export const rentalCarKeys = {
 
   details: () => ['demoHybridCars', 'detail'] as const,
 
-  /** Phase 5 — infinite scroll list variant */
+  /** Infinite scroll — query omits `page` (page lives in `pageParam` only) */
   infinite: (query?: RentalCarListQuery) =>
     ['demoHybridCars', 'infinite', query] as const,
 

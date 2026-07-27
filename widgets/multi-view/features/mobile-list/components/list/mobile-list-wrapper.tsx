@@ -75,6 +75,13 @@ export interface MobileListWrapperProps<T> {
   ////////////////////////////////////
   /** URL / toolbar groupBy override (wins over `config.groupBy`). */
   selectedGroupBy?: string | null
+  /**
+   * Trailing virtualized slot (e.g. infinite load-more).
+   * Appended after cards / group headers — not domain data.
+   */
+  listEndRow?: ReactNode
+  /** Estimate height for `listEndRow` before measure (default 40). */
+  listEndRowHeight?: number
 }
 
 ////////////////////////////////////
@@ -117,6 +124,8 @@ export function MobileListWrapper<T>({
   selectedGroupBy,
   className,
   emptyState,
+  listEndRow,
+  listEndRowHeight = 40,
 }: MobileListWrapperProps<T>) {
   ////////////////////////////////////
   // 1. Config resolution
@@ -174,14 +183,19 @@ export function MobileListWrapper<T>({
   // Flat list: optional `group-header` rows interleaved with `card` rows
   const virtualRows = useMemo(
     function buildRows() {
-      return buildVirtualRows({
+      const rows = buildVirtualRows({
         data,
         getItemId,
         groupBy: effectiveGroupBy,
         groupKeyFormatter,
       })
+      if (listEndRow == null) return rows
+      return [
+        ...rows,
+        { kind: 'end-slot' as const, id: '__mobile-list-end-row__' },
+      ]
     },
-    [data, getItemId, effectiveGroupBy, groupKeyFormatter]
+    [data, getItemId, effectiveGroupBy, groupKeyFormatter, listEndRow]
   )
 
   // Dynamic heights: estimate first, then measureElement on expand/accordion
@@ -191,7 +205,9 @@ export function MobileListWrapper<T>({
       return parentRef.current
     },
     estimateSize: function estimateSize(index) {
-      return estimateVirtualRowSize(virtualRows[index])
+      const row = virtualRows[index]
+      if (row?.kind === 'end-slot') return listEndRowHeight
+      return estimateVirtualRowSize(row)
     },
     overscan: 8,
     getItemKey: function getItemKey(index) {
@@ -267,7 +283,11 @@ export function MobileListWrapper<T>({
               key={virtualItem.key}
               data-index={virtualItem.index}
               ref={virtualizer.measureElement}
-              className="absolute left-0 top-0 w-full px-3 pb-3 md:px-0 md:pr-2"
+              className={
+                row.kind === 'end-slot'
+                  ? 'absolute left-0 top-0 w-full px-3 md:px-0 md:pr-2'
+                  : 'absolute left-0 top-0 w-full px-3 pb-3 md:px-0 md:pr-2'
+              }
               style={{
                 transform: `translateY(${virtualItem.start}px)`,
               }}
@@ -275,6 +295,13 @@ export function MobileListWrapper<T>({
               {row.kind === 'group-header' ? (
                 // Section label: e.g. Available (5)
                 <GroupSectionHeader label={row.label} count={row.count} />
+              ) : row.kind === 'end-slot' ? (
+                <div
+                  className="flex w-full items-stretch"
+                  style={{ height: listEndRowHeight }}
+                >
+                  {listEndRow}
+                </div>
               ) : (
                 // Card stack item (accordion + optional lifted expansion)
                 <MobileCardItem

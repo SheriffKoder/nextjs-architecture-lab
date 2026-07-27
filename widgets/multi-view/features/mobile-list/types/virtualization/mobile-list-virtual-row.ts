@@ -1,9 +1,9 @@
 /**
  * Flat virtual-row model for `@tanstack/react-virtual`.
- * Built by `lib/virtualization/build-virtual-rows.ts`.
+ * Built by `lib/virtualization/build-virtual-rows.ts` (+ optional end slot in the list host).
  */
 
-export type MobileListVirtualRowKind = 'group-header' | 'card'
+export type MobileListVirtualRowKind = 'group-header' | 'card' | 'end-slot'
 
 export interface MobileListGroupHeaderRow {
   kind: 'group-header'
@@ -21,6 +21,13 @@ export interface MobileListCardVirtualRow<T = unknown> {
   groupKey?: string
 }
 
+/** Trailing load-more / footer slot — not domain data. */
+export interface MobileListEndSlotRow {
+  kind: 'end-slot'
+  id: string
+}
+
 export type MobileListVirtualRow<T = unknown> =
   | MobileListGroupHeaderRow
   | MobileListCardVirtualRow<T>
+  | MobileListEndSlotRow

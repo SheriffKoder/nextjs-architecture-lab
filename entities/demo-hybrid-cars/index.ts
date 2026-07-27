@@ -10,6 +10,7 @@
 export { rentalCarKeys } from './cache/rental-car-keys'
 export { findRentalCarInListCache } from './cache/find-rental-car-in-list-cache'
 export { seedRentalCarDetailFromRow } from './cache/seed-rental-car-detail'
+export { seedRentalCarListPageFromInfinite } from './cache/seed-rental-car-list-page-from-infinite'
 export * from './client'
 export * from './queries'
 export * from './mutations'

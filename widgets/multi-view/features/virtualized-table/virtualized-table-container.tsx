@@ -98,6 +98,15 @@ interface VirtualizedTableComponentProps<T = any> {
   };
   // Filter props for header filters
   filters?: FilterConfig[];
+  /**
+   * Optional trailing virtualized row (e.g. infinite load-more).
+   * Renders as `itemCount = dataItemCount + 1` — not treated as row data.
+   */
+  listEndRow?: React.ReactNode;
+  /**
+   * Height for `listEndRow`. Defaults to the view’s measured/configured row height.
+   */
+  listEndRowHeight?: number;
 };
 ////////////////////////////////////
 // Component Implementation: Main table logic
@@ -145,6 +154,8 @@ export function VirtualizedTableComponent<T = any>({
   defaultGroupsExpanded = false,
   minimalControlsConfig,
   filters,
+  listEndRow,
+  listEndRowHeight,
 }: VirtualizedTableComponentProps<T>) {
   // Extract props from tableConfig
   const {
@@ -306,6 +317,11 @@ export function VirtualizedTableComponent<T = any>({
     return data;
   }, [flattenedRows, data]);
 
+  /** Virtualization length before optional trailing end row. */
+  const dataItemCount = flattenedRows ? flattenedRows.length : displayData.length;
+  const hasListEndRow = listEndRow != null;
+  const itemCount = dataItemCount + (hasListEndRow ? 1 : 0);
+
   ////////////////////////////////////
   // Row Height Calculation: Calculate height based on content
   ////////////////////////////////////
@@ -316,6 +332,10 @@ export function VirtualizedTableComponent<T = any>({
    * Also handles different row types when grouping is enabled
    */
   const calculateRowHeight = useCallback((index: number): number => {
+    if (hasListEndRow && index === dataItemCount) {
+      return listEndRowHeight ?? calculatedRowHeight;
+    }
+
     // If grouping is enabled, check row type
     if (flattenedRows && flattenedRows[index]) {
       const flattenedRow = flattenedRows[index];
@@ -383,24 +403,13 @@ export function VirtualizedTableComponent<T = any>({
     
     // Default: return base height
     return baseHeight;
-  }, [calculatedRowHeight, rowExpansionEnabled, displayData, isRowExpanded, getChildren, flattenedRows, tableConfig]);
+  }, [calculatedRowHeight, rowExpansionEnabled, displayData, isRowExpanded, getChildren, flattenedRows, tableConfig, hasListEndRow, dataItemCount, listEndRowHeight]);
 
 
   ////////////////////////////////////
   // Dynamic Height Calculation: Calculate height based on visible rows
   ////////////////////////////////////
   
-  /**
-   * Get item count for virtualization
-   * When grouping is enabled, use flattened rows count
-   */
-  const itemCount = useMemo(() => {
-    if (flattenedRows) {
-      return flattenedRows.length;
-    }
-    return displayData.length;
-  }, [flattenedRows, displayData.length]);
-
   const { containerRef: bodyMeasureRef, height: measuredBodyHeight } =
     useContainerHeight({
       fixedHeight: tableHeight && tableHeight > 0 ? tableHeight : undefined,
@@ -440,6 +449,17 @@ export function VirtualizedTableComponent<T = any>({
    * Also handles different row types when grouping is enabled
    */
   const rowRenderer = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) => {
+    if (hasListEndRow && index === dataItemCount) {
+      return (
+        <div
+          style={style}
+          className="flex h-full w-full items-center justify-center"
+        >
+          {listEndRow}
+        </div>
+      );
+    }
+
     // If grouping is enabled, handle different row types
     if (flattenedRows && flattenedRows[index]) {
       const flattenedRow = flattenedRows[index];
@@ -512,7 +532,7 @@ export function VirtualizedTableComponent<T = any>({
                 onRowClick={onRowClick}
                 onRowPointerEnter={onRowPointerEnter}
                 style={{ height: style.height, width: '100%' }}
-                isLastRow={index === flattenedRows.length - 1}
+                isLastRow={index === dataItemCount - 1}
                 onActionClick={onActionClick}
                 actionMode={actionMode}
                 actionClickConfigs={actionConfigs?.(item)}
@@ -560,7 +580,7 @@ export function VirtualizedTableComponent<T = any>({
         onRowClick={onRowClick}
         onRowPointerEnter={onRowPointerEnter}
         style={style}
-        isLastRow={index === displayData.length - 1}
+        isLastRow={index === dataItemCount - 1}
         onActionClick={onActionClick}
         actionMode={actionMode}
         actionClickConfigs={actionConfigs?.(item)}
@@ -585,7 +605,7 @@ export function VirtualizedTableComponent<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [flattenedRows, groupState, displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, effectiveGroupBy, effectiveSubGroupBy]);
+  }, [flattenedRows, groupState, displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, effectiveGroupBy, effectiveSubGroupBy, hasListEndRow, dataItemCount, listEndRow, calculatedRowHeight, listRef]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED
@@ -658,9 +678,9 @@ export function VirtualizedTableComponent<T = any>({
                   </div>
                 ) : itemCount > 0 ? (
                   <div className="h-full relative">
-                    {dynamicRowHeight ? (
+                    {dynamicRowHeight || hasListEndRow ? (
                       <VariableSizeList
-                        key={`table-${calculatedRowHeight}-${flattenedRows ? 'grouped' : 'ungrouped'}`} // Force re-render when height or grouping changes
+                        key={`table-${calculatedRowHeight}-${flattenedRows ? 'grouped' : 'ungrouped'}-${hasListEndRow ? 'end' : 'plain'}`}
                         ref={(ref: any) => {
                           listRef.current = ref;
                           if (rowExpansionEnabled) {

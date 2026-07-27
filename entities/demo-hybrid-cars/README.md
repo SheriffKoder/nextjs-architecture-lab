@@ -25,7 +25,7 @@ hooks in `mutations/` own optimistic cache updates + `invalidateQueries` (no `re
 | `server/` | Use-cases for API + prefetch | `get-rental-cars-data.ts`, `create|update|delete-rental-car.ts` |
 | `client/` | Browser fetch wrappers | `fetch-*.ts`, `mutate-rental-cars.ts` |
 | `cache/` | Keys + invalidate helpers | `rental-car-keys.ts`, `invalidate-rental-car-caches.ts` |
-| `queries/` | Read hooks | `use-rental-cars.ts`, `use-rental-car-detail.ts` |
+| `queries/` | Read hooks | `use-rental-cars.ts`, `use-infinite-rental-cars.ts`, `use-rental-car-detail.ts` |
 | `mutations/` | Write hooks | `use-create|update|delete|toggle-*-activity.ts` |
 | `hydration/` | RSC prefetch + dehydrate | `prefetch-rental-car-page.ts` |
 | `providers/` | `QueryClientProvider` | `query-provider.tsx` |

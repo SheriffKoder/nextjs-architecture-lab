@@ -2,6 +2,7 @@
 
 | Doc | Description |
 |-----|-------------|
+| [rsc-to-hybrid-shifts.md](./architecture/rsc-to-hybrid-shifts.md) | Major RSC→hybrid shifts + decisions (cross-phase) |
 | [Phase 0 scaffold](../../../app/development/hybrid-migration/phase-0-scaffold.md) | Migration plan for Phase 0 |
 | [0-hybrid-scaffold.md](./architecture/0-hybrid-scaffold.md) | What was built in Phase 0 |
 | [Phase 1 detail prefetch](../../../app/development/hybrid-migration/phase-1-detail-prefetch.md) | Migration plan for Phase 1 |
@@ -18,3 +19,6 @@
 | [3-url-drawer-client-content.md](./drawers/3-url-drawer-client-content.md) | URL drawer + TanStack detail body |
 | [Phase 4 mutations](../../../app/development/hybrid-migration/phase-4-mutations.md) | CRUD + optimistic activity toggle |
 | [4-optimistic-mutations.md](./ui/4-optimistic-mutations.md) | TanStack mutations; no `revalidatePath` |
+| [Pagination decision](../../../app/development/hybrid-migration/decisions/pagination.md) | Offset + infinite v1; list vs infinite cache findings |
+| [Phase 5 infinite scroll](../../../app/development/hybrid-migration/phase-5-infinite-scroll.md) | Infinite on All mode; table/list paginated by default |
+| [5-infinite-scroll.md](./ui/5-infinite-scroll.md) | `all=1` → infinite; seed key fix; All-entry no skeleton |

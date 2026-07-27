@@ -199,6 +199,13 @@ interface ViewOrchestratorProps<T extends Record<string, any> = Record<string, a
   urlGroupingAllowedKeys?: string[];
   /** Expand groups when grouping is first applied (page-level SSOT). */
   defaultGroupsExpanded?: boolean;
+  /**
+   * Trailing virtualized row for list / table / cards (e.g. infinite load-more).
+   * Ignored by board views (kanban, calendar, …).
+   */
+  listEndRow?: React.ReactNode;
+  /** Height for `listEndRow`. Defaults to each view’s row height when omitted. */
+  listEndRowHeight?: number;
 };
 ////////////////////////////////////
 // Component Implementation: Main table logic
@@ -250,6 +257,8 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
   defaultGroupsExpanded = false,
   columnActions,
   filters,
+  listEndRow,
+  listEndRowHeight,
 }: ViewOrchestratorProps<T>) {
   // Extract table config values with defaults
   const {
@@ -518,6 +527,8 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
             columnActions={columnActions}
             onCellValueChange={onCellValueChange}
             selectedGroupBy={selectedGroupBy}
+            listEndRow={listEndRow}
+            listEndRowHeight={listEndRowHeight}
           />
         ) : (
           /* Table/List View */
@@ -545,6 +556,8 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
               defaultGroupsExpanded={defaultGroupsExpanded}
               minimalControlsConfig={groupingControlsSignal}
               filters={filters}
+              listEndRow={listEndRow}
+              listEndRowHeight={listEndRowHeight}
             />
           ) : (
             <VirtualizedTableComponent
@@ -570,6 +583,8 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
               defaultGroupsExpanded={defaultGroupsExpanded}
               minimalControlsConfig={groupingControlsSignal}
               filters={filters}
+              listEndRow={listEndRow}
+              listEndRowHeight={listEndRowHeight}
             />
           )
         )}

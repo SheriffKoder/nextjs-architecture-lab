@@ -4,6 +4,7 @@
 
 export type {
   MobileListCardVirtualRow,
+  MobileListEndSlotRow,
   MobileListGroupHeaderRow,
   MobileListVirtualRow,
   MobileListVirtualRowKind,

@@ -23,13 +23,22 @@ import { rentalCarKeys } from '@/entities/demo-hybrid-cars/cache/rental-car-keys
 import { fetchRentalCars } from '@/entities/demo-hybrid-cars/client/fetch-rental-cars'
 import type { RentalCarListQuery } from '@/entities/demo-hybrid-cars/model/rental-car-list-query'
 
+export type UseRentalCarsOptions = {
+  /** When false, skip fetch (e.g. infinite list view owns the data path). */
+  enabled?: boolean
+}
+
 /**
  * Subscribe to the paginated rental car list for the given URL-shaped query.
  *
  * @param query - List/filter/pagination state; should match RSC prefetch query on cold load
+ * @param options.enabled - Gate when another view path (infinite) is active
  * @returns TanStack `useQuery` result (`data`, `isLoading`, `isFetching`, `isError`, …)
  */
-export function useRentalCars(query?: RentalCarListQuery) {
+export function useRentalCars(
+  query?: RentalCarListQuery,
+  options?: UseRentalCarsOptions,
+) {
   return useQuery({
     // Step 1: cache key mirrors the query object exactly
     queryKey: rentalCarKeys.list(query),
@@ -39,5 +48,6 @@ export function useRentalCars(query?: RentalCarListQuery) {
     staleTime: 5 * 60 * 1000,
     // Step 4: no empty-table flash on filter/page changes
     placeholderData: keepPreviousData,
+    enabled: options?.enabled ?? true,
   })
 }
