@@ -1,18 +1,20 @@
+/**
+ * @file views/demo-rsc-page/ui/drawer/modes/view/sections/vehicle-section.tsx
+ * Read-only vehicle identity + specs (view mode body section).
+ */
+
 'use client'
 
 import CollapsibleCard from '@/shared/ui/collapsible-card'
 import DetailRow from '@/shared/ui/loading-skeletons/detail-row/detail-row'
 import { ChevronDownIcon } from 'lucide-react'
-import type { RentalCarTableItem } from '../../../../../entities/cars-rsc/types/rental-car-table-item'
+import type { RentalCarTableItem } from '@/entities/cars-rsc/types/rental-car-table-item'
 
-export interface RentalCarVehicleDetailsProps {
+export interface RentalCarVehicleSectionProps {
   car: RentalCarTableItem
 }
 
-/**
- * Read-only vehicle identity + specs for the demo client car drawer (view mode).
- */
-export default function RentalCarVehicleDetails({ car }: RentalCarVehicleDetailsProps) {
+export default function RentalCarVehicleSection({ car }: RentalCarVehicleSectionProps) {
   return (
     <CollapsibleCard
       headerText="Vehicle"

@@ -6,7 +6,7 @@ Temporary stand-in data. Anything here must eventually come from a real loader, 
 
 | File | What it mocks | Wired today | Replace with |
 |------|---------------|-------------|--------------|
-| `form-option-mocks.ts` | Make / status / location `DropdownItem` lists for the create drawer | `ui/drawer-forms/rsc-car-create-form-client.tsx` (`items={MOCK_CAR_*}`) | Facet options from `getFilters` / a dedicated lookup (same `DropdownItem` or map from `FilterConfig.options`). Prefer server-provided values so create form stays aligned with list filters. |
+| `form-option-mocks.ts` | Make / status / location `DropdownItem` lists for the create drawer | `ui/drawer/forms/create-form.tsx` (`items={MOCK_CAR_*}`) | Facet options from `getFilters` / a dedicated lookup (same `DropdownItem` or map from `FilterConfig.options`). Prefer server-provided values so create form stays aligned with list filters. |
 | `location-options-mock.ts` | Location `{ value, label }` enum for inline editable cells | `ui/cells/rental-car-location-options.ts` → `columns.ts` / table editable dropdown | Same location facet or `/locations` lookup. Keep `value` equal to `RentalCarTableItem.location` (and filter URL values). |
 | `timeline-journey-mocks.ts` | Static journey timeline events (not per-car) | `ui/drawer/modes/view/sections/sections-layout.tsx` → `TimelineJourney` `data` prop | Per-car history endpoint (e.g. `getRentalCarJourney(id)` on drawer open). Pass real `TimelineJourneyItem[]` into `TimelineJourney`. |
 

@@ -51,7 +51,7 @@ views/<route>/
 │   │   ├── filters-section.tsx        # Facets + FiltersHeader (+ optional NL assistant)
 │   │   └── table-and-pagination-section.tsx  # List payload + content + PaginationFooter
 │   ├── layout-sections-error-boundaries/     # Island error UI (table/list failures)
-│   └── drawer-content/                # url-drawer body: view / create / edit / delete
+│   └── drawer/                        # url-drawer: layer, orchestrator, modes, chrome, forms, actions
 ├── config/                            # View-local config — see config/README.md
 │   ├── contract/                      # Shared keys only: field map, data vs UI URL params
 │   ├── data/                          # What server fetches/caches/paginates (base filters, search, …)

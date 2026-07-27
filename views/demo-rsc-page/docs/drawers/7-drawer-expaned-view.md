@@ -40,8 +40,8 @@ In `drawer-wrapper.tsx`, context-related blocks are grouped under **`/////////`*
 
 ## Demo RSC usage
 
-- **Shell:** `DemoRscDrawerLayer` → `DrawerWrapper` → `RscCarDrawerContent` (server) → view branch → `RscCarDrawerViewHeader` + **`DemoClientCarSliderDetailsContainer`** (client).
-- **Consumer:** `features/demo-rsc-page/components/drawer-content/details-content/details-container.tsx` uses **`useDrawerChrome()`** and passes **`isJourneyPanelOpen` / `setIsJourneyPanelOpen`** into **`TimelineJourney`**.
+- **Shell:** `DemoRscDrawerLayer` → `DrawerWrapper` → `CarDrawerOrchestrator` (server) → view branch → `RscCarDrawerViewHeader` + **`CarDrawerViewSectionsLayout`** (client).
+- **Consumer:** `ui/drawer/modes/view/sections/sections-layout.tsx` uses **`useDrawerChrome()`** and passes **`isJourneyPanelOpen` / `setIsJourneyPanelOpen`** into **`TimelineJourney`**.
 - **Layout:** When expanded, the same file can switch to a **row layout** (details column + timeline `flex-1`), with a **scrollable** details column and height delegated from **`rsc-car-drawer-view-content.tsx`** (`min-h-0` / `flex-1` / `overflow-hidden` chain).
 
 ---
@@ -57,5 +57,5 @@ In `drawer-wrapper.tsx`, context-related blocks are grouped under **`/////////`*
 - `components/design/right-drawer.tsx` — `expandToFullScreen` width behavior
 - `platform/url-kit/url-drawer/providers/drawer-chrome-context.tsx` — context API
 - `platform/url-kit/url-drawer/components/drawer-wrapper.tsx` — state, reset, provider, `RightDrawer` wiring
-- `features/demo-rsc-page/components/drawer-content/details-content/details-container.tsx` — consumer + layout
-- `features/demo-rsc-page/components/drawer-content/details-content/timeline-journey.tsx` — toggles expand via props from parent
+- `ui/drawer/modes/view/sections/sections-layout.tsx` — consumer + layout
+- `ui/drawer/modes/view/sections/timeline-journey.tsx` — toggles expand via props from parent

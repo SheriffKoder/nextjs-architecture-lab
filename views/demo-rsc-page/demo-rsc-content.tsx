@@ -49,7 +49,7 @@ import type { RentalCarTableItem } from '@/entities/cars-rsc/types/rental-car-ta
 import type { SubheadingsUpdateContext } from '@/widgets/multi-view/features/subheadings/dnd'
 
 // Components
-import { DEMO_RSC_CAR_DRAWER_KEY } from './ui/drawer-content/rsc-car-drawer-content'
+import { DEMO_RSC_CAR_DRAWER_KEY } from './ui/drawer'
 import { useDemoRscTableActivityToggle } from './hooks/use-demo-rsc-table-activity-toggle'
 
 ////////////////////////////////////////////////////////////

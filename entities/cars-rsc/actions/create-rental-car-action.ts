@@ -4,7 +4,7 @@
  * Create rental car — Server Action (demo RSC drawer)
  *
  * Purpose: Authoritative Zod validation for create payload; returns discriminated result for client toasts + RHF error mapping; persistence stub until DB exists.
- * Used in: `features/demo-rsc-page/components/drawer-forms/rsc-car-create-form-client.tsx`
+ * Used in: `views/demo-rsc-page/ui/drawer/forms/create-form.tsx`
  * Used for: Server-first mutation contract aligned with `docs/5. server-forms.md` (no trusted client validation).
  *
  * Function Index:

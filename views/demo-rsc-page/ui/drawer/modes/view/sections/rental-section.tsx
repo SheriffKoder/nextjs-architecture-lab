@@ -1,3 +1,8 @@
+/**
+ * @file views/demo-rsc-page/ui/drawer/modes/view/sections/rental-section.tsx
+ * Read-only rental terms, pricing, and location (view mode body section).
+ */
+
 'use client'
 
 import CollapsibleCard from '@/shared/ui/collapsible-card'
@@ -8,16 +13,13 @@ import {
   formatCurrency,
   formatDate,
 } from '@/shared/lib/formatters'
-import type { RentalCarTableItem } from '../../../../../entities/cars-rsc/types/rental-car-table-item'
+import type { RentalCarTableItem } from '@/entities/cars-rsc/types/rental-car-table-item'
 
-export interface RentalCarRentalDetailsProps {
+export interface RentalCarRentalSectionProps {
   car: RentalCarTableItem
 }
 
-/**
- * Read-only rental terms, pricing, and location for the demo client car drawer (view mode).
- */
-export default function RentalCarRentalDetails({ car }: RentalCarRentalDetailsProps) {
+export default function RentalCarRentalSection({ car }: RentalCarRentalSectionProps) {
   const coords =
     car.latitude != null && car.longitude != null
       ? `${car.latitude.toFixed(4)}, ${car.longitude.toFixed(4)}`

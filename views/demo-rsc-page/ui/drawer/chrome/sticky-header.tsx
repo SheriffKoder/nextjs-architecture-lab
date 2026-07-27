@@ -1,15 +1,8 @@
 /**
- * RSC car drawer sticky headers
+ * @file views/demo-rsc-page/ui/drawer/chrome/sticky-header.tsx
+ * Shared blurred toolbar chrome plus mode-specific actions (create / view / edit).
  *
- * Purpose: Shared blurred toolbar chrome plus mode-specific actions (create submit/reset, view edit, edit view/delete).
- * Used in: `rsc-car-drawer-create-content.tsx`, `rsc-car-drawer-view-content.tsx`, `rsc-car-drawer-edit-content.tsx`
- * Used for: Matches client drawer toolbar styling; create flow uses `form` + `formId` so Save sits in header while fields scroll.
- *
- * Function Index:
- * - RscCarDrawerStickyHeader — generic label/title/actions shell
- * - RscCarDrawerCreateHeader — Reset + submit associated to remote `<form id>`
- * - RscCarDrawerViewHeader — jump to edit
- * - RscCarDrawerEditHeader — view + delete affordances
+ * Used in: `modes/view|edit|create` content shells
  */
 
 'use client'
@@ -17,8 +10,8 @@
 import type { ReactNode } from 'react'
 import { Eye, Pencil, Trash2, Save, RotateCcw } from 'lucide-react'
 import { useDrawerActions } from '@/platform/url-kit/url-drawer'
-import { DEMO_RSC_CAR_DRAWER_KEY } from './rsc-car-drawer-constants'
-import { RscCarDrawerToolbarButton } from './rsc-car-drawer-toolbar-button'
+import { DEMO_RSC_CAR_DRAWER_KEY } from '../car-drawer-key'
+import { RscCarDrawerToolbarButton } from './toolbar-button'
 
 export interface RscCarDrawerStickyHeaderProps {
   label: string

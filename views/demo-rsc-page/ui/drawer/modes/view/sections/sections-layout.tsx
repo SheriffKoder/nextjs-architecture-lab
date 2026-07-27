@@ -1,23 +1,30 @@
+/**
+ * @file views/demo-rsc-page/ui/drawer/modes/view/sections/sections-layout.tsx
+ * Composes read-only view sections (vehicle, rental, journey) + journey expand layout.
+ *
+ * Used in: `view-panel` after detail fetch succeeds
+ */
+
 'use client'
 
-import type { RentalCarTableItem } from '../../../../../entities/cars-rsc/types/rental-car-table-item'
+import type { RentalCarTableItem } from '@/entities/cars-rsc/types/rental-car-table-item'
 import { useDrawerChrome } from '@/platform/url-kit/url-drawer'
 import { cn } from '@/shared/lib/utils'
-import RentalCarVehicleDetails from './rental-car-vehicle-details'
-import RentalCarRentalDetails from './rental-car-rental-details'
+import { MOCK_TIMELINE_JOURNEY_ITEMS } from '@/views/demo-rsc-page/config/mocks/timeline-journey-mocks'
+import RentalCarVehicleSection from './vehicle-section'
+import RentalCarRentalSection from './rental-section'
 import TimelineJourney from './timeline-journey'
-import { MOCK_TIMELINE_JOURNEY_ITEMS } from '../../../config/mocks/timeline-journey-mocks'
 
-export interface DemoClientCarSliderDetailsContainerProps {
+export interface CarDrawerViewSectionsLayoutProps {
   selectedCar: RentalCarTableItem | null
 }
 
 /**
- * View-mode body: column by default; journey expanded → row with scrollable details column (`shrink-0` cards) + timeline `flex-1`.
+ * Column by default; journey expanded → row with scrollable sections + timeline.
  */
-export default function DemoClientCarSliderDetailsContainer({
+export default function CarDrawerViewSectionsLayout({
   selectedCar,
-}: DemoClientCarSliderDetailsContainerProps) {
+}: CarDrawerViewSectionsLayoutProps) {
   const { isJourneyPanelOpen, setIsJourneyPanelOpen } = useDrawerChrome()
 
   if (!selectedCar) {
@@ -41,8 +48,8 @@ export default function DemoClientCarSliderDetailsContainer({
             : 'w-full [&>*]:shrink-0',
         )}
       >
-        <RentalCarVehicleDetails car={selectedCar} />
-        <RentalCarRentalDetails car={selectedCar} />
+        <RentalCarVehicleSection car={selectedCar} />
+        <RentalCarRentalSection car={selectedCar} />
       </div>
 
       {isJourneyPanelOpen ? (

@@ -13,10 +13,10 @@
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useDrawerActions } from '@/platform/url-kit/url-drawer'
-import { DEMO_RSC_CAR_DRAWER_KEY } from './drawer-content/rsc-car-drawer-content'
+import { DEMO_RSC_CAR_DRAWER_KEY } from './drawer'
 
 interface AddCarButtonProps {
-  /** Query `drawer=` value; must match `RscCarDrawerContent` */
+  /** Query `drawer=` value; must match car drawer key */
   drawerKey?: string
 }
 

@@ -138,8 +138,8 @@ Children are whatever the page composes (often an RSC body).
 demo-rsc-index
   → DemoRscDrawerLayer(params)
        → DrawerWrapper (client shell)
-            → RscCarDrawerContent(params)  // server: create / view / edit
-       → RscCarDrawerDeleteModal (client island)
+            → CarDrawerOrchestrator(params)  // server: create / view / edit
+       → CarDrawerDeleteModal (client island)
 ```
 
 - Page passes normalized `params` so content can `parseDrawerState(params)` without `useSearchParams`

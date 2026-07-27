@@ -4,7 +4,7 @@
  * Replace with per-car journey/history from the server — see `config/mocks/responsibilities.md`.
  */
 
-import type { TimelineJourneyItem } from '../../ui/drawer-content/details-content/timeline-journey'
+import type { TimelineJourneyItem } from '../../ui/drawer/modes/view/sections/timeline-journey'
 
 export const MOCK_TIMELINE_JOURNEY_ITEMS: TimelineJourneyItem[] = [
   {

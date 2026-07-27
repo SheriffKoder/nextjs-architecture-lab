@@ -1,15 +1,15 @@
 /**
- * RscCarDrawerDeleteModal
+ * @file views/demo-rsc-page/ui/drawer/actions/delete-modal.tsx
+ * Client island for URL-driven delete confirmation (`action=delete`).
  *
- * Purpose: Client island for URL-driven delete confirmation (`action=delete`) on the demo RSC page
- * Used in: `demo-rsc-drawer-layer.tsx` (server) — keeps the layer free of `'use client'`
+ * Used in: `drawer-layer.tsx` (server) — keeps the layer free of `'use client'`
  */
 
 'use client'
 
 import { DeleteActionModal, useDrawerActions } from '@/platform/url-kit/url-drawer'
 
-export default function RscCarDrawerDeleteModal() {
+export default function CarDrawerDeleteModal() {
   const { close } = useDrawerActions()
 
   return (

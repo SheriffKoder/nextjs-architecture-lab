@@ -1,3 +1,8 @@
+/**
+ * @file views/demo-rsc-page/ui/drawer/chrome/toolbar-button.tsx
+ * Icon toolbar button used by sticky drawer headers.
+ */
+
 'use client'
 
 import type { ComponentPropsWithoutRef } from 'react'
@@ -7,7 +12,7 @@ const toolbarBtnClass =
 
 type RscCarDrawerToolbarButtonProps = ComponentPropsWithoutRef<'button'>
 
-/** Matches icon toolbar buttons in `car-edit-slider-form.tsx`. */
+/** Matches icon toolbar buttons in create / edit drawer chrome. */
 export function RscCarDrawerToolbarButton({
   className,
   type = 'button',

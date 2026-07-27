@@ -1,13 +1,20 @@
+/**
+ * @file views/demo-rsc-page/ui/drawer/modes/view/view-panel.tsx
+ * View-mode panel — async server fetch via `getRentalCarByIdAction`, then sections.
+ *
+ * Used in: `car-drawer-orchestrator` when `mode=view` (inside Suspense)
+ */
+
 import { Eye } from 'lucide-react'
-import { RscCarDrawerViewHeader } from './rsc-car-drawer-sticky-header'
-import DemoClientCarSliderDetailsContainer from './details-content/details-container'
+import { RscCarDrawerViewHeader } from '../../chrome/sticky-header'
+import CarDrawerViewSectionsLayout from './sections/sections-layout'
 import { getRentalCarByIdAction } from '@/entities/cars-rsc/actions/get-rental-car-by-id-action'
 
-interface RscCarDrawerViewContentProps {
+interface CarDrawerViewPanelProps {
   id: string
 }
 
-export default async function RscCarDrawerViewContent({ id }: RscCarDrawerViewContentProps) {
+export default async function CarDrawerViewPanel({ id }: CarDrawerViewPanelProps) {
   const car = await getRentalCarByIdAction(id)
 
   return (
@@ -21,7 +28,7 @@ export default async function RscCarDrawerViewContent({ id }: RscCarDrawerViewCo
           </p>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col overflow-">
-            <DemoClientCarSliderDetailsContainer selectedCar={car} />
+            <CarDrawerViewSectionsLayout selectedCar={car} />
           </div>
         )}
         <p className="mt-3 flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">

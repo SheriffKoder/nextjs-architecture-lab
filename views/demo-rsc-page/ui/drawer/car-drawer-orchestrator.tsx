@@ -1,23 +1,22 @@
 /**
- * RscCarDrawerContent
+ * @file views/demo-rsc-page/ui/drawer/car-drawer-orchestrator.tsx
+ * Server mode router — branches create / view / edit from page `searchParams`.
  *
- * Purpose: Server body for URL-driven car drawer — branches create / view / edit from `params` (same contract as `parseDrawerState`)
- * Used in: `demo-rsc-drawer-layer.tsx` inside `DrawerWrapper`
- * Why: Drawer state comes from the RSC page `searchParams` prop; view mode suspends on **`getRentalCarByIdAction`**
+ * Used in: `drawer-layer.tsx` inside `DrawerWrapper`
+ * Why: Drawer state comes from the RSC page `searchParams` prop; view mode
+ * suspends on `getRentalCarByIdAction`.
  */
 
 import { Suspense } from 'react'
 import { parseDrawerState } from '@/platform/url-kit/url-drawer'
 import type { DemoRscPageSearchParams } from '@/app/(root)/demo-rsc-page/page'
-import { DEMO_RSC_CAR_DRAWER_KEY } from './rsc-car-drawer-constants'
-import RscCarDrawerCreateContent from './rsc-car-drawer-create-content'
-import RscCarDrawerEditContent from './rsc-car-drawer-edit-content'
-import RscCarDrawerViewContent from './rsc-car-drawer-view-content'
-import { RscCarDrawerViewHeader } from './rsc-car-drawer-sticky-header'
+import { DEMO_RSC_CAR_DRAWER_KEY } from './car-drawer-key'
+import CarDrawerCreateContent from './modes/create/create-content'
+import CarDrawerEditContent from './modes/edit/edit-content'
+import CarDrawerViewPanel from './modes/view/view-panel'
+import { RscCarDrawerViewHeader } from './chrome/sticky-header'
 
-export { DEMO_RSC_CAR_DRAWER_KEY } from './rsc-car-drawer-constants'
-
-function RscCarDrawerViewSkeleton({ id }: { id: string }) {
+function CarDrawerViewSkeleton({ id }: { id: string }) {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <RscCarDrawerViewHeader id={id} />
@@ -29,7 +28,11 @@ function RscCarDrawerViewSkeleton({ id }: { id: string }) {
   )
 }
 
-export default function RscCarDrawerContent({ params }: { params: DemoRscPageSearchParams }) {
+export default function CarDrawerOrchestrator({
+  params,
+}: {
+  params: DemoRscPageSearchParams
+}) {
   const state = parseDrawerState(params)
 
   if (state.drawer !== DEMO_RSC_CAR_DRAWER_KEY) {
@@ -42,7 +45,7 @@ export default function RscCarDrawerContent({ params }: { params: DemoRscPageSea
 
   // Client form with server action, RHF, Zod.
   if (state.mode === 'create') {
-    return <RscCarDrawerCreateContent />
+    return <CarDrawerCreateContent />
   }
 
   const id = state.id
@@ -56,14 +59,14 @@ export default function RscCarDrawerContent({ params }: { params: DemoRscPageSea
 
   if (state.mode === 'view') {
     return (
-      <Suspense fallback={<RscCarDrawerViewSkeleton id={id} />}>
-        <RscCarDrawerViewContent key={id} id={id} />
+      <Suspense fallback={<CarDrawerViewSkeleton id={id} />}>
+        <CarDrawerViewPanel key={id} id={id} />
       </Suspense>
     )
   }
 
   if (state.mode === 'edit') {
-    return <RscCarDrawerEditContent id={id} />
+    return <CarDrawerEditContent id={id} />
   }
 
   return null

@@ -14,7 +14,7 @@ import FilterToolbarSkeleton from '@/shared/ui/loading-skeletons/filters/filter-
 
 // Layout components
 import DemoRscPageHeader from './ui/demo-rsc-page-header'
-import DemoRscDrawerLayer from './ui/drawer-content/demo-rsc-drawer-layer'
+import { DemoRscDrawerLayer } from './ui/drawer'
 import FiltersSection from './ui/layout-sections/filters-section'
 import TableAndPaginationSection from './ui/layout-sections/table-and-pagination-section'
 import TablePaginationErrorBoundary from './ui/layout-sections-error-boundaries/table-pagination-error-boundary'

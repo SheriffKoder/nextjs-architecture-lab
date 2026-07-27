@@ -168,22 +168,22 @@ Legend: **Done** — shipped as described. **Done (variant)** — same intent, d
 - **Server loader + per-request dedupe:** `entities/cars-rsc/server/get-rental-car-by-id.ts` — `loadRentalCarById` wrapped in React **`cache()`**; reads from `data-source` `rentalCars`; optional delay via `DEMO_RSC_SIMULATE_RENTAL_CAR_BY_ID_MS` in `simulate-server-delay.ts`.
 - **Cross-request cache:** `entities/cars-rsc/server/demo-rsc-cached-loaders.ts` — **`getRentalCarByIdCached`** wraps `getRentalCarById` in **`unstable_cache`** keyed by `id` (`revalidate: 60`).
 - **Server Action entry (fetch):** `entities/cars-rsc/actions/get-rental-car-by-id-action.ts` — **`getRentalCarByIdAction(id)`** (`'use server'`) delegates to **`getRentalCarByIdCached`**.
-- **Async view body:** `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-view-content.tsx` — default export **`async`**; **`await getRentalCarByIdAction(id)`**; renders **`DemoClientCarSliderDetailsContainer`** from `details-content/details-container.tsx`.
-- **Suspense + loading UI:** `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-content.tsx` — **`mode === 'view'`** wraps **`RscCarDrawerViewContent`** in **`<Suspense>`** with **`RscCarDrawerViewSkeleton`** (header + pulse block).
-- **`key={id}` on async child:** `RscCarDrawerViewContent` is rendered with **`key={id}`** so row switches remount the detail subtree.
-- **Server drawer stack + params (no `useSearchParams` in content):** `demo-rsc-index.tsx` passes **`params`** into **`DemoRscDrawerLayer`** → **`RscCarDrawerContent`** uses **`parseDrawerState(params)`** (same contract as URL).
-- **Server `DemoRscDrawerLayer`:** `ui/drawer-content/demo-rsc-drawer-layer.tsx` — no `'use client'`; composes **`DrawerWrapper`** + **`RscCarDrawerContent`**. Delete confirm UI lives in client island **`rsc-car-drawer-delete-modal.tsx`**.
+- **Async view body:** `views/demo-rsc-page/ui/drawer/modes/view/view-panel.tsx` — default export **`async`**; **`await getRentalCarByIdAction(id)`**; renders **`CarDrawerViewSectionsLayout`** from `sections/sections-layout.tsx`.
+- **Suspense + loading UI:** `views/demo-rsc-page/ui/drawer/car-drawer-orchestrator.tsx` — **`mode === 'view'`** wraps **`CarDrawerViewPanel`** in **`<Suspense>`** with **`CarDrawerViewSkeleton`** (header + pulse block).
+- **`key={id}` on async child:** `CarDrawerViewPanel` is rendered with **`key={id}`** so row switches remount the detail subtree.
+- **Server drawer stack + params (no `useSearchParams` in content):** `demo-rsc-index.tsx` passes **`params`** into **`DemoRscDrawerLayer`** → **`CarDrawerOrchestrator`** uses **`parseDrawerState(params)`** (same contract as URL).
+- **Server `DemoRscDrawerLayer`:** `ui/drawer/drawer-layer.tsx` — no `'use client'`; composes **`DrawerWrapper`** + **`CarDrawerOrchestrator`**. Delete confirm UI lives in client island **`actions/delete-modal.tsx`**.
 - **`DrawerWrapper`** remains client (`platform/url-kit/url-drawer`); it receives server-rendered drawer body as children.
 - **Prefetch on row hover:** `demo-rsc-content.tsx` — **`onRowPointerEnter`** calls **`void getRentalCarByIdAction(row.id)`** so open can hit the warm `unstable_cache` entry.
 
 ### Done (variant) / deferred from original plan
 
-- **No separate `CarDrawerDetailSection` file** — view fetch + `DetailsContainer` live in **`RscCarDrawerViewContent`** instead of a standalone `CarDrawerDetailSection` component.
-- **No `children` slot from `DemoRscIndex` into `DrawerWrapper`** — detail is not composed as `children` from the index file; **`params`** are threaded so **`RscCarDrawerContent`** stays server and owns branching + Suspense.
+- **No separate `CarDrawerDetailSection` file** — view fetch + sections layout live in **`CarDrawerViewPanel`** instead of a standalone `CarDrawerDetailSection` component.
+- **No `children` slot from `DemoRscIndex` into `DrawerWrapper`** — detail is not composed as `children` from the index file; **`params`** are threaded so **`CarDrawerOrchestrator`** stays server and owns branching + Suspense.
 
 ### Todo
 
-- **Edit mode detail fetch:** `RscCarDrawerEditContent` is still placeholder-by-id only; no **`getRentalCarByIdAction`** / shared **`DetailsContainer`** there yet if parity with view is wanted.
+- **Edit mode detail fetch:** `CarDrawerEditContent` is still placeholder-by-id only; no **`getRentalCarByIdAction`** / shared sections layout there yet if parity with view is wanted.
 
 ---
 
@@ -196,11 +196,11 @@ Legend: **Done** — shipped as described. **Done (variant)** — same intent, d
 | Server action (fetch + prefetch) | `entities/cars-rsc/actions/get-rental-car-by-id-action.ts` |
 | Row hover prefetch | `views/demo-rsc-page/demo-rsc-content.tsx` |
 | Params → drawer | `views/demo-rsc-page/demo-rsc-index.tsx` → `DemoRscDrawerLayer` |
-| Server drawer shell | `views/demo-rsc-page/ui/drawer-content/demo-rsc-drawer-layer.tsx` |
-| Delete modal (client) | `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-delete-modal.tsx` |
-| Branch + Suspense | `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-content.tsx` |
-| Async view + details UI | `views/demo-rsc-page/ui/drawer-content/rsc-car-drawer-view-content.tsx` |
-| Details sections (client) | `views/demo-rsc-page/ui/drawer-content/details-content/details-container.tsx` |
+| Server drawer shell | `views/demo-rsc-page/ui/drawer/drawer-layer.tsx` |
+| Delete modal (client) | `views/demo-rsc-page/ui/drawer/actions/delete-modal.tsx` |
+| Branch + Suspense | `views/demo-rsc-page/ui/drawer/car-drawer-orchestrator.tsx` |
+| Async view + details UI | `views/demo-rsc-page/ui/drawer/modes/view/view-panel.tsx` |
+| Details sections (client) | `views/demo-rsc-page/ui/drawer/modes/view/sections/sections-layout.tsx` |
 
 This matches the architecture above while fitting
 `app/(root)/demo-rsc-page/page.tsx` → **`DemoRscIndex`** → table vs drawer layout already in the tree.

@@ -28,10 +28,10 @@ Server validation is the source of truth. Client Zod / RHF is UX only.
 |---|---|---|
 | Schema | Shared Zod contract + defaults + row mapper | `entities/cars-rsc/validation/rental-car-create-form-schema.ts` |
 | Server Action | `safeParse` → persist (or stub) → result union | `entities/cars-rsc/actions/create-rental-car-action.ts` |
-| Drawer branch | `mode=create` → create content | `rsc-car-drawer-content.tsx` |
-| Composition shell | `formId` + `useTransition` + header + form | `rsc-car-drawer-create-content.tsx` |
-| Sticky header | Submit/reset via `form={formId}` | `rsc-car-drawer-sticky-header.tsx` → `RscCarDrawerCreateHeader` |
-| Client form | Fields, submit pipeline, toasts, `close()` | `rsc-car-create-form-client.tsx` |
+| Drawer branch | `mode=create` → create content | `ui/drawer/car-drawer-orchestrator.tsx` |
+| Composition shell | `formId` + `useTransition` + header + form | `ui/drawer/modes/create/create-content.tsx` |
+| Sticky header | Submit/reset via `form={formId}` | `ui/drawer/chrome/sticky-header.tsx` → `RscCarDrawerCreateHeader` |
+| Client form | Fields, submit pipeline, toasts, `close()` | `ui/drawer/forms/create-form.tsx` |
 
 ---
 

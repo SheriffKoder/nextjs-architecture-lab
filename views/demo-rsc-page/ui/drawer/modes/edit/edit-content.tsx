@@ -1,11 +1,18 @@
-import { Pencil } from 'lucide-react'
-import { RscCarDrawerEditHeader } from './rsc-car-drawer-sticky-header'
+/**
+ * @file views/demo-rsc-page/ui/drawer/modes/edit/edit-content.tsx
+ * Edit mode (`mode=edit`) — placeholder shell until edit form is wired.
+ *
+ * Used in: `car-drawer-orchestrator` when `mode=edit`
+ */
 
-interface RscCarDrawerEditContentProps {
+import { Pencil } from 'lucide-react'
+import { RscCarDrawerEditHeader } from '../../chrome/sticky-header'
+
+interface CarDrawerEditContentProps {
   id: string
 }
 
-export default function RscCarDrawerEditContent({ id }: RscCarDrawerEditContentProps) {
+export default function CarDrawerEditContent({ id }: CarDrawerEditContentProps) {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <RscCarDrawerEditHeader id={id} />

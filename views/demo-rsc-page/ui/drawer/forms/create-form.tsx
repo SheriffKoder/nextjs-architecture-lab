@@ -1,25 +1,8 @@
 /**
- * RscCarCreateFormClient
+ * @file views/demo-rsc-page/ui/drawer/forms/create-form.tsx
+ * Client create-car form (RHF + Zod) calling `createRentalCarAction` inside `startTransition`.
  *
- * Purpose: Client-side create-car UX (react-hook-form + Zod resolver) calling `createRentalCarAction` inside `startTransition` for server-authoritative validation.
- * Used in: `features/demo-rsc-page/components/drawer-content/rsc-car-drawer-create-content.tsx`
- * Used for: Mirrors `demo-client-page` CarSliderForm fields without TanStack; maps Server Action results to toasts + `setError` per `docs/5. server-forms.md`.
- *
- * Function Index:
- * - toDateInputValue — ISO → `YYYY-MM-DD` for `<input type="date">`
- * - formatNum — number → controlled input string
- * - fromDateInputToIso — date input → stable noon UTC ISO for schema
- * - toSingle — one `DropdownItem` → array shape for `DropdownSelect`
- * - formatFieldErrors — RHF errors → newline string for toast
- * - applyServerFieldErrors — Zod-style `fieldErrors` → RHF `setError`
- * - RscCarCreateFormClient — form registration, submit pipeline, field Controllers
- *
- * Steps (RscCarCreateFormClient):
- * 1. useForm + zodResolver(shared schema); expose reset to parent for header Reset.
- * 2. Derive dropdown selection from `useWatch` + memoized lookups (guideline: derived state).
- * 3. Memoize shared DropdownSelect props to limit child churn.
- * 4. On valid submit: transition wraps async server action; branch success / formError / fieldErrors.
- * 5. On invalid submit: toast consolidated client validation messages.
+ * Used in: `modes/create/create-content.tsx`
  */
 
 'use client'
