@@ -28,7 +28,7 @@ type RentalCarDetailResponseBody = {
 /**
  * Load one rental car row by stable id.
  *
- * @param id - Row id from the table or drawer store
+ * @param id - Row id from the table or drawer URL
  * @returns The matching `RentalCarTableItem`
  * @throws Error when not found or response is invalid
  */

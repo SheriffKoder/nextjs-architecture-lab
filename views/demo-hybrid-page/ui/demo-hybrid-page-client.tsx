@@ -24,6 +24,8 @@ import ToastContainer from '@/shared/ui/toast/toast-container'
 import { ToastPosition, ToastStacking } from '@/shared/ui/toast/toast'
 import { useListQueryFromUrl } from '@/views/demo-hybrid-page/hooks/use-list-query-from-url'
 import { useQueryErrorToast } from '@/views/demo-hybrid-page/hooks/use-query-error-toast'
+import AddCarButton from './add-car-button'
+import { DemoHybridDrawerLayer } from './drawer'
 import { DemoHybridFiltersSection } from './layout-sections/filters-section'
 import { DemoHybridTableAndPaginationSection } from './layout-sections/table-and-pagination-section'
 
@@ -96,7 +98,10 @@ export function DemoHybridPageClient() {
               Shallow URL · TanStack list + facets (no RSC remount on filter)
             </p>
           </div>
+          <AddCarButton />
         </header>
+
+        <DemoHybridDrawerLayer />
 
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-4">
           {showFiltersLoading ? (

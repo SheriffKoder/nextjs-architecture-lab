@@ -1,0 +1,46 @@
+'use client'
+
+import CollapsibleCard from '@/shared/ui/collapsible-card'
+import DetailRow from '@/shared/ui/loading-skeletons/detail-row/detail-row'
+import { ChevronDownIcon } from 'lucide-react'
+import {
+  capitalizeAllFirstLetters,
+  formatCurrency,
+  formatDate,
+} from '@/shared/lib/formatters'
+import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
+
+export interface RentalCarRentalSectionProps {
+  car: RentalCarTableItem
+}
+
+/**
+ * Read-only rental terms, pricing, and location (view mode body section).
+ */
+export default function RentalCarRentalSection({ car }: RentalCarRentalSectionProps) {
+  const coords =
+    car.latitude != null && car.longitude != null
+      ? `${car.latitude.toFixed(4)}, ${car.longitude.toFixed(4)}`
+      : undefined
+
+  return (
+    <CollapsibleCard
+      headerText="Rental"
+      rightIcon={ChevronDownIcon}
+      defaultOpen
+      variant="sm"
+    >
+      <div className="mt-0">
+        <h3 className="border-b border-foreground/10 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-tertiary">
+          Terms & placement
+        </h3>
+        <DetailRow label="Status" value={capitalizeAllFirstLetters(car.status)} />
+        <DetailRow label="Location" value={car.location} />
+        <DetailRow label="Price per day" value={`${formatCurrency(car.pricePerDay)} / day`} />
+        <DetailRow label="Rental start" value={formatDate(car.rentalStartDate)} />
+        <DetailRow label="Rental end" value={formatDate(car.rentalEndDate)} />
+        {coords ? <DetailRow label="Coordinates" value={coords} /> : null}
+      </div>
+    </CollapsibleCard>
+  )
+}

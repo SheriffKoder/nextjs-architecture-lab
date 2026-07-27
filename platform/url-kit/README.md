@@ -40,15 +40,18 @@ Import from `@/platform/url-kit/url-params`. See [`url-params/README.md`](./url-
 
 `filter-toolbar/` consumes grouping/view through **`minimal-controls`** hooks (transport-aware). It does not define its own URL hooks.
 
-### Does not use `url-params` yet (direct `useRouter` / `useSearchParams`)
+### Does not use `url-params` yet
 
 | Area | Notes |
 |------|--------|
-| `url-drawer/`, `drawer/` | Drawer open/mode/id params |
-| `confirm/` | Confirm-action URL params |
+| `drawer/` (legacy) | Older drawer helpers — prefer `url-drawer/` |
+| `confirm/` | Confirm-action URL params — Phase 6 moves confirm to local modal |
 
-These still work on RSC pages. Hybrid pages should enable drawer/confirm only after wiring through `url-params`.
+### Uses `url-params` (Phase 3)
 
+| Area | Notes |
+|------|--------|
+| `url-drawer/` | `useDrawerActions`, `DrawerWrapper`, `DeleteActionModal` — router or shallow via transport; **keep** URL contract ([drawer-url-state.md](../../app/development/hybrid-migration/decisions/drawer-url-state.md)) |
 ### Internal to router transport
 
 | Area | Role |

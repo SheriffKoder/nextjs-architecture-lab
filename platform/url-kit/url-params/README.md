@@ -44,4 +44,4 @@ Decision background: `app/development/hybrid-migration/decisions/url-kit-transpo
 | Initial sorts / grouping | via `useUrlSorting` / `useUrlGrouping` | `commit` |
 | Query builder (`filter=` blob) | `effectiveParams` | `commit` |
 | NL filter assistant | `effectiveParams` | `commit` |
-| Drawer / confirm | not migrated | not migrated |
+| Drawer / confirm | Drawer: `url-params` (Phase 3). Confirm: Phase 6 local modal — see `decisions/drawer-url-state.md` |

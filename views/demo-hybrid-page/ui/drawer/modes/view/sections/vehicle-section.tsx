@@ -1,0 +1,36 @@
+'use client'
+
+import CollapsibleCard from '@/shared/ui/collapsible-card'
+import DetailRow from '@/shared/ui/loading-skeletons/detail-row/detail-row'
+import { ChevronDownIcon } from 'lucide-react'
+import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
+
+export interface RentalCarVehicleSectionProps {
+  car: RentalCarTableItem
+}
+
+/**
+ * Read-only vehicle identity + specs (view mode body section).
+ */
+export default function RentalCarVehicleSection({ car }: RentalCarVehicleSectionProps) {
+  return (
+    <CollapsibleCard
+      headerText="Vehicle"
+      rightIcon={ChevronDownIcon}
+      defaultOpen
+      variant="sm"
+    >
+      <div className="mt-0">
+        <h3 className="border-b border-foreground/10 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-tertiary">
+          Identification & specs
+        </h3>
+        <DetailRow label="Make" value={car.make} />
+        <DetailRow label="Model" value={car.model} />
+        <DetailRow label="Year" value={car.year} />
+        <DetailRow label="Color" value={car.color} />
+        <DetailRow label="License plate" value={car.licensePlate} />
+        <DetailRow label="Mileage" value={car.mileage.toLocaleString()} />
+      </div>
+    </CollapsibleCard>
+  )
+}

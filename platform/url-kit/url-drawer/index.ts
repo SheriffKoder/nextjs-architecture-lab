@@ -1,8 +1,10 @@
 /**
- * url-drawer — URL-driven drawer system (Zod + Next router)
+ * url-drawer — URL-driven drawer system (Zod + url-params transport)
  *
  * Purpose: Public exports for schema, parser, hook, and UI shells
  * Used in: App routes that want `?drawer=&mode=&id=&action=` without global state
+ * Transport: `useDrawerActions` / shells read & write via `url-params`
+ *   (router fallback on RSC; shallow under `ShallowUrlProvider` on hybrid)
  */
 
 export {

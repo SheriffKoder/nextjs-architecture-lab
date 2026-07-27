@@ -1,17 +1,17 @@
 /**
  * @file views/demo-hybrid-page/ui/demo-hybrid-content.tsx
- * Hybrid table surface: ViewOrchestrator + detail hover prefetch + selectedId.
+ * Hybrid table surface: ViewOrchestrator + detail hover prefetch + URL drawer actions.
  */
 
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useDrawerActions } from '@/platform/url-kit/url-drawer'
 import { ViewOrchestrator } from '@/widgets/multi-view/view-orchestrator'
 import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
 import { rentalCarKeys } from '@/entities/demo-hybrid-cars/cache/rental-car-keys'
 import { fetchRentalCarById } from '@/entities/demo-hybrid-cars/client'
-import { useRentalCarDetail } from '@/entities/demo-hybrid-cars/queries'
 import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
 import type { SubheadingsUpdateContext } from '@/widgets/multi-view/features/subheadings/dnd'
 import {
@@ -30,6 +30,8 @@ import { timelineConfig } from '@/views/demo-hybrid-page/config/ui/displays/time
 import { subheadingsConfig } from '@/views/demo-hybrid-page/config/ui/displays/subheadings-config'
 import { listViewConfig } from '@/views/demo-hybrid-page/config/ui/displays/list-config'
 import { mobileListConfig } from '@/views/demo-hybrid-page/config/ui/displays/mobile-list-config'
+import { demoRscRowActionConfigs } from '@/views/demo-hybrid-page/config/ui/demo-rsc-row-action-configs'
+import { DEMO_HYBRID_CAR_DRAWER_KEY } from './drawer'
 
 const DETAIL_STALE_TIME_MS = 5 * 60 * 1000
 
@@ -44,9 +46,7 @@ export function DemoHybridContent({
 }: DemoHybridContentProps) {
   const queryClient = useQueryClient()
   const [tableData, setTableData] = useState(cars)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-
-  const detailQuery = useRentalCarDetail(selectedId)
+  const { openView, openEdit, openRowDeleteConfirm } = useDrawerActions()
 
   useEffect(() => {
     setTableData(cars)
@@ -63,9 +63,37 @@ export function DemoHybridContent({
     [queryClient]
   )
 
-  const handleRowClick = useCallback((row: RentalCarTableItem) => {
-    setSelectedId(row.id)
-  }, [])
+  const handleRowClick = useCallback(
+    (row: RentalCarTableItem) => {
+      openView(DEMO_HYBRID_CAR_DRAWER_KEY, row.id)
+    },
+    [openView],
+  )
+
+  const onActionClick = useCallback(
+    (action: string, row: RentalCarTableItem) => {
+      if (action === 'view') {
+        openView(DEMO_HYBRID_CAR_DRAWER_KEY, row.id)
+        return
+      }
+      if (action === 'edit') {
+        openEdit(DEMO_HYBRID_CAR_DRAWER_KEY, row.id)
+      }
+    },
+    [openEdit, openView],
+  )
+
+  const handleDeleteColumnAction = useCallback(
+    (item: RentalCarTableItem) => {
+      openRowDeleteConfirm(DEMO_HYBRID_CAR_DRAWER_KEY, item.id)
+    },
+    [openRowDeleteConfirm],
+  )
+
+  const getRowActionConfigs = useCallback(
+    (row: RentalCarTableItem) => demoRscRowActionConfigs(onActionClick, row),
+    [onActionClick],
+  )
 
   const subheadingsDragEnd = useCallback((updatedData: RentalCarTableItem[]) => {
     setTableData(updatedData)
@@ -80,29 +108,6 @@ export function DemoHybridContent({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
-      <div className="rounded-md border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
-        {selectedId == null ? (
-          <p>No row selected. Hover to prefetch · click to set selectedId.</p>
-        ) : (
-          <p>
-            selectedId:{' '}
-            <span className="font-mono text-foreground">{selectedId}</span>
-            {' · '}
-            detail:{' '}
-            {detailQuery.isFetching
-              ? 'fetching'
-              : detailQuery.isError
-                ? 'error'
-                : detailQuery.isSuccess
-                  ? 'cache ready'
-                  : 'idle'}
-            {detailQuery.data
-              ? ` (${detailQuery.data.make} ${detailQuery.data.model})`
-              : null}
-          </p>
-        )}
-      </div>
-
       <ViewOrchestrator
         data={tableData}
         columns={tableColumns}
@@ -110,6 +115,11 @@ export function DemoHybridContent({
         filters={filters}
         onRowClick={handleRowClick}
         onRowPointerEnter={handleRowPointerEnter}
+        onActionClick={onActionClick}
+        actionConfigs={getRowActionConfigs}
+        columnActions={{
+          delete: (item) => handleDeleteColumnAction(item),
+        }}
         externalUrlControls
         urlGroupingAllowedKeys={DEMO_RSC_GROUPING_ALLOWED_KEYS}
         defaultGroupsExpanded={DEMO_RSC_DEFAULT_GROUPS_EXPANDED}

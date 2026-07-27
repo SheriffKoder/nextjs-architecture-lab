@@ -3,7 +3,7 @@
  * TanStack read hook for a single rental car row.
  *
  * Purpose: `useQuery` → `GET /api/demo-hybrid-page/cars/:id`
- * Used in: Hover prefetch + `selectedId` subscription (Phase 1); drawer view mode (Phase 3)
+ * Used in: Hover prefetch + drawer view/edit mode (Phase 3)
  * Used for: Detail reads from client cache without reloading the list
  *
  * Function Index:

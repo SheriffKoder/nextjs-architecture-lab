@@ -6,7 +6,7 @@
  * Used for: Shared shell (overlay + panel) driven only by search params
  *
  * Steps:
- * 1. Subscribe to `useSearchParams()` for reactive URL updates
+ * 1. Subscribe to `useEffectiveSearchParams()` for transport-aware URL updates
  * 2. Parse with `parseDrawerState` (Zod-backed)
  * 3. Keep `RightDrawer` mounted with `isOpen` so Framer exit animation can finish
  * 4. `onClose` clears URL drawer params via `useDrawerActions().close()`
@@ -16,7 +16,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useEffectiveSearchParams } from '@/platform/url-kit/url-params'
 import { RightDrawer } from '@/shared/ui/right-drawer'
 import { parseDrawerState } from '../drawer-parser'
 import { useDrawerActions } from '../hooks/use-drawer-actions'
@@ -27,7 +27,7 @@ export default function DrawerWrapper({
 }: {
   children: React.ReactNode
 }) {
-  const searchParams = useSearchParams()
+  const searchParams = useEffectiveSearchParams()
   const { close } = useDrawerActions()
 
   // Build a plain record: each `get` returns first value for a key (matches typical usage).

@@ -6,7 +6,7 @@
  * Used for: Destructive confirmation aligned with `components/confirm-modal.tsx` styling/ARIA
  *
  * Steps:
- * 1. Read URL → `parseDrawerState`
+ * 1. Read URL via `useEffectiveSearchParams` → `parseDrawerState`
  * 2. Only render `ConfirmModal` when `action === 'delete'` and `id` is set
  * 3. Confirm runs parent `onConfirm(id)`; cancel clears `action` via `cancelAction`
  */
@@ -14,7 +14,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useEffectiveSearchParams } from '@/platform/url-kit/url-params'
 import ConfirmModal from '@/shared/ui/confirm-modal/confirm-modal'
 import { parseDrawerState } from '../drawer-parser'
 import { useDrawerActions } from '../hooks/use-drawer-actions'
@@ -32,7 +32,7 @@ export default function DeleteActionModal({
   confirmLabel?: string
   cancelLabel?: string
 }) {
-  const searchParams = useSearchParams()
+  const searchParams = useEffectiveSearchParams()
   const { cancelAction } = useDrawerActions()
 
   const raw = useMemo(() => {
