@@ -17,7 +17,7 @@
 import * as React from "react"
 import { useState, useEffect, useRef } from "react"
 import { useUrlFilters } from "../../hooks/useUrlFilters"
-import { useSearchParams } from "next/navigation"
+import { useEffectiveSearchParams } from '@/platform/url-kit/url-params'
 import { Search, ChevronDown, ChevronUp } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import type { SearchConfig } from "../search-types"
@@ -71,13 +71,13 @@ export function PillSearchBar({
 }: PillSearchBarProps) {
   // Get search functions from useUrlFilters hook
   // WHY: Provides setSearch function for URL state management
-  // HOW: Hook updates URL via router.replace
+  // HOW: Hook updates URL via url-params transport
   const { setSearch } = useUrlFilters()
   
   // Get searchParams directly to read current value
   // WHY: Need stable reference to check URL value changes
-  // HOW: useSearchParams provides current URL params
-  const searchParams = useSearchParams()
+  // HOW: useEffectiveSearchParams provides transport-aware URL params
+  const searchParams = useEffectiveSearchParams()
   
   // Get current search value from URL
   // WHY: Initialize and sync with URL state

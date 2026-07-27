@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useMemo, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useUrlParamsTransport } from '@/platform/url-kit/url-params'
 
 import { useToast } from '@/shared/ui/toast/use-toast'
 import MaskImage from '@/shared/ui/mask-image/mask-image'
@@ -24,7 +24,6 @@ import type {
   NlFilterAssistantRuntimeConfig,
   NlFilterCatalogEntry,
 } from '@/platform/url-kit/ai-filter/types/nl-filter-assistant'
-import { useNavigationTransitionOptional } from '@/platform/url-kit/filters/navigation-transition-context'
 import { cn } from '@/shared/lib/utils'
 import { Loader2 } from 'lucide-react'
 
@@ -64,24 +63,27 @@ export function NlFilterAssistant({
   placeholder = DEFAULT_PLACEHOLDER,
   className,
 }: NlFilterAssistantProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const { wrapNavigation } = useNavigationTransitionOptional()
+  const {
+    effectiveParams,
+    buildParams,
+    commit,
+    committedSnapshot,
+    wrapNavigation,
+  } = useUrlParamsTransport()
   const { showError, showInfo, showSuccess } = useToast()
 
   const { applyTextSearch, clearTextSearch } = useApplyTextSearchFromNlAssistant(
     assistantConfig.paginationPageParamKey ?? 'page',
   )
 
-  const hasUrlSearch = Boolean(searchParams.get('q')?.trim())
+  const hasUrlSearch = Boolean(effectiveParams.get('q')?.trim())
 
   const [text, setText] = useState('')
   const [isPending, setIsPending] = useState(false)
 
   const currentParamsReference = useMemo(
-    () => buildNlCurrentParamsReference(catalog, searchParams),
-    [catalog, searchParams],
+    () => buildNlCurrentParamsReference(catalog, effectiveParams),
+    [catalog, effectiveParams],
   )
 
   const submit = useCallback(async () => {
@@ -96,7 +98,7 @@ export function NlFilterAssistant({
       if (clearIntent) {
         const patches = buildClearAllFilterPatches(catalog)
         let qs = applyNlFilterPatchToSearchParams({
-          current: new URLSearchParams(searchParams.toString()),
+          current: buildParams(),
           catalog,
           filterPatches: patches,
           sorts: [],
@@ -106,17 +108,14 @@ export function NlFilterAssistant({
           qs,
           assistantConfig.paginationPageParamKey ?? 'page',
         )
-        const href = qs ? `${pathname}?${qs}` : pathname
-        if (qs !== searchParams.toString()) {
-          wrapNavigation(() => {
-            router.replace(href, { scroll: false })
-          })
+        if (qs !== committedSnapshot) {
+          wrapNavigation(() => commit(qs))
         }
         showSuccess('Cleared all filters.', 'Filters')
         return
       }
 
-      const currentParams = searchParamsToPlainRecord(searchParams)
+      const currentParams = searchParamsToPlainRecord(effectiveParams)
       const res = await fetch(apiPath, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -148,7 +147,7 @@ export function NlFilterAssistant({
 
       const patches = data.filterPatches ?? {}
       let qs = applyNlFilterPatchToSearchParams({
-        current: new URLSearchParams(searchParams.toString()),
+        current: buildParams(),
         catalog,
         filterPatches: patches,
         sorts: data.sorts,
@@ -166,11 +165,8 @@ export function NlFilterAssistant({
         assistantConfig.paginationPageParamKey ?? 'page',
       )
 
-      const href = qs ? `${pathname}?${qs}` : pathname
-      if (qs !== searchParams.toString()) {
-        wrapNavigation(() => {
-          router.replace(href, { scroll: false })
-        })
+      if (qs !== committedSnapshot) {
+        wrapNavigation(() => commit(qs))
       }
 
       showInfo(data.feedback, 'AI filter')
@@ -182,12 +178,13 @@ export function NlFilterAssistant({
   }, [
     apiPath,
     assistantConfig,
+    buildParams,
     catalog,
+    commit,
+    committedSnapshot,
     currentParamsReference,
+    effectiveParams,
     isPending,
-    pathname,
-    router,
-    searchParams,
     showError,
     showInfo,
     showSuccess,

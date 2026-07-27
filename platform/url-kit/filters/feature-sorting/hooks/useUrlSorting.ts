@@ -18,9 +18,7 @@
 
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
-import { useOptimisticUrlSearchParams } from '@/platform/url-kit/filters/lib/use-optimistic-url-search-params'
-import { useNavigationTransitionOptional } from '@/platform/url-kit/filters/navigation-transition-context'
+import { useUrlParamsTransport } from '@/platform/url-kit/url-params'
 import { useMemo, useCallback } from 'react'
 import { resetPageInSearchParams } from '@/platform/url-kit/filters/feature-pagination/utils'
 import type { SortSpec, SortDirection } from '../types'
@@ -42,18 +40,7 @@ import type { SortSpec, SortDirection } from '../types'
  * ```
  */
 export function useUrlSorting() {
-  // Initialize Next.js navigation hooks to access and modify URL state
-  // WHY: These hooks provide access to current URL params and ability to update them
-  // HOW: searchParams reads current URL, router updates URL, pathname gets current route
-  const router = useRouter()
-  const pathname = usePathname()
-  const { wrapNavigation } = useNavigationTransitionOptional()
-  const {
-    committedSnapshot,
-    effectiveParams,
-    buildParams,
-    applyPendingSnapshot,
-  } = useOptimisticUrlSearchParams()
+  const { effectiveParams, buildParams, commit } = useUrlParamsTransport()
 
   //////////////////////////////////
   // Helper Functions: Build and update URL parameters
@@ -69,14 +56,9 @@ export function useUrlSorting() {
   const updateUrl = useCallback(
     (params: URLSearchParams) => {
       resetPageInSearchParams(params)
-      const next = params.toString()
-      applyPendingSnapshot(next)
-      if (next === committedSnapshot) return
-      wrapNavigation(() => {
-        router.replace(`${pathname}?${next}`, { scroll: false })
-      })
+      commit(params.toString())
     },
-    [router, pathname, committedSnapshot, applyPendingSnapshot, wrapNavigation],
+    [commit],
   )
 
   //////////////////////////////////

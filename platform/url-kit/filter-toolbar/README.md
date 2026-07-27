@@ -25,7 +25,8 @@ Does **not** depend on `FiltersHeader` or `MinimalControls`. Couples only to low
 
 ```text
 filter-toolbar
-├── owns: chrome, icon trigger, grouping/view hooks, layout, label UI
+├── owns: chrome, icon trigger, layout, label UI
+├── minimal-controls  ← useUrlGrouping, useViewResolution (url-params transport)
 ├── url-kit/filters (engine)  ← main coupling
 ├── @/components/ui/dropdown-menu
 ├── @/shared/lib/utils (cn)
@@ -43,8 +44,8 @@ filter-toolbar
 | `FilterColumnList` + `FilterOptionsPanel` | filter-control (pill panel body) |
 | `SearchBar` | search-control |
 | `ReactDateFilterDropDown` + `date-display-utils` | date-control |
-| `feature-pagination/utils` (`all=1` sync) | `use-view-resolution` |
-| `navigation-transition-context` | grouping + view URL writes |
+| `feature-pagination/utils` (`all=1` sync) | via `minimal-controls/use-view-resolution` |
+| `minimal-controls` | `useUrlGrouping`, `useViewResolution` |
 
 **Not imported:** `FiltersHeader`, `MinimalControls`, `PillFilter` shell, `FilterOptionsButtons` (label-filters owns its own chips/dropdown).
 
@@ -53,7 +54,7 @@ filter-toolbar
 | Package / path | Role |
 |----------------|------|
 | `react` | UI + hooks |
-| `next/navigation` | `useSearchParams` / `router` / `pathname` in grouping + view hooks |
+| `next/navigation` | Suspense boundary only (hooks in minimal-controls + filters) |
 | `@/components/ui/dropdown-menu` | group, view, label dropdown |
 | `lucide-react` | icons |
 | `@/shared/lib/utils` | `cn` |
@@ -61,7 +62,7 @@ filter-toolbar
 ### Owned internally
 
 - `config/chrome.ts` — trigger / search classes
-- `hooks/use-url-grouping.ts`, `hooks/use-view-resolution.ts`, `lib/resolve-view.ts`
+- `lib/resolve-view.ts` — view resolution helper (types exported from `model/`)
 - `ui/shared/icon-trigger-button.tsx`
 - All slot UIs under `ui/*`
 

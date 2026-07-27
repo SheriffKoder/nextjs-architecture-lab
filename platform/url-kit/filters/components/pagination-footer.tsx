@@ -12,8 +12,8 @@
 
 'use client'
 
-import { useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
+import { useEffectiveSearchParams } from '@/platform/url-kit/url-params'
 import { PaginationWrapper } from '../feature-pagination/components'
 import { PaginationMobile } from '../feature-pagination/components/pagination-mobile'
 import { shouldHidePaginationForUseAllView } from '../feature-pagination/utils'
@@ -40,7 +40,7 @@ export function PaginationFooter({
   hideWhenShowAllForViews,
   defaultView = 'table',
 }: PaginationFooterProps) {
-  const searchParams = useSearchParams()
+  const searchParams = useEffectiveSearchParams()
   const hidden = useMemo(
     () =>
       shouldHidePaginationForUseAllView(searchParams, {

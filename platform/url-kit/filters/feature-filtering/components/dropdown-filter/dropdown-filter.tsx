@@ -19,7 +19,7 @@
 import * as React from "react"
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { createPortal } from "react-dom"
-import { useSearchParams } from "next/navigation"
+import { useEffectiveSearchParams, useUrlParamsTransport } from '@/platform/url-kit/url-params'
 import { ListFilter, X } from "lucide-react"
 import { useUrlFilters } from "../../hooks/useUrlFilters"
 import {
@@ -110,7 +110,8 @@ export function DropdownFilter({
   
   // URL filters hook
   const { getRange, getNumberRange, setList, setRange, setNumberRange, remove } = useUrlFilters()
-  const searchParams = useSearchParams()
+  const searchParams = useEffectiveSearchParams()
+  const paramsSnapshot = useUrlParamsTransport().committedSnapshot
 
   const selectKnownValues = useMemo(
     () =>
@@ -155,7 +156,7 @@ export function DropdownFilter({
     filter.type,
     getRange,
     getNumberRange,
-    searchParams,
+    paramsSnapshot,
     selectKnownValues,
   ])
   
@@ -411,7 +412,7 @@ export function DropdownFilter({
   // Effects
   //////////////////////////////////
   
-  // Get current active filters for dependency tracking using searchParams directly
+  // Get current active filters for dependency tracking via transport snapshot
   const currentActiveFiltersString = useMemo(() => {
     if (filter.type === "multi-select" || filter.type === "single-select") {
       const value = searchParams.get(filter.key)
@@ -421,7 +422,7 @@ export function DropdownFilter({
       return JSON.stringify(filters)
     }
     return ''
-  }, [filter.key, filter.type, searchParams, selectKnownValues])
+  }, [filter.key, filter.type, paramsSnapshot, selectKnownValues])
   
   // Track previous values with refs
   const prevIsOpenRef = useRef(isOpen)
@@ -651,7 +652,7 @@ export function DropdownFilter({
       return searchParams.get(filter.key) || ''
     }
     return ''
-  }, [filter.type, filter.key, searchParams])
+  }, [filter.type, filter.key, paramsSnapshot])
   
   // Sync rangeSelectedValues with URL (for display)
   useEffect(() => {

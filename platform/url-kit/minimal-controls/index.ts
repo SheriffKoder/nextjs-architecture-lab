@@ -41,6 +41,8 @@ export type {
   UseUrlGroupingReturn,
 } from './hooks/use-url-grouping'
 
+export { useInitialGrouping } from './hooks/use-initial-grouping'
+
 export { useViewResolution } from './hooks/use-view-resolution'
 export type {
   UseViewResolutionOptions,

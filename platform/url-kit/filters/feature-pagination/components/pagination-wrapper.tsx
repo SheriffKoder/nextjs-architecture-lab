@@ -9,7 +9,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useEffectiveSearchParams } from '@/platform/url-kit/url-params'
 import { useUrlPagination } from '../hooks'
 import { shouldHidePaginationForUseAllView } from '../utils'
 import { PaginationButtons, PaginationInfo } from './index'
@@ -59,7 +59,7 @@ export function PaginationWrapper({
   hideWhenShowAllForViews,
   defaultView = 'table',
 }: PaginationWrapperProps) {
-  const searchParams = useSearchParams()
+  const searchParams = useEffectiveSearchParams()
   const hidden = useMemo(
     () =>
       shouldHidePaginationForUseAllView(searchParams, {

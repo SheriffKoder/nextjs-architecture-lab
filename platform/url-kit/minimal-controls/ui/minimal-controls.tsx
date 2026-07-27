@@ -14,6 +14,7 @@ import { ExpandableSearchControl } from '@/platform/url-kit/filters/feature-filt
 import { GroupingControl } from './grouping-control'
 import { ViewSwitcherControl } from './view-switcher-control'
 import { useUrlGrouping } from '../hooks/use-url-grouping'
+import { useInitialGrouping } from '../hooks/use-initial-grouping'
 import { useViewResolution } from '../hooks/use-view-resolution'
 import {
   DEFAULT_GROUPING_SUPPORTED_VIEWS,
@@ -49,6 +50,8 @@ function MinimalControlsInner(config: MinimalControlsProps) {
   const { groupBy, subGroupBy, setGroupBy, setSubGroupBy } = useUrlGrouping({
     allowedKeys,
   })
+
+  useInitialGrouping(groupableFields, { allowedKeys })
 
   const { currentView, setView, resolution } = useViewResolution({
     availableViews,

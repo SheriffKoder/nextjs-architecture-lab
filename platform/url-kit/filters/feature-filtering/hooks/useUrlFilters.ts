@@ -23,9 +23,7 @@
 
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
-import { useOptimisticUrlSearchParams } from '@/platform/url-kit/filters/lib/use-optimistic-url-search-params'
-import { useNavigationTransitionOptional } from '@/platform/url-kit/filters/navigation-transition-context'
+import { useUrlParamsTransport } from '@/platform/url-kit/url-params'
 import {
   decodeUrlParamList,
   encodeUrlParamList,
@@ -49,18 +47,12 @@ import { resetPageInSearchParams } from '@/platform/url-kit/filters/feature-pagi
  * ```
  */
 export function useUrlFilters() {
-  // Initialize Next.js navigation hooks to access and modify URL state
-  // WHY: These hooks provide access to current URL params and ability to update them
-  // HOW: searchParams reads current URL, router updates URL, pathname gets current route
-  const router = useRouter()
-  const pathname = usePathname()
-  const { wrapNavigation } = useNavigationTransitionOptional()
   const {
-    committedSnapshot,
     effectiveParams,
     buildParams,
-    applyPendingSnapshot,
-  } = useOptimisticUrlSearchParams()
+    commit,
+    clearAllParams,
+  } = useUrlParamsTransport()
 
   //////////////////////////////////
   // Helper Functions: Build and update URL parameters
@@ -74,13 +66,7 @@ export function useUrlFilters() {
    * @param {URLSearchParams} params - The new search parameters to set in URL
    */
   const updateUrl = (params: URLSearchParams) => {
-    const next = params.toString()
-    applyPendingSnapshot(next)
-    // Skip replace when already committed (e.g. QueryBuilder clear on mount when param absent).
-    if (next === committedSnapshot) return
-    wrapNavigation(() => {
-      router.replace(`${pathname}?${next}`, { scroll: false })
-    })
+    commit(params.toString())
   }
 
   /**
@@ -278,10 +264,7 @@ export function useUrlFilters() {
    * HOW: Replaces entire URL with just pathname, removing all query parameters
    */
   const clearAll = () => {
-    applyPendingSnapshot('')
-    wrapNavigation(() => {
-      router.replace(pathname, { scroll: false }) // Navigate to pathname only, removing all query params
-    })
+    clearAllParams()
   }
 
   //////////////////////////////////

@@ -17,8 +17,7 @@
 
 'use client'
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useNavigationTransitionOptional } from '@/platform/url-kit/filters/navigation-transition-context'
+import { useUrlParamsTransport } from '@/platform/url-kit/url-params'
 import { useMemo, useCallback } from 'react'
 import {
   parsePagination,
@@ -47,49 +46,30 @@ import type { PaginationConfig, PaginationState, PaginationCalculated } from '..
  * ```
  */
 export function useUrlPagination(config: PaginationConfig = {}) {
-  // Initialize Next.js navigation hooks to access and modify URL state
-  // WHY: These hooks provide access to current URL params and ability to update them
-  // HOW: searchParams reads current URL, router updates URL, pathname gets current route
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
-  const { wrapNavigation } = useNavigationTransitionOptional()
+  const {
+    effectiveParams,
+    buildParams,
+    commit,
+    committedSnapshot,
+  } = useUrlParamsTransport()
 
-  // Get default limit from config or use 20
-  // WHY: Allow configurable default page size
-  // HOW: Use config.defaultPageSize or fallback to 20
   const defaultLimit = config.defaultPageSize || 20
 
   //////////////////////////////////
   // Helper Functions: Build and update URL parameters
   //////////////////////////////////
 
-  /**
-   * Creates a new URLSearchParams object from current search params
-   * WHY: Need a mutable copy to modify without affecting original
-   * HOW: Creates new instance from string representation of current params
-   * @returns {URLSearchParams} Mutable copy of current URL search parameters
-   */
-  const buildParams = useCallback(() => {
-    return new URLSearchParams(searchParams.toString())
-  }, [searchParams])
+  const buildParamsFromEffective = useCallback(() => {
+    return buildParams()
+  }, [buildParams])
 
-  /**
-   * Updates the URL with new search parameters
-   * WHY: Use replace() instead of push() to prevent history spam when pagination changes frequently
-   * HOW: Replaces current URL with new params, preserving pathname but updating query string; returns early when the query string is unchanged
-   * IMPACT: Better UX - back button doesn't go through every page change, cleaner history
-   * @param {URLSearchParams} params - The new search parameters to set in URL
-   */
   const updateUrl = useCallback(
     (params: URLSearchParams) => {
-      // Avoid no-op navigations so useTransition (wrapNavigation) does not briefly show pending UI.
-      if (params.toString() === searchParams.toString()) return
-      wrapNavigation(() => {
-        router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-      })
+      const next = params.toString()
+      if (next === committedSnapshot) return
+      commit(next)
     },
-    [router, pathname, searchParams, wrapNavigation]
+    [commit, committedSnapshot],
   )
 
   //////////////////////////////////
@@ -103,8 +83,8 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    * @returns {PaginationState} Current page and limit
    */
   const getPagination = useCallback((): PaginationState => {
-    return parsePagination(searchParams, defaultLimit)
-  }, [searchParams, defaultLimit])
+    return parsePagination(effectiveParams, defaultLimit)
+  }, [effectiveParams, defaultLimit])
 
   /**
    * Get current page number
@@ -138,8 +118,8 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    * @returns {boolean} True if show all is enabled
    */
   const isShowAll = useMemo(
-    () => isShowAllUrlParam(searchParams),
-    [searchParams],
+    () => isShowAllUrlParam(effectiveParams),
+    [effectiveParams],
   )
 
   //////////////////////////////////
@@ -153,12 +133,12 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    * @param {number} page - Page number to set (must be >= 1)
    */
   const setPage = useCallback((page: number) => {
-    const params = buildParams()
+    const params = buildParamsFromEffective()
     params.delete(SHOW_ALL_URL_PARAM)
     const validPage = Math.max(1, page)
     params.set('page', validPage.toString())
     updateUrl(params)
-  }, [buildParams, updateUrl])
+  }, [buildParamsFromEffective, updateUrl])
 
   /**
    * Set page size (limit) in URL
@@ -167,19 +147,19 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    * @param {number} limit - Items per page (must be >= 1)
    */
   const setLimit = useCallback((limit: number) => {
-    const params = buildParams()
+    const params = buildParamsFromEffective()
     params.delete(SHOW_ALL_URL_PARAM)
     const validLimit = Math.max(1, limit)
     params.set('limit', validLimit.toString())
     params.set('page', '1')
     updateUrl(params)
-  }, [buildParams, updateUrl])
+  }, [buildParamsFromEffective, updateUrl])
 
   const setShowAll = useCallback(() => {
-    const params = buildParams()
+    const params = buildParamsFromEffective()
     applyShowAllToSearchParams(params)
     updateUrl(params)
-  }, [buildParams, updateUrl])
+  }, [buildParamsFromEffective, updateUrl])
 
   /**
    * Set both page and limit at once
@@ -189,14 +169,14 @@ export function useUrlPagination(config: PaginationConfig = {}) {
    * @param {number} limit - Items per page to set
    */
   const setPagination = useCallback((page: number, limit: number) => {
-    const params = buildParams()
+    const params = buildParamsFromEffective()
     params.delete(SHOW_ALL_URL_PARAM)
     const validPage = Math.max(1, page)
     const validLimit = Math.max(1, limit)
     params.set('page', validPage.toString())
     params.set('limit', validLimit.toString())
     updateUrl(params)
-  }, [buildParams, updateUrl])
+  }, [buildParamsFromEffective, updateUrl])
 
   /**
    * Reset to first page

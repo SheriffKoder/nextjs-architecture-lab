@@ -10,6 +10,10 @@ import type { SearchConfig } from '@/platform/url-kit/filters/feature-filtering/
 export interface GroupableField {
   key: string
   label: string
+  /** Apply as default groupBy when URL has no grouping */
+  initial?: boolean
+  /** Apply as default subGroupBy when primary grouping is set and URL has no subGroupBy */
+  initialSubGroup?: boolean
 }
 
 export type ViewResolution =

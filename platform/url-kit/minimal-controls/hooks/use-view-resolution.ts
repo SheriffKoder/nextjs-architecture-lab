@@ -8,8 +8,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useNavigationTransitionOptional } from '@/platform/url-kit/filters/navigation-transition-context'
+import { useUrlParamsTransport } from '@/platform/url-kit/url-params'
 import {
   applyShowAllToSearchParams,
   isShowAllUrlParam,
@@ -51,32 +50,28 @@ export function useViewResolution(
   const effectiveDefaultView =
     defaultView || (availableViews.length > 0 ? availableViews[0] : 'table')
 
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const pathname = usePathname()
-  const { wrapNavigation } = useNavigationTransitionOptional()
+  const { effectiveParams, buildParams, commit, committedSnapshot } =
+    useUrlParamsTransport()
 
   const resolution = useMemo(
     () =>
       resolveView(
-        searchParams.get(paramName),
+        effectiveParams.get(paramName),
         availableViews,
         effectiveDefaultView
       ),
-    [searchParams, paramName, availableViews, effectiveDefaultView]
+    [effectiveParams, paramName, availableViews, effectiveDefaultView]
   )
 
   const currentView = resolution.view
 
   const replaceParams = useCallback(
     (params: URLSearchParams) => {
-      if (params.toString() === searchParams.toString()) return
-      const qs = params.toString()
-      wrapNavigation(() => {
-        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-      })
+      const next = params.toString()
+      if (next === committedSnapshot) return
+      commit(next)
     },
-    [pathname, router, searchParams, wrapNavigation]
+    [commit, committedSnapshot]
   )
 
   const setView = useCallback(
@@ -89,7 +84,7 @@ export function useViewResolution(
         return
       }
 
-      const params = new URLSearchParams(searchParams.toString())
+      const params = buildParams()
       if (view === effectiveDefaultView) {
         params.delete(paramName)
       } else {
@@ -105,12 +100,12 @@ export function useViewResolution(
     },
     [
       availableViews,
+      buildParams,
       currentView,
       defaultPageSize,
       effectiveDefaultView,
       paramName,
       replaceParams,
-      searchParams,
       useAllItems,
     ]
   )
@@ -124,19 +119,19 @@ export function useViewResolution(
       didSyncShowAllRef.current = null
       return
     }
-    if (isShowAllUrlParam(searchParams)) {
-      didSyncShowAllRef.current = searchParams.toString()
+    if (isShowAllUrlParam(effectiveParams)) {
+      didSyncShowAllRef.current = effectiveParams.toString()
       return
     }
 
-    const key = searchParams.toString()
+    const key = effectiveParams.toString()
     if (didSyncShowAllRef.current === key) return
     didSyncShowAllRef.current = key
 
-    const params = new URLSearchParams(searchParams.toString())
+    const params = buildParams()
     applyShowAllToSearchParams(params)
     replaceParams(params)
-  }, [currentView, replaceParams, searchParams, useAllItems])
+  }, [buildParams, currentView, effectiveParams, replaceParams, useAllItems])
 
   const isViewAvailable = useCallback(
     (view: string): boolean => availableViews.includes(view),

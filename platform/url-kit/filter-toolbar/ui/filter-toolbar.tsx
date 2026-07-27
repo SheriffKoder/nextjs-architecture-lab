@@ -15,8 +15,7 @@
 import { Suspense } from 'react'
 import type { FilterToolbarProps } from '../model/types'
 import { DEFAULT_GROUPING_SUPPORTED_VIEWS } from '../config/chrome'
-import { useUrlGrouping } from '../hooks/use-url-grouping'
-import { useViewResolution } from '../hooks/use-view-resolution'
+import { useUrlGrouping, useInitialGrouping, useViewResolution } from '@/platform/url-kit/minimal-controls'
 import { resolvePlaceholderMarqueeForViewport } from '@/platform/url-kit/filters/feature-filtering/features/placeholder-marquee'
 import { FilterToolbarDesktop } from './filter-toolbar-desktop'
 import { FilterToolbarMobile } from './filter-toolbar-mobile'
@@ -50,6 +49,8 @@ function FilterToolbarInner({
   const { groupBy, subGroupBy, setGroupBy, setSubGroupBy } = useUrlGrouping({
     allowedKeys,
   })
+
+  useInitialGrouping(groupableFields, { allowedKeys })
 
   const { currentView, setView } = useViewResolution({
     availableViews,

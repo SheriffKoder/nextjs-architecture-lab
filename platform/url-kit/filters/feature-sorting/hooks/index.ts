@@ -8,3 +8,4 @@
 
 export { useUrlSorting } from './useUrlSorting'
 export { useInitialSorts } from './useInitialSorts'
+export { useInitialSortSpecs } from './use-initial-sorts'

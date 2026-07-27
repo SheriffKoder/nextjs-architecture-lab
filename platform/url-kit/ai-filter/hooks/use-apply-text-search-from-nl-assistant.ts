@@ -1,13 +1,12 @@
 'use client'
 
 import { useCallback } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import {
   applyTextSearchToUrlQuery,
   clearTextSearchFromUrlQuery,
 } from '@/platform/url-kit/ai-filter/lib/apply-text-search-to-url-query'
-import { useNavigationTransitionOptional } from '@/platform/url-kit/filters/navigation-transition-context'
+import { useUrlParamsTransport } from '@/platform/url-kit/url-params'
 
 /**
  * Applies the assistant input as a normal URL text search (`q` by default),
@@ -17,52 +16,49 @@ export function useApplyTextSearchFromNlAssistant(
   paginationPageParamKey = 'page',
   searchParamKey = 'q',
 ) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const { wrapNavigation } = useNavigationTransitionOptional()
+  const {
+    effectiveParams,
+    buildParams,
+    commit,
+    committedSnapshot,
+    wrapNavigation,
+  } = useUrlParamsTransport()
 
   const applyTextSearch = useCallback(
     (rawText: string) => {
       const qs = applyTextSearchToUrlQuery(
-        new URLSearchParams(searchParams.toString()),
+        buildParams(),
         rawText,
         { searchParamKey, paginationPageParamKey },
       )
-      const href = qs ? `${pathname}?${qs}` : pathname
-      if (qs !== searchParams.toString()) {
-        wrapNavigation(() => {
-          router.replace(href, { scroll: false })
-        })
+      if (qs !== committedSnapshot) {
+        wrapNavigation(() => commit(qs))
       }
     },
     [
+      buildParams,
+      commit,
+      committedSnapshot,
       paginationPageParamKey,
-      pathname,
-      router,
       searchParamKey,
-      searchParams,
       wrapNavigation,
     ],
   )
 
   const clearTextSearch = useCallback(() => {
-    const qs = clearTextSearchFromUrlQuery(
-      new URLSearchParams(searchParams.toString()),
-      { searchParamKey, paginationPageParamKey },
-    )
-    const href = qs ? `${pathname}?${qs}` : pathname
-    if (qs !== searchParams.toString()) {
-      wrapNavigation(() => {
-        router.replace(href, { scroll: false })
-      })
+    const qs = clearTextSearchFromUrlQuery(buildParams(), {
+      searchParamKey,
+      paginationPageParamKey,
+    })
+    if (qs !== committedSnapshot) {
+      wrapNavigation(() => commit(qs))
     }
   }, [
+    buildParams,
+    commit,
+    committedSnapshot,
     paginationPageParamKey,
-    pathname,
-    router,
     searchParamKey,
-    searchParams,
     wrapNavigation,
   ])
 

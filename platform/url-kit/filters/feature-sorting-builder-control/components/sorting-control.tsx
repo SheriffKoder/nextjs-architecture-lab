@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ArrowUpDown, RotateCcw } from 'lucide-react'
-import { useUrlSorting } from '../hooks/useUrlSorting'
+import { useUrlSorting } from '@/platform/url-kit/filters/feature-sorting/hooks/useUrlSorting'
 import { SortRow } from './sort-row'
 import { AvailableSortsList } from './available-sorts-list'
 import type { SortingControlProps } from '../types'

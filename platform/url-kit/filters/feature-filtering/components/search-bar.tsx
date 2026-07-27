@@ -22,7 +22,7 @@
 import * as React from "react"
 import { useState, useEffect, useRef } from "react"
 import { useUrlFilters } from "../hooks/useUrlFilters"
-import { useSearchParams } from "next/navigation"
+import { useEffectiveSearchParams } from '@/platform/url-kit/url-params'
 import { Input } from "./ui/input"
 import { Search } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
@@ -91,7 +91,7 @@ export function SearchBar<T extends Record<string, any>>({
   // Get searchParams directly to read current value
   // WHY: Need stable reference to check URL value changes
   // HOW: useSearchParams provides current URL params
-  const searchParams = useSearchParams()
+  const searchParams = useEffectiveSearchParams()
   
   // Get current search value from URL
   // WHY: Initialize and sync with URL state

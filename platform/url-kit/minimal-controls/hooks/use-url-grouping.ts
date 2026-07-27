@@ -5,8 +5,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useNavigationTransitionOptional } from '@/platform/url-kit/filters/navigation-transition-context'
+import { useUrlParamsTransport } from '@/platform/url-kit/url-params'
 import {
   DEFAULT_GROUP_BY_PARAM,
   DEFAULT_SUB_GROUP_BY_PARAM,
@@ -44,38 +43,34 @@ export function useUrlGrouping(
     subGroupByParam = DEFAULT_SUB_GROUP_BY_PARAM,
   } = options
 
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const pathname = usePathname()
-  const { wrapNavigation } = useNavigationTransitionOptional()
+  const { effectiveParams, buildParams, commit, committedSnapshot } =
+    useUrlParamsTransport()
 
   const groupBy = useMemo(
-    () => parseAllowed(searchParams.get(groupByParam), allowedKeys),
-    [searchParams, groupByParam, allowedKeys]
+    () => parseAllowed(effectiveParams.get(groupByParam), allowedKeys),
+    [effectiveParams, groupByParam, allowedKeys]
   )
 
   const subGroupBy = useMemo(() => {
-    const primary = parseAllowed(searchParams.get(groupByParam), allowedKeys)
+    const primary = parseAllowed(effectiveParams.get(groupByParam), allowedKeys)
     if (!primary) return null
     const secondary = parseAllowed(
-      searchParams.get(subGroupByParam),
+      effectiveParams.get(subGroupByParam),
       allowedKeys
     )
     if (!secondary || secondary === primary) return null
     return secondary
-  }, [searchParams, groupByParam, subGroupByParam, allowedKeys])
+  }, [effectiveParams, groupByParam, subGroupByParam, allowedKeys])
 
   const replaceParams = useCallback(
     (mutate: (params: URLSearchParams) => void) => {
-      const params = new URLSearchParams(searchParams.toString())
+      const params = buildParams()
       mutate(params)
-      if (params.toString() === searchParams.toString()) return
-      const qs = params.toString()
-      wrapNavigation(() => {
-        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-      })
+      const next = params.toString()
+      if (next === committedSnapshot) return
+      commit(next)
     },
-    [searchParams, pathname, router, wrapNavigation]
+    [buildParams, commit, committedSnapshot]
   )
 
   const setGroupBy = useCallback(

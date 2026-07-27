@@ -6,7 +6,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useEffectiveSearchParams } from '@/platform/url-kit/url-params'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   DropdownMenu,
@@ -35,7 +35,7 @@ export function PaginationMobile({
   hideWhenShowAllForViews,
   defaultView = 'table',
 }: PaginationMobileProps) {
-  const searchParams = useSearchParams()
+  const searchParams = useEffectiveSearchParams()
   const hidden = useMemo(
     () =>
       shouldHidePaginationForUseAllView(searchParams, {
