@@ -2,5 +2,7 @@
 
 | Doc | Description |
 |-----|-------------|
-| [Phase 0 scaffold](../../../app/development/hybrid-migration/phase-0-scaffold.md) | Migration plan for this phase |
+| [Phase 0 scaffold](../../../app/development/hybrid-migration/phase-0-scaffold.md) | Migration plan for Phase 0 |
 | [0-hybrid-scaffold.md](./architecture/0-hybrid-scaffold.md) | What was built in Phase 0 |
+| [Phase 1 detail prefetch](../../../app/development/hybrid-migration/phase-1-detail-prefetch.md) | Migration plan for Phase 1 |
+| [1-detail-prefetch.md](./ui/1-detail-prefetch.md) | Hover prefetch + selectedId (no panel yet) |
