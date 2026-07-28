@@ -33,6 +33,9 @@ import { sortGroupedData } from "./utils/sort-grouped-data";
 import { GroupHeader } from "./components/group-header";
 import VirtualizedTableHeader from "./components/filtering-table-header";
 import { useContainerHeight } from "./hooks/ui/useContainerHeight";
+import {
+  ROW_HEIGHT_MEASURE_SAMPLE_SIZE,
+} from "../../constants/virtualization";
 
 ////////////////////////////////////
 // Type Definitions: Component props and interfaces
@@ -160,7 +163,7 @@ export function VirtualizedTableComponent<T = any>({
     rowHeight = 40,
     minRowHeight = 40,
     tableHeight,
-    dynamicRowHeight = true,
+    dynamicRowHeight = false,
     emptyMessage = "No data available",
     loading,
     loadingStateShimmer = false,
@@ -338,6 +341,9 @@ export function VirtualizedTableComponent<T = any>({
       .filter((row) => row.type === 'data-row' && row.data != null)
       .map((row) => row.data as T);
   }, [flattenedRows, data]);
+
+  const effectiveDynamicRowHeight =
+    dynamicRowHeight && measureData.length <= ROW_HEIGHT_MEASURE_SAMPLE_SIZE;
 
   /**
    * Clear react-window's per-index size cache when the flattened structure
@@ -586,8 +592,8 @@ export function VirtualizedTableComponent<T = any>({
                 isLastRow={index === dataItemCount - 1}
                 onActionClick={onActionClick}
                 actionMode={actionMode}
-                actionClickConfigs={actionConfigs?.(item as T)}
-                truncateText={!dynamicRowHeight}
+                actionConfigs={actionConfigs}
+                truncateText={!effectiveDynamicRowHeight}
                 isSelected={!!isSelected}
                 editableColumns={editableColumns}
                 onCellValueChange={onCellValueChange}
@@ -633,9 +639,9 @@ export function VirtualizedTableComponent<T = any>({
         isLastRow={index === dataItemCount - 1}
         onActionClick={onActionClick}
         actionMode={actionMode}
-        actionClickConfigs={actionConfigs?.(item)}
+        actionConfigs={actionConfigs}
         globalSearchText={undefined}
-        truncateText={!dynamicRowHeight}
+        truncateText={!effectiveDynamicRowHeight}
         isSelected={!!isSelected}
         editableColumns={editableColumns}
         onCellValueChange={onCellValueChange}
@@ -655,7 +661,7 @@ export function VirtualizedTableComponent<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, flattenedRows, groupState, groupSortState, transparentHeader, hasListEndRow, dataItemCount, listEndRow, calculatedRowHeight, filters, headerFilters, sortConfig, effectiveGroupBy, effectiveSubGroupBy]);
+  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, effectiveDynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, flattenedRows, groupState, groupSortState, transparentHeader, hasListEndRow, dataItemCount, listEndRow, calculatedRowHeight, filters, headerFilters, sortConfig, effectiveGroupBy, effectiveSubGroupBy]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED
@@ -665,7 +671,7 @@ export function VirtualizedTableComponent<T = any>({
   return (
     <div className="relative flex h-full min-h-0 flex-col gap-0 p-0">
       {/* Hidden measurement: real data rows only (never flattened headers/spacers) */}
-      {dynamicRowHeight && measureData.length > 0 && (
+      {effectiveDynamicRowHeight && measureData.length > 0 && (
         <TableRowMeasurer
           data={measureData}
           columns={columns}
@@ -729,7 +735,7 @@ export function VirtualizedTableComponent<T = any>({
                   </div>
                 ) : displayData.length > 0 ? (
                   <div className="h-full relative">
-                    {dynamicRowHeight || hasListEndRow ? (
+                    {effectiveDynamicRowHeight || hasListEndRow ? (
                       <VariableSizeList
                         // Remount when height or grouping mode changes so react-window
                         // does not keep stale per-index sizes (causes vertical row shift).

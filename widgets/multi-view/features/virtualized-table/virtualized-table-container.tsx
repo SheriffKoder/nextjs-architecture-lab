@@ -35,6 +35,9 @@ import { GroupHeaderRow } from "./components/group-header-row";
 import VirtualizedTableHeader from "../../components/filtering-table-header";
 import { useContainerHeight } from "./hooks/ui/useContainerHeight";
 import type { FilterConfig } from "@/platform/url-kit/filters/feature-filtering/components/filter-types";
+import {
+  ROW_HEIGHT_MEASURE_SAMPLE_SIZE,
+} from "../../constants/virtualization";
 
 ////////////////////////////////////
 // Type Definitions: Component props and interfaces
@@ -163,7 +166,7 @@ export function VirtualizedTableComponent<T = any>({
     minRowHeight = 40,
     headerFilters,
     tableHeight,
-    dynamicRowHeight = true,
+    dynamicRowHeight = false,
     emptyMessage = "No data available",
     loading,
     loadingStateShimmer = false,
@@ -316,6 +319,17 @@ export function VirtualizedTableComponent<T = any>({
     // Default behavior: no grouping
     return data;
   }, [flattenedRows, data]);
+
+  /** Real data rows only for height measurement. */
+  const measureData = useMemo(() => {
+    if (!flattenedRows) return data;
+    return flattenedRows
+      .filter((row) => row.type === "data-row" && row.data != null)
+      .map((row) => row.data as T);
+  }, [flattenedRows, data]);
+
+  const effectiveDynamicRowHeight =
+    dynamicRowHeight && measureData.length <= ROW_HEIGHT_MEASURE_SAMPLE_SIZE;
 
   /** Virtualization length before optional trailing end row. */
   const dataItemCount = flattenedRows ? flattenedRows.length : displayData.length;
@@ -535,8 +549,8 @@ export function VirtualizedTableComponent<T = any>({
                 isLastRow={index === dataItemCount - 1}
                 onActionClick={onActionClick}
                 actionMode={actionMode}
-                actionClickConfigs={actionConfigs?.(item)}
-                truncateText={!dynamicRowHeight}
+                actionConfigs={actionConfigs}
+                truncateText={!effectiveDynamicRowHeight}
                 isSelected={!!isSelected}
                 editableColumns={editableColumns}
                 onCellValueChange={onCellValueChange}
@@ -583,9 +597,9 @@ export function VirtualizedTableComponent<T = any>({
         isLastRow={index === dataItemCount - 1}
         onActionClick={onActionClick}
         actionMode={actionMode}
-        actionClickConfigs={actionConfigs?.(item)}
+        actionConfigs={actionConfigs}
         globalSearchText={undefined}
-        truncateText={!dynamicRowHeight}
+        truncateText={!effectiveDynamicRowHeight}
         isSelected={!!isSelected}
         editableColumns={editableColumns}
         onCellValueChange={onCellValueChange}
@@ -605,7 +619,7 @@ export function VirtualizedTableComponent<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [flattenedRows, groupState, displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, effectiveGroupBy, effectiveSubGroupBy, hasListEndRow, dataItemCount, listEndRow, calculatedRowHeight, listRef]);
+  }, [flattenedRows, groupState, displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, effectiveDynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions, effectiveGroupBy, effectiveSubGroupBy, hasListEndRow, dataItemCount, listEndRow, calculatedRowHeight, listRef]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED
@@ -615,9 +629,9 @@ export function VirtualizedTableComponent<T = any>({
   return (
     <div className="relative flex h-full min-h-0 flex-col gap-0 p-0">
       {/* Hidden measurement component for accurate row height calculation (only when dynamic height is enabled) */}
-      {dynamicRowHeight && displayData.length > 0 && (
+      {effectiveDynamicRowHeight && measureData.length > 0 && (
         <TableRowMeasurer
-          data={displayData}
+          data={measureData}
           columns={columns}
           onHeightCalculated={setCalculatedRowHeight}
           onRowClick={onRowClick}
@@ -678,7 +692,7 @@ export function VirtualizedTableComponent<T = any>({
                   </div>
                 ) : itemCount > 0 ? (
                   <div className="h-full relative">
-                    {dynamicRowHeight || hasListEndRow ? (
+                    {effectiveDynamicRowHeight || hasListEndRow ? (
                       <VariableSizeList
                         key={`table-${calculatedRowHeight}-${flattenedRows ? 'grouped' : 'ungrouped'}-${hasListEndRow ? 'end' : 'plain'}`}
                         ref={(ref: any) => {

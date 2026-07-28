@@ -53,6 +53,9 @@ import {
   SUBHEADINGS_DROP_PLACEHOLDER_HEIGHT,
 } from "./dnd";
 import { useContainerHeight } from "./hooks/ui/useContainerHeight";
+import {
+  ROW_HEIGHT_MEASURE_SAMPLE_SIZE,
+} from "../../constants/virtualization";
 
 ////////////////////////////////////
 // Type Definitions: Component props and interfaces
@@ -210,7 +213,7 @@ export function SubHeadingsContainer<T = any>({
     rowHeight = 40,
     minRowHeight = 40,
     tableHeight,
-    dynamicRowHeight = true,
+    dynamicRowHeight = false,
     headerFilters,
     sortConfig,
     emptyMessage = "No data available",
@@ -289,6 +292,9 @@ export function SubHeadingsContainer<T = any>({
   
   // Use data directly (no pagination)
   const displayData = data;
+
+  const effectiveDynamicRowHeight =
+    dynamicRowHeight && displayData.length <= ROW_HEIGHT_MEASURE_SAMPLE_SIZE;
 
   ////////////////////////////////////
   // Grouping: Group data by the specified key
@@ -711,8 +717,8 @@ export function SubHeadingsContainer<T = any>({
         isLastRow={index === displayData.length - 1}
         onActionClick={onActionClick}
         actionMode={actionMode}
-        actionClickConfigs={actionConfigs?.(item)}
-        truncateText={!dynamicRowHeight}
+        actionConfigs={actionConfigs}
+        truncateText={!effectiveDynamicRowHeight}
         isSelected={!!isSelected}
         editableColumns={editableColumns}
         onCellValueChange={onCellValueChange}
@@ -733,7 +739,7 @@ export function SubHeadingsContainer<T = any>({
         columnActions={columnActions}
       />
     );
-  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, dynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions]);
+  }, [displayData, visibleColumns, onRowClick, onRowPointerEnter, onActionClick, actionMode, actionConfigs, effectiveDynamicRowHeight, selectedItemId, editableColumns, onCellValueChange, groupStylerConfig, rowStyler, rowHighlighting, rowExpansionEnabled, isRowExpanded, toggleRow, getChildren, isLoadingChildren, rowExpansion, resetAfterIndex, columnActions]);
 
   ////////////////////////////////////
   // Scroll Container Ref- REMOVED
@@ -753,7 +759,7 @@ export function SubHeadingsContainer<T = any>({
     >
       <div className="relative flex h-full min-h-0 flex-col gap-0 p-0">
       {/* Hidden measurement component for accurate row height calculation (only when dynamic height is enabled) */}
-      {dynamicRowHeight && displayData.length > 0 && (
+      {effectiveDynamicRowHeight && displayData.length > 0 && (
         <TableRowMeasurer
           data={displayData}
           columns={columns}
@@ -985,8 +991,8 @@ export function SubHeadingsContainer<T = any>({
                                                             isLastRow={index === groupItems.length - 1}
                                                             onActionClick={onActionClick}
                                                             actionMode={actionMode}
-                                                            actionClickConfigs={actionConfigs?.(item)}
-                                                            truncateText={!dynamicRowHeight}
+                                                            actionConfigs={actionConfigs}
+                                                            truncateText={!effectiveDynamicRowHeight}
                                                             isSelected={!!isSelected}
                                                             editableColumns={editableColumns}
                                                             onCellValueChange={onCellValueChange}
@@ -1111,8 +1117,8 @@ export function SubHeadingsContainer<T = any>({
                                                         isLastRow={index === groupItems.length - 1}
                                                         onActionClick={onActionClick}
                                                         actionMode={actionMode}
-                                                        actionClickConfigs={actionConfigs?.(item)}
-                                                        truncateText={!dynamicRowHeight}
+                                                        actionConfigs={actionConfigs}
+                                                        truncateText={!effectiveDynamicRowHeight}
                                                         isSelected={!!isSelected}
                                                         editableColumns={editableColumns}
                                                         onCellValueChange={onCellValueChange}
@@ -1323,8 +1329,8 @@ export function SubHeadingsContainer<T = any>({
                                               isLastRow={index === groupItems.length - 1}
                                               onActionClick={onActionClick}
                                               actionMode={actionMode}
-                                              actionClickConfigs={actionConfigs?.(item)}
-                                              truncateText={!dynamicRowHeight}
+                                              actionConfigs={actionConfigs}
+                                              truncateText={!effectiveDynamicRowHeight}
                                               isSelected={!!isSelected}
                                               editableColumns={editableColumns}
                                               onCellValueChange={onCellValueChange}
@@ -1506,8 +1512,8 @@ export function SubHeadingsContainer<T = any>({
                                           isLastRow={index === groupItems.length - 1}
                                           onActionClick={onActionClick}
                                           actionMode={actionMode}
-                                          actionClickConfigs={actionConfigs?.(item)}
-                                          truncateText={!dynamicRowHeight}
+                                          actionConfigs={actionConfigs}
+                                          truncateText={!effectiveDynamicRowHeight}
                                           isSelected={!!isSelected}
                                           editableColumns={editableColumns}
                                           onCellValueChange={onCellValueChange}
@@ -1580,7 +1586,7 @@ export function SubHeadingsContainer<T = any>({
               columns={visibleColumns}
               style={{ width: '100%' }}
               isLastRow={false}
-              truncateText={!dynamicRowHeight}
+              truncateText={!effectiveDynamicRowHeight}
               calculatedRowHeight={calculatedRowHeight}
               groupStylerConfig={groupStylerConfig}
               rowStyler={rowStyler}

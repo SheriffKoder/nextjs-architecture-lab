@@ -1,24 +1,33 @@
 /**
  * VirtualizedTableRow Component
- * 
+ *
  * Purpose: Renders individual table rows with proper formatting and click handling
- * Used in: VirtualizedTable component rowRenderer
+ * Used in: `virtualized-table-container` rowRenderer, `TableRowMeasurer`
  * Why: Separates row rendering logic for better maintainability and reusability
- * 
+ *
+ * Performance:
+ * - Exported as `React.memo(VirtualizedTableRowInner)` so visible rows skip
+ *   re-render when props are unchanged during scroll/filter updates.
+ * - Parent passes `actionConfigs` factory (not pre-built arrays); this file
+ *   resolves configs once per row identity via `useMemo` (see block below).
+ * - Prefer `actionConfigs` over `actionClickConfigs` unless a one-off override
+ *   is required — inline `actionConfigs(item)` in the container defeats memo.
+ *
  * Steps:
  * 1. Import required types and utilities
  * 2. Define component props interface
- * 3. Render row with proper styling and click handling
- * 4. Format cell values using utility functions
+ * 3. Resolve stable row action configs (memoized per row id)
+ * 4. Render row with proper styling and click handling
+ * 5. Format cell values using utility functions
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 // Import types from types folder structure
 import { TableColumn } from "../../types/table-column";
 // Import cell formatting utility
 import { formatCellValue } from "../../utils/format-cell-value";
 import { ActionButton } from "./rows-action-buttons";
-import { actionConfigs } from "../../../../constants/actions";
+import { actionConfigs as buildDefaultActionConfigs } from "../../../../constants/actions";
 // Import width calculation utility
 import { calculateColumnWidth } from "../../utils/column-width-calculator";
 // Import sticky column utilities
@@ -158,8 +167,10 @@ interface VirtualizedTableRowProps<T = any> {
   onRowPointerEnter?: (row: T) => void;
   // Optional action click handler
   onActionClick?: (action: string, row: T) => void;
-  // Action configurations for the row
+  // Pre-built action configs (optional override)
   actionClickConfigs?: any[];
+  /** Factory for row action configs — resolved and memoized per row. */
+  actionConfigs?: (row: T) => any[];
   // Mode for displaying action buttons: 'inline' or 'dropdown'
   actionMode?: 'inline' | 'dropdown';
   // CSS styles for virtualization (from react-window)
@@ -207,30 +218,18 @@ interface VirtualizedTableRowProps<T = any> {
 ////////////////////////////////////
 
 /**
- * Individual table row component with cell formatting and click handling
- * Renders a single row with all its cells properly formatted
- * 
- * @template T - The type of data items in the table
- * @param {VirtualizedTableRowProps<T>} props - Component props
- * @returns {JSX.Element} Complete table row with formatted cells
- * 
- * @example
- * ```tsx
- * <VirtualizedTableRow
- *   item={dataItem}
- *   columns={tableColumns}
- *   onRowClick={handleRowClick}
- *   style={virtualizationStyle}
- * />
- * ```
+ * Inner row implementation — wrapped in `React.memo` at export as
+ * `VirtualizedTableRow`. Keep this as the named inner function so memo applies
+ * to the component consumers import.
  */
-export function VirtualizedTableRow<T = any>({
+function VirtualizedTableRowInner<T = any>({
   item,
   columns,
   onRowClick,
   onRowPointerEnter,
   onActionClick,
   actionClickConfigs,
+  actionConfigs,
   actionMode,
   style,
   isLastRow,
@@ -256,9 +255,23 @@ export function VirtualizedTableRow<T = any>({
   indentLevel = 0,
 }: VirtualizedTableRowProps<T>) {
   ////////////////////////////////////
-  // Width Calculation: Handle mixed fixed and percentage widths
+  // Row action configs: stable reference per row (H8)
   ////////////////////////////////////
-  
+  //
+  // Containers must pass `actionConfigs` factory — not `actionConfigs(item)`.
+  // `rowIdentityKey` drives memo invalidation (prefer `item.id`, else rowIndex)
+  // so unchanged rows keep the same config array reference across parent renders.
+  // Resolution order: actionClickConfigs override → factory → default builder.
+  const rowIdentityKey =
+    (item as { id?: string | number })?.id ?? rowIndex ?? 0;
+
+  const rowActionConfigs = useMemo(() => {
+    if (actionClickConfigs) return actionClickConfigs;
+    if (actionConfigs) return actionConfigs(item);
+    if (onActionClick) return buildDefaultActionConfigs(onActionClick, item);
+    return undefined;
+  }, [actionClickConfigs, actionConfigs, onActionClick, item, rowIdentityKey]);
+
   // Get visible columns (non-hidden) for width calculations
   const visibleColumns = columns.filter(col => !col.isHidden);
   
@@ -456,8 +469,8 @@ export function VirtualizedTableRow<T = any>({
               }}
             >
               {onActionClick && (
-                <ActionButton 
-                  actions={actionClickConfigs || actionConfigs(onActionClick, item)}
+                <ActionButton
+                  actions={rowActionConfigs ?? []}
                   mode={actionMode}
                 />
               )}
@@ -652,5 +665,7 @@ export function VirtualizedTableRow<T = any>({
   );
 }
 
-// Export component with React.memo for performance optimization
-export default React.memo(VirtualizedTableRow); 
+/** Memoized public export — use this name in containers and measurer. */
+export const VirtualizedTableRow = React.memo(
+  VirtualizedTableRowInner,
+) as typeof VirtualizedTableRowInner; 
