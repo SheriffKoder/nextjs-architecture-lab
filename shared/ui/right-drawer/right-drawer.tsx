@@ -4,6 +4,7 @@ import React, { useSyncExternalStore } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useResizableWidth } from './hooks/use-resizable-width'
+import { RIGHT_DRAWER_Z } from './layers'
 
 export interface RightDrawerProps {
   isOpen: boolean
@@ -44,7 +45,7 @@ const RightDrawer: React.FC<RightDrawerProps> = ({
   onClose,
   children,
   className = '',
-  zIndex = 90,
+  zIndex = RIGHT_DRAWER_Z.panel,
   closeOnOverlayClick = false,
   expandToFullScreen = false,
   showPanelClose = true,
@@ -81,7 +82,7 @@ const RightDrawer: React.FC<RightDrawerProps> = ({
       {isOpen ? (
         <motion.div
           key="right-drawer-overlay"
-          className="fixed left-0 top-0 z-40 h-full backdrop-blur-[2px]"
+          className="fixed left-0 top-0 h-full backdrop-blur-[2px]"
           style={{ zIndex: zIndex - 1, width: closeOnOverlayClick ? '100vw' : 'auto' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -109,8 +110,8 @@ const RightDrawer: React.FC<RightDrawerProps> = ({
           {!expandToFullScreen && isMdUp ? (
             <div
               onMouseDown={handleMouseDown}
-              className="absolute bottom-0 left-0 top-0 z-20 w-1 cursor-col-resize transition-colors duration-150 hover:bg-primary/50"
-              style={{ cursor: 'col-resize' }}
+              className="absolute bottom-0 left-0 top-0 w-1 cursor-col-resize transition-colors duration-150 hover:bg-primary/50"
+              style={{ cursor: 'col-resize', zIndex: RIGHT_DRAWER_Z.resizeHandle }}
             />
           ) : null}
 
@@ -118,7 +119,8 @@ const RightDrawer: React.FC<RightDrawerProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="absolute right-2 top-2 z-30 rounded-md p-2 text-muted-foreground transition-colors duration-150 hover:bg-muted/50 hover:text-foreground"
+              className="absolute right-2 top-2 rounded-md p-2 text-muted-foreground transition-colors duration-150 hover:bg-muted/50 hover:text-foreground"
+              style={{ zIndex: RIGHT_DRAWER_Z.closeButton }}
               aria-label="Close drawer"
             >
               <X size={20} />

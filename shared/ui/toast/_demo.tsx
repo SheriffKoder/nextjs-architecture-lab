@@ -18,7 +18,7 @@
 
 import { useState } from 'react'
 import { CheckCircle, AlertCircle, AlertTriangle, Info, Zap, Clock, MapPin, Layers } from 'lucide-react'
-import ToastContainer from './toast-container'
+import { ToastProvider } from './toast-provider'
 import { ToastPosition, ToastType, ToastStacking } from './toast'
 import { useToast } from './use-toast'
 
@@ -135,14 +135,7 @@ export default function Test3Page() {
   }
 
   return (
-    <>
-      {/* Toast Container - This is the main component that manages all toasts */}
-      <ToastContainer 
-        position={currentPosition} 
-        maxToasts={5} 
-        stacking={currentStacking}
-      />
-      
+    <ToastProvider position={currentPosition} maxToasts={5} stacking={currentStacking}>
       <div className="p-8 mx-auto max-w-6xl">
         
         {/* Page Header */}
@@ -353,6 +346,6 @@ export default function Test3Page() {
         </div>
 
       </div>
-    </>
+    </ToastProvider>
   )
 } 

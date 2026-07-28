@@ -1,30 +1,39 @@
 /**
- * Navigation Tooltip Component
- * 
- * Purpose: Reusable tooltip for navigation items when sidebar is collapsed
- * Used in: NavLink and ExpandableGroup components
- * Why: Follows DRY principle - single component for tooltip functionality
- * 
- * Implementation Steps:
- * 1. Accept text, color, and active state as props
- * 2. Format text (capitalize words, replace hyphens)
- * 3. Apply appropriate colors based on active state
- * 4. Position tooltip with arrow pointing to sidebar
+ * @file widgets/side-nav/ui/nav-tooltip.tsx
+ * Portaled tooltip for collapsed side-nav items. Anchors to the hovered item
+ * and stays above page overlays via side-nav z-index tokens.
  */
 
 'use client'
 
-import React from 'react'
+import React, { useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { SIDE_NAV_Z } from '../config/z-index'
 
+/**
+ * Props for {@link NavTooltip}.
+ */
 interface NavTooltipProps {
   text: string
+  /** Parent group label shown above item name (collapsed child links). */
+  groupLabel?: string
   color?: 'primary' | 'secondary'
   isActive: boolean
+  show: boolean
+  anchorRef: React.RefObject<HTMLElement | null>
 }
 
-export default function NavTooltip({ text, color = 'primary', isActive }: NavTooltipProps) {
-  // Tooltip color classes based on color prop and active state
-  // Secondary color (#4BADB4) is a teal/cyan color, using teal-500 as close match
+export default function NavTooltip({
+  text,
+  groupLabel,
+  color = 'primary',
+  isActive,
+  show,
+  anchorRef,
+}: NavTooltipProps) {
+  //////////////////////////////////
+  // Visual tone map for active/inactive states
+  //////////////////////////////////
   const tooltipColors = {
     primary: {
       bg: 'bg-primary',
@@ -38,10 +47,11 @@ export default function NavTooltip({ text, color = 'primary', isActive }: NavToo
     }
   }
   
-  // Use secondary background if not active, otherwise use the color prop
   const tooltipColor = isActive ? tooltipColors[color] : tooltipColors.secondary
 
-  // Format text for tooltip (capitalize words)
+  //////////////////////////////////
+  // Label formatting for display readability
+  //////////////////////////////////
   const formatTooltipText = (text: string) => {
     return text.replace(/-/g, ' ').split(' ').map((word, index, array) => (
       <span key={index}>
@@ -51,17 +61,71 @@ export default function NavTooltip({ text, color = 'primary', isActive }: NavToo
     ))
   }
 
-  return (
-    <div className="absolute left-[calc(100%+15px)] ml-2 top-1/2 -translate-y-1/2 z-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+  const tooltipRef = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState({ top: 0, left: 0 })
+
+  //////////////////////////////////
+  // Keep tooltip aligned with its anchor (hovered nav item)
+  //////////////////////////////////
+  useLayoutEffect(() => {
+    if (!show) return
+    const anchor = anchorRef.current
+    if (!anchor) return
+
+    const updatePosition = () => {
+      const rect = anchor.getBoundingClientRect()
+      setPosition({
+        top: rect.top + rect.height / 2,
+        left: rect.right + 23,
+      })
+    }
+
+    updatePosition()
+
+    const observer = new ResizeObserver(updatePosition)
+    observer.observe(anchor)
+    window.addEventListener('resize', updatePosition)
+    window.addEventListener('scroll', updatePosition, true)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', updatePosition)
+      window.removeEventListener('scroll', updatePosition, true)
+    }
+  }, [anchorRef, show])
+
+  if (!show || typeof document === 'undefined') return null
+
+  return createPortal(
+    <div
+      ref={tooltipRef}
+      className="pointer-events-none fixed -translate-y-1/2 transition-opacity duration-150"
+      style={{
+        top: position.top,
+        left: position.left,
+        zIndex: SIDE_NAV_Z.desktopTooltip,
+      }}
+    >
       <div className="relative">
         {/* Arrow pointing right (towards tooltip) */}
-        <div className={`absolute right-[calc(100%-3px)] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[7px] border-t-transparent border-b-[7px] border-b-transparent ${tooltipColor.arrow} border-r-[7px]`}></div>
+        <div className={`absolute right-[calc(100%-3px)] top-1/2 -translate-y-1/2 h-0 w-0 border-t-[7px] border-b-[7px] border-r-[7px] border-t-transparent border-b-transparent ${tooltipColor.arrow}`} />
         {/* Tooltip content */}
-        <div className={`${tooltipColor.bg} ${tooltipColor.text} px-3 py-1.5 rounded-md shadow-lg whitespace-nowrap text-xs font-medium`}>
-          {formatTooltipText(text)}
+        <div className={`${tooltipColor.bg} ${tooltipColor.text} whitespace-nowrap rounded-md px-3 py-1.5 shadow-lg`}>
+          {groupLabel ? (
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[10px] font-normal leading-none opacity-70">
+                {groupLabel}
+              </span>
+              <span className="text-xs font-medium leading-tight">
+                {formatTooltipText(text)}
+              </span>
+            </div>
+          ) : (
+            <span className="text-xs font-medium">{formatTooltipText(text)}</span>
+          )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

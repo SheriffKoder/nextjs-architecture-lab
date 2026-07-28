@@ -19,6 +19,7 @@ import {
   useAnchoredPanelPosition,
   type PanelAlign,
 } from '@/platform/url-kit/filters/lib/use-anchored-panel-position'
+import { URL_KIT_Z } from '@/platform/url-kit/config/z-index'
 
 export interface DateControlProps {
   filterKey: string
@@ -104,10 +105,11 @@ export function DateControl({
       ? createPortal(
           <div
             ref={panelRef}
-            className="fixed z-50 max-w-[calc(100vw-1rem)]"
+            className="fixed max-w-[calc(100vw-1rem)]"
             style={{
               top: position.top,
               left: position.left,
+              zIndex: URL_KIT_Z.anchoredPanel,
               visibility: hasPositioned ? 'visible' : 'hidden',
             }}
           >

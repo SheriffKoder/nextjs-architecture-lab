@@ -12,7 +12,6 @@
 
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import PageHeader from '@/shared/ui/page-header/page-header'
 import { useSidebar } from '@/widgets/side-nav'
 import ActionButtons from './action-buttons'
 
@@ -46,20 +45,23 @@ export default function DemoRscPageHeader({
 }: DemoRscPageHeaderProps) {
   return (
     <header className="flex shrink-0 items-center justify-between gap-3 border-b border-tertiary/10 p-4">
-      <PageHeader
-        subTitle={subTitle}
-        showMenuToggle={false}
-        hideSubtitleOnMobile
-        className="min-w-0 flex-1"
-      />
+      <div className="min-w-0 flex-1">
+        <h1 className="text-lg font-semibold tracking-tight">
+          Car Rentals (RSC)
+        </h1>
+        <p className="hidden text-sm text-muted-foreground md:block">
+          {subTitle}
+        </p>
+      </div>
 
       <div className="flex shrink-0 items-center gap-1 md:gap-2">
-        <ActionButtons
+      <ActionButtons
           exportForMailchimp={exportForMailchimp}
           showAddCarDrawerButton={showAddCarDrawerButton}
         />
         <MobileSidebarToggle />
       </div>
     </header>
+
   )
 }

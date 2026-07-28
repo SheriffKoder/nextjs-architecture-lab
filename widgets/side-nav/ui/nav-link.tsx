@@ -1,17 +1,7 @@
 /**
- * Navigation Link Component
- * 
- * Purpose: Reusable navigation link for sidebar
- * Used in: Sidebar header navigation
- * Why: Reduces code duplication and provides consistent styling
- * 
- * Implementation Steps:
- * 1. Create component with props for href, icon, text, and active state
- * 2. Handle active state styling with left indicator
- * 3. Support different color themes (primary/secondary)
- * 4. Apply consistent hover effects
- * 5. Support collapsed state for sidebar
- * 6. Support image URLs with MaskImage component
+ * @file widgets/side-nav/ui/nav-link.tsx
+ * Renders one side-nav link row and orchestrates collapsed hover tooltip,
+ * active styling, icon/image rendering, and mobile drawer close-on-navigate.
  */
 
 'use client'
@@ -25,8 +15,7 @@ import { sidebarColorConfig } from '../config/config'
 import { useSidebar } from '../providers/sidebar-context'
 
 /**
- * Navigation link props interface
- * @interface NavLinkProps
+ * Props for {@link NavLink}.
  */
 interface NavLinkProps {
   href: string
@@ -39,12 +28,14 @@ interface NavLinkProps {
   size?: 'sm' | 'md'
   isCollapsed?: boolean
   style?: 'dark' | 'light'
+  /** Parent group name for collapsed tooltip context. */
+  tooltipGroupLabel?: string
 }
 
 /**
- * Navigation link component
- * @param {NavLinkProps} props - Component props
- * @returns {JSX.Element} Navigation link
+ * Render a single side-nav link with collapsed/expanded behaviors.
+ *
+ * @param props - Link rendering and interaction options.
  */
 export default function NavLink({
   href,
@@ -56,12 +47,18 @@ export default function NavLink({
   color = 'primary',
   size = 'md',
   isCollapsed = false,
-  style = 'light'
+  style = 'light',
+  tooltipGroupLabel,
 }: NavLinkProps) {
-  ///////////////////////
-  // Get color classes from centralized config
-  // Why: Single source of truth for all color styling
-  // How: Uses sidebarColorConfig based on color prop and style (dark/light)
+  //////////////////////////////////
+  // Anchor + hover state (collapsed tooltip)
+  //////////////////////////////////
+  const linkRef = React.useRef<HTMLAnchorElement>(null)
+  const [isHovered, setIsHovered] = React.useState(false)
+
+  //////////////////////////////////
+  // Tone mapping from centralized sidebar color config
+  //////////////////////////////////
   const colorConfig = sidebarColorConfig[color]
   const currentColor = {
     active: colorConfig.active[style],
@@ -69,22 +66,22 @@ export default function NavLink({
     indicator: colorConfig.indicator
   }
 
-  ///////////////////////
-  // Size classes
+  //////////////////////////////////
+  // Spacing + icon size scales
+  //////////////////////////////////
   const sizeClasses = {
     sm: 'px-4 py-2',
     md: 'px-4 py-2'
   }
 
-  ///////////////////////
-  // Icon size classes
   const iconSizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-5 h-5'
   }
 
-  ///////////////////////
-  // Image size mapping
+  //////////////////////////////////
+  // Image sizing fallback map for image-backed links
+  //////////////////////////////////
   const imageSizeMapping = {
     sm: { width: 16, height: 16 },
     md: { width: 20, height: 20 }
@@ -92,10 +89,9 @@ export default function NavLink({
 
   const imageSize = imageSizeMapping[size]
 
-  ///////////////////////
-  // Get icon style based on active state, color, and style
-  // Why: Provide consistent icon coloring that matches text colors
-  // How: Uses centralized color config for icon styles
+  //////////////////////////////////
+  // Icon tone resolver (active/inactive x theme)
+  //////////////////////////////////
   const getIconStyle = (): string => {
     if (isActive) {
       return colorConfig.icon.active
@@ -104,7 +100,9 @@ export default function NavLink({
     }
   }
 
-  // Close mobile drawer on navigate (desktop rail ignores drawer state)
+  //////////////////////////////////
+  // Mobile drawer close on navigate
+  //////////////////////////////////
   const { closeSidebar } = useSidebar()
 
   const handleLinkClick = () => {
@@ -113,8 +111,11 @@ export default function NavLink({
 
   return (
     <Link
+      ref={linkRef}
       href={href}
       onClick={handleLinkClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`group flex items-center gap-3 text-sm font-medium transition-colors relative ${
         sizeClasses[size]
       } ${
@@ -127,7 +128,14 @@ export default function NavLink({
       
       {/* Tooltip - Only show when collapsed */}
       {isCollapsed && (
-        <NavTooltip text={text} color={color} isActive={isActive} />
+        <NavTooltip
+          text={text}
+          groupLabel={tooltipGroupLabel}
+          color={color}
+          isActive={isActive}
+          show={isHovered}
+          anchorRef={linkRef}
+        />
       )}
 
       {imageUrl ? (

@@ -12,6 +12,7 @@ import SidebarUserArea from '../sidebar-user-area'
 import SidebarLogo from '../sidebar-logo'
 import NavItemsList from './nav-items-list'
 import { sidebarConfig as config } from '../../config/config'
+import { SIDE_NAV_Z } from '../../config/z-index'
 import { cn } from '@/shared/lib/utils'
 import type { SideNavShellProps } from './types'
 
@@ -47,6 +48,7 @@ export default function DesktopRail({ user, isScrollable = false }: SideNavShell
         style === 'dark' ? '' : 'p-2',
         isScrollable ? 'h-screen' : 'h-screen',
       )}
+      style={{ zIndex: SIDE_NAV_Z.desktopRail }}
     >
       <div
         className={cn(

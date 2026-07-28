@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import PageHeader from '@/shared/ui/page-header/page-header'
 import CollapsibleCard from '@/shared/ui/collapsible-card'
 import DetailRow from '@/shared/ui/loading-skeletons/detail-row/detail-row'
 import EditableAvatar from './ui/editable-avatar'
@@ -48,7 +47,14 @@ const Profile = () => {
     <div className='flex-1 flex flex-col h-full w-full min-w-0 overflow-hidden relative'>
       <header className='absolute top-0 left-0 w-full lg:w-[calc(100%)] flex flex-col md:flex-row gap-4 p-4 border-b border-tertiary/10 items-center justify-between flex-shrink-0
       bg-background/20 backdrop-blur-sm z-[50]'>
-        <PageHeader subTitle="Profile information and account details" />
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg font-semibold tracking-tight">
+            Profile
+          </h1>
+          <p className="hidden text-sm text-muted-foreground md:block">
+            Profile information and account details
+          </p>
+        </div>
       </header>
 
       <div className='flex-1 overflow-y-auto overflow-x-hidden flex flex-col gap-8 p-6 md:p-8 pb-0 min-w-0 min-h-0 pt-[200px] lg:pt-[120px] w-full'>

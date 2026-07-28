@@ -41,6 +41,7 @@ import { NumberRangeFilterDropdown } from "./range-filters/number-range-filter-d
 import { RangeQuickSelectList } from "./components/range-quick-select-list"
 import { QuickSelectCollapsibleSection } from "./components/quick-select-collapsible-section"
 import { DropdownSortRow } from "@/platform/url-kit/filters/feature-sorting/components"
+import { URL_KIT_Z } from '@/platform/url-kit/config/z-index'
 
 //////////////////////////////////
 // Component Implementation
@@ -765,10 +766,11 @@ export function DropdownFilter({
       ? createPortal(
           <div
             ref={panelRef}
-            className="fixed z-50 flex max-h-[min(70vh,28rem)] min-h-0 w-64 flex-col overflow-hidden rounded border border-border bg-background/90 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-background/70"
+            className="fixed flex max-h-[min(70vh,28rem)] min-h-0 w-64 flex-col overflow-hidden rounded border border-border bg-background/90 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-background/70"
             style={{
               top: position.top,
               left: position.left,
+              zIndex: URL_KIT_Z.anchoredPanel,
               visibility: hasPositioned ? 'visible' : 'hidden',
             }}
           >

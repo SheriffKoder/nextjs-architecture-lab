@@ -19,11 +19,6 @@ import FiltersSection from './ui/layout-sections/filters-section'
 import TableAndPaginationSection from './ui/layout-sections/table-and-pagination-section'
 import TablePaginationErrorBoundary from './ui/layout-sections-error-boundaries/table-pagination-error-boundary'
 
-// Notifications
-import OfflineDetector from '@/shared/ui/offline/offline-detector'
-import ToastContainer from '@/shared/ui/toast/toast-container'
-import { ToastPosition, ToastStacking } from '@/shared/ui/toast/toast'
-
 // Navigation transition context
 import { NavigationTransitionRoot } from '@/platform/url-kit/filters/navigation-transition-context'
 
@@ -41,11 +36,6 @@ export default function DemoRscIndex({
 }) {
   return (
     <NavigationTransitionRoot>
-      <ToastContainer
-        position={ToastPosition.BOTTOM_RIGHT}
-        stacking={ToastStacking.PUSH_DOWN}
-      />
-      <OfflineDetector />
       <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
         <DemoRscPageHeader
           subTitle="Demo RSC page with server-side data fetching, filtering, and pagination"
@@ -53,8 +43,8 @@ export default function DemoRscIndex({
           showAddCarDrawerButton
         />
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pb-0 pt-0 md:pt-4">
-          <div className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden md:px-2">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pb-0 pt-0 md:pt-2 md:px-2">
+          <div className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden">
             <Suspense fallback={<FiltersSkeleton buttonCount={2} pillFilter={true} buttonWidthPx="md:w-[200px]" />}>
               <FiltersSection params={params} />
             </Suspense>

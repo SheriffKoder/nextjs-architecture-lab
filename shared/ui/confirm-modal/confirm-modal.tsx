@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/components/ui/button'
+import { CONFIRM_MODAL_Z } from './layers'
 
 export interface ConfirmModalProps {
   /** Whether the modal is open */
@@ -73,7 +74,8 @@ const ConfirmModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/20 backdrop-blur-[2px] p-4"
+      className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] p-4"
+      style={{ zIndex: CONFIRM_MODAL_Z.overlay }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"

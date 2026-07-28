@@ -22,6 +22,7 @@ side-nav/
 ├── index.ts
 ├── ui/
 │   ├── side-nav.tsx           # orchestrator (mobile + desktop shells)
+│   ├── nav-tooltip.tsx        # portaled collapsed tooltip (anchor-positioned)
 │   ├── shells/
 │   │   ├── mobile-drawer.tsx  # slide-over; always full labels; flexible width
 │   │   ├── desktop-rail.tsx   # dual nav layers + collapse chevron
@@ -30,7 +31,7 @@ side-nav/
 ├── lib/                       # path / active helpers
 ├── providers/                 # SidebarProvider / useSidebar
 ├── model/                     # nav config types
-└── config/                    # default nav items + theme colors
+└── config/                    # default nav items + theme colors + z-index tokens
 ```
 
 `MaskImage` lives in `@/shared/ui/mask-image` — this widget imports it; it does not own a copy.
@@ -108,6 +109,15 @@ The desktop rail uses two stacked nav layers:
 
 Labels stay on the open layer only, so they do not wrap mid-transition.
 
+### Layering + tooltip behavior
+
+- Collapsed side-nav tooltips are rendered via portal (`document.body`) from `ui/nav-tooltip.tsx`.
+- Tooltip layer is controlled by `config/z-index.ts` (`SIDE_NAV_Z.desktopTooltip`, band `70-79`, currently `75`).
+- Intended order: above page dropdowns/filters/views; below drawer/popup/confirm overlays.
+- Collapsed child links can show parent-group context in tooltip:
+  - muted label (e.g. `Demo pages`)
+  - main item name (e.g. `Car Rentals (Server)`)
+
 ## Changelog
 
 ### Mobile / desktop shells
@@ -124,7 +134,9 @@ Labels stay on the open layer only, so they do not wrap mid-transition.
 - **Dual nav layers** — collapsed icon rail fades out; open panel is absolute at full width and revealed as the shell widens (no label wrap mid-open)
 - **Open labels don’t reflow** — `whitespace-nowrap` on open-mode titles/subtext
 - **Collapse toggle visible** — shell does not use `overflow-hidden` (clipping stays on the nav viewport when open) so the `-right-6` chevron isn’t clipped
-- **Collapsed tooltips** — `overflow-visible` while collapsed; open panel hard-hidden (`invisible w-0`) so it doesn’t spill; `group` on expandable triggers for hover tooltips
+- **Collapsed tooltips (portal)** — tooltip is portaled and anchor-positioned, so it stacks above page overlays reliably
+- **Tooltip content hierarchy** — collapsed child links can show muted parent group label above the item name
+- **Group row tooltip removal** — expandable group row no longer shows a collapsed tooltip; context now appears on child tooltips
 - **Suspense fallback width** — root layout fallback matched to collapsed `w-24` to avoid a load jump (desktop only)
 
 ## Pieces also exported

@@ -10,6 +10,7 @@
 
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { MULTI_VIEW_Z } from '../config/z-index'
 
 export type RowActionsDropdownPortalProps = {
   open: boolean
@@ -78,13 +79,14 @@ export function RowActionsDropdownPortal({
   return createPortal(
     <div
       ref={menuRef}
-      className="pointer-events-auto fixed z-[19] min-w-[170px]"
-      style={{ top: coords.top, right: coords.right }}
+      className="pointer-events-auto fixed min-w-[170px]"
+      style={{ top: coords.top, right: coords.right, zIndex: MULTI_VIEW_Z.rowActionsMenu }}
     >
       <div className="relative" onMouseDown={(e) => e.stopPropagation()}>
         {/* Upward caret at panel top-right, pointing at the ⋯ trigger */}
         <div
-          className="pointer-events-none absolute -top-[6px] z-[20] right-3 size-3 rotate-45 border-l border-t border-border bg-background"
+          className="pointer-events-none absolute -top-[6px] right-3 size-3 rotate-45 border-l border-t border-border bg-background"
+          style={{ zIndex: MULTI_VIEW_Z.rowActionsMenuCaret }}
           aria-hidden
         />
         <div className={panelClassName}>{children}</div>

@@ -18,7 +18,6 @@
 import React, { useState, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import NavLink from './nav-link'
-import NavTooltip from './nav-tooltip'
 import LogoIconPair from './logo-icon-pair'
 import { NavItemConfig } from '../model/types'
 import { independentButtonConfig } from '../config/config'
@@ -74,8 +73,6 @@ export default function ExpandableGroup({
     })
     return parentMatch || childMatch || !!item.defaultOpen
   })
-  const [isHovered, setIsHovered] = useState(false)
-
   // When navigating into this group's routes, open if it was closed; do not auto-close when leaving (preserves manual state)
   useEffect(() => {
     if (isGroupActive) {
@@ -98,30 +95,11 @@ export default function ExpandableGroup({
     setIsOpen(!isOpen)
   }
 
-  // Handle hover for collapsed sidebar
-  const handleMouseEnter = () => {
-    if (isCollapsed) {
-      setIsHovered(true)
-    }
-  }
-
-  const handleMouseLeave = () => {
-    if (isCollapsed) {
-      setIsHovered(false)
-    }
-  }
-
-  const Icon = item.icon
-
   /** Closed: muted text + chevron; open: tertiary for label, icon, and chevron */
   const triggerTone = isOpen ? 'text-foreground/70' : 'text-foreground/70'
 
   return (
-    <div
-      className="relative overflow-visible"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="relative overflow-visible">
       <button
         type="button"
         tabIndex={0}
@@ -157,11 +135,6 @@ export default function ExpandableGroup({
             className={cn('size-4 shrink-0 transition-transform', triggerTone, isOpen && 'rotate-180')}
             aria-hidden
           />
-        )}
-        
-        {/* Tooltip - Only show when collapsed */}
-        {isCollapsed && (
-          <NavTooltip text={item.text} color={item.color || 'primary'} isActive={isGroupActive} />
         )}
       </button>
 
@@ -264,7 +237,7 @@ export default function ExpandableGroup({
               key={child.href}
               href={child.href}
               text={child.text}
-                subtext={child.subtext}
+              subtext={child.subtext}
               icon={child.icon}
               imageUrl={child.imageUrl}
               isActive={isChildActive}
@@ -272,6 +245,7 @@ export default function ExpandableGroup({
               size={child.size || 'sm'}
               isCollapsed={true}
               style={style}
+              tooltipGroupLabel={item.text}
             />
             )
           })}

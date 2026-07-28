@@ -17,6 +17,7 @@ import { useAnchoredPanelPosition } from '@/platform/url-kit/filters/lib/use-anc
 import type { PanelAlign } from '@/platform/url-kit/filters/lib/use-anchored-panel-position'
 import { cn } from '@/shared/lib/utils'
 import { IconTriggerButton } from '../shared/icon-trigger-button'
+import { URL_KIT_Z } from '@/platform/url-kit/config/z-index'
 
 export interface FilterControlProps {
   filters: FilterConfig[]
@@ -114,13 +115,14 @@ export function FilterControl({
           <div
             ref={panelRef}
             className={cn(
-              'fixed z-50 w-fit max-w-[calc(100vw-1rem)] min-w-[min(100vw-1.5rem,600px)] lg:min-w-[600px]',
+              'fixed w-fit max-w-[calc(100vw-1rem)] min-w-[min(100vw-1.5rem,600px)] lg:min-w-[600px]',
               'border border-border rounded-lg shadow-lg',
               panelClassName
             )}
             style={{
               top: position.top,
               left: position.left,
+              zIndex: URL_KIT_Z.anchoredPanel,
               visibility: hasPositioned ? 'visible' : 'hidden',
             }}
           >

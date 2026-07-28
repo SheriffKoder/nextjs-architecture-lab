@@ -70,7 +70,7 @@ export default function ViewToggleButton({
           }`}
         />
         
-        <div className="flex gap-1 relative z-2 w-full">
+        <div className="flex gap-1 relative z-[2] w-full">
           {/* Option One Button */}
           <button
             type="button"

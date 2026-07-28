@@ -1,15 +1,9 @@
 'use client'
 
-/**
- * useOfflineToast
- *
- * Purpose: Listen for browser `online` / `offline` and show grouped toasts via `useToast`.
- * Used in: `OfflineDetector` (page chrome next to `ToastContainer`)
- */
-
 import { useEffect, useRef } from 'react'
-import { ToastType } from '@/shared/ui/toast/toast'
-import { useToast } from '@/shared/ui/toast/use-toast'
+import { Wifi, WifiOff } from 'lucide-react'
+import { ToastType } from '../toast'
+import { useToast } from '../use-toast'
 
 /** Toast group — cleared before each connectivity toast so stacks do not pile up. */
 export const OFFLINE_TOAST_GROUP = 'connectivity'
@@ -60,6 +54,7 @@ export function useOfflineToast(options: UseOfflineToastOptions = {}) {
           title: onlineTitle,
           message: onlineMessage,
           group: OFFLINE_TOAST_GROUP,
+          icon: Wifi,
         })
       } else if (!online && notifyOnOffline) {
         addToast({
@@ -67,6 +62,8 @@ export function useOfflineToast(options: UseOfflineToastOptions = {}) {
           title: offlineTitle,
           message: offlineMessage,
           group: OFFLINE_TOAST_GROUP,
+          duration: 0,
+          icon: WifiOff,
         })
       }
     }
@@ -77,11 +74,6 @@ export function useOfflineToast(options: UseOfflineToastOptions = {}) {
     window.addEventListener('offline', handleOffline)
     window.addEventListener('online', handleOnline)
 
-    /**
-     * `navigator.onLine` and `online` / `offline` only reflect whether the browser
-     * thinks a network interface exists — not that your API is reachable.
-     * Wi‑Fi with no internet, captive portals, and VPNs often still report `onLine: true`.
-     */
     if (!skipInitial && typeof navigator !== 'undefined' && !navigator.onLine) {
       notify(false)
     }

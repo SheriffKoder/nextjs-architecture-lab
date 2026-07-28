@@ -15,6 +15,7 @@ import { sidebarConfig as config } from '../../config/config'
 import { useSidebar } from '../../providers/sidebar-context'
 import { cn } from '@/shared/lib/utils'
 import type { SideNavShellProps } from './types'
+import { SIDE_NAV_Z } from '../../config/z-index'
 
 export default function MobileDrawer({ user, isScrollable = false }: SideNavShellProps) {
   const pathname = usePathname()
@@ -45,19 +46,21 @@ export default function MobileDrawer({ user, isScrollable = false }: SideNavShel
         aria-label="Close sidebar"
         onClick={closeSidebar}
         className={cn(
-          'fixed inset-0 z-[89] bg-black/40 transition-opacity duration-300 md:hidden',
+          'fixed inset-0 bg-black/40 transition-opacity duration-300 md:hidden',
           isSidebarOpen
             ? 'pointer-events-auto opacity-100'
             : 'pointer-events-none opacity-0',
         )}
+        style={{ zIndex: SIDE_NAV_Z.mobileOverlay }}
       />
 
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-[90] flex w-[min(100vw-16px,320px)] max-w-full p-2 transition-transform duration-300 ease-in-out md:hidden',
+          'fixed inset-y-0 left-0 flex w-[min(100vw-16px,320px)] max-w-full p-2 transition-transform duration-300 ease-in-out md:hidden',
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
           isScrollable ? 'h-screen' : 'h-screen',
         )}
+        style={{ zIndex: SIDE_NAV_Z.mobilePanel }}
       >
         <div
           className={cn(

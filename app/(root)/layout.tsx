@@ -3,6 +3,7 @@
 import SideNav, { SidebarProvider, useSidebar } from '@/widgets/side-nav'
 import React, { Suspense, useEffect } from 'react'
 import '@/views/login/styles/main-background.css'
+import { ToastProvider } from '@/shared/ui/toast/toast-provider'
 
 /** Temporary stub until auth is re-implemented. */
 interface User {
@@ -82,10 +83,12 @@ const fallbackUser: User = {
 
 export default function layout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider defaultOpen={false}>
-      <LayoutContent user={fallbackUser}>
-        {children}
-      </LayoutContent>
-    </SidebarProvider>
+    <ToastProvider offline={true}>
+      <SidebarProvider defaultOpen={false}>
+        <LayoutContent user={fallbackUser}>
+          {children}
+        </LayoutContent>
+      </SidebarProvider>
+    </ToastProvider>
   )
 }

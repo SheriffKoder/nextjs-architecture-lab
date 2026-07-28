@@ -26,8 +26,10 @@
 
 'use client'
 
-import { useState, useEffect, type CSSProperties } from 'react'
-import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react'
+import { useState, useEffect, useRef, type CSSProperties } from 'react'
+import { X, CheckCircle, AlertCircle, AlertTriangle, Info, type LucideIcon } from 'lucide-react'
+import { TOAST_Z } from './layers'
+import { Button } from '@/components/ui/button'
 
 /**
  * Toast type enum
@@ -63,7 +65,10 @@ export enum ToastStacking {
   PUSH_DOWN = 'push-down'  // New toasts push existing ones down
 }
 
-/** Optional action button (e.g. Retry) shown below the toast message */
+export const DEFAULT_TOAST_STACK_GAP = 80
+export const TOAST_EXIT_ANIMATION_MS = 300
+
+/** Optional action button (e.g. Retry) shown in the right control rail */
 export type ToastAction = {
   label: string
   onClick: () => void
@@ -81,7 +86,7 @@ export interface ToastProps {
   duration?: number // in milliseconds, 0 = no auto-dismiss
   /** Optional bucket for bulk dismiss (e.g. `connectivity`) via `clearToastsByGroup` */
   group?: string
-  /** Optional action button below the message */
+  /** Optional action button in the toast control rail */
   action?: ToastAction
   position?: ToastPosition
   stacking?: ToastStacking
@@ -91,12 +96,14 @@ export interface ToastProps {
   index?: number // Internal use for stacking
   zIndex?: number // Custom z-index
   gap?: number
+  /** Optional icon override (e.g. connectivity toasts). */
+  icon?: LucideIcon
 }
 
 /** Payload for `addToast` / `useToast().addToast` */
 export type AddToastPayload = Pick<
   ToastProps,
-  'type' | 'title' | 'message' | 'duration' | 'group' | 'action'
+  'type' | 'title' | 'message' | 'duration' | 'group' | 'action' | 'icon'
 >
 
 /**
@@ -152,6 +159,16 @@ const positionClasses = {
   [ToastPosition.BOTTOM_CENTER]: 'bottom-4'
 }
 
+function getToastA11yProps(type: ToastType): {
+  role: 'alert' | 'status'
+  'aria-live': 'assertive' | 'polite'
+} {
+  if (type === ToastType.ERROR || type === ToastType.WARNING) {
+    return { role: 'alert', 'aria-live': 'assertive' }
+  }
+  return { role: 'status', 'aria-live': 'polite' }
+}
+
 /**
  * Toast notification component
  * @param {ToastProps} props - Component props
@@ -170,14 +187,17 @@ export default function Toast({
   showCloseButton = true,
   className = '',
   index,
-  gap = 20,
-  zIndex
+  gap = DEFAULT_TOAST_STACK_GAP,
+  zIndex,
+  icon,
 }: ToastProps) {
-  const [isVisible, setIsVisible] = useState(true)
+  const [isVisible, setIsVisible] = useState(false)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const colors = toastColors[type]
-  const IconComponent = toastIcons[type]
+  const IconComponent = icon ?? toastIcons[type]
   const basePositionClass = positionClasses[position]
+  const a11yProps = getToastA11yProps(type)
 
   const isHorizontallyCentered =
     position === ToastPosition.TOP_CENTER || position === ToastPosition.BOTTOM_CENTER
@@ -189,19 +209,19 @@ export default function Toast({
       return null
     }
 
-    const offset = index * gap // 80px per toast (includes margin)
+    const offset = index * gap
 
     if (stacking === ToastStacking.PUSH_UP) {
       if (position.includes('top')) {
-        return `translateY(-${offset+(gap*index)}px)`
+        return `translateY(-${offset}px)`
       }
-      return `translateY(${offset+(gap*index)}px)`
+      return `translateY(${offset}px)`
     }
     if (stacking === ToastStacking.PUSH_DOWN) {
       if (position.includes('top')) {
-        return `translateY(${offset+(gap*index)}px)`
+        return `translateY(${offset}px)`
       }
-      return `translateY(-${offset+(gap*index)}px)`
+      return `translateY(-${offset}px)`
     }
 
     return null
@@ -220,81 +240,103 @@ export default function Toast({
   const positionClass = basePositionClass
 
   const combinedStyle: CSSProperties = {
-    zIndex: zIndex || 100,
+    zIndex: zIndex || TOAST_Z.container,
     ...(isHorizontallyCentered ? { left: '50%' } : {}),
     ...(outerTransform ? { transform: outerTransform } : {}),
   }
 
   useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setIsVisible(true)
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [])
+
+  useEffect(() => {
     if (duration > 0) {
       const timer = setTimeout(() => {
         setIsVisible(false)
-        setTimeout(() => {
+        closeTimerRef.current = setTimeout(() => {
           onClose?.(id)
-        }, 300) // Wait for fade out animation
+        }, TOAST_EXIT_ANIMATION_MS) // Wait for fade out animation
       }, duration)
 
-      return () => clearTimeout(timer)
+      return () => {
+        clearTimeout(timer)
+      }
     }
   }, [duration, onClose, id])
 
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current)
+      }
+    }
+  }, [])
+
   const handleClose = () => {
     setIsVisible(false)
-    setTimeout(() => {
+    closeTimerRef.current = setTimeout(() => {
       onClose?.(id)
-    }, 300) // Wait for fade out animation
-  }
-
-  if (!isVisible) {
-    return null
+    }, TOAST_EXIT_ANIMATION_MS) // Wait for fade out animation
   }
 
   return (
     <div
-      className={`pointer-events-auto fixed ${positionClass} max-w-sm w-full transition-transform duration-300 ease-in-out ${className}`}
+      className={`pointer-events-auto fixed ${positionClass} w-[min(22rem,calc(100vw-1rem))] transition-transform duration-300 ease-in-out ${className}`}
       style={combinedStyle}
-      role="alert"
-      aria-live="assertive"
+      role={a11yProps.role}
+      aria-live={a11yProps['aria-live']}
     >
       <div
-        className={`${colors.bg} ${colors.border} border rounded-lg shadow-lg p-2 transition-all duration-300 ease-in-out ${
+        className={`${colors.bg} ${colors.border} border rounded-lg shadow-lg p-2.5 transition-all duration-300 ease-in-out ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}
       >
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-2.5">
           {/* Icon */}
-          <IconComponent className={`w-5 h-5 mt-0.5 flex-shrink-0 ${colors.icon}`} />
+          <IconComponent className={`h-4 w-4 mt-0.5 shrink-0 ${colors.icon}`} />
           
           {/* Content */}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             {title && (
-              <h3 className={`text-sm font-medium ${colors.text} mb-1`}>
+              <h3 className={`text-sm font-semibold leading-tight ${colors.text}`}>
                 {title}
               </h3>
             )}
-            <p className={`text-sm ${colors.text}`}>
+            <p className={`text-xs leading-tight opacity-85 ${colors.text} ${title ? 'mt-0.5' : ''}`}>
               {message}
             </p>
-            {action ? (
-              <button
-                type="button"
-                onClick={action.onClick}
-                className={`mt-2 text-sm font-medium underline underline-offset-2 hover:opacity-80 ${colors.text}`}
-              >
-                {action.label}
-              </button>
-            ) : null}
           </div>
-          
-          {/* Close Button */}
-          {showCloseButton && (
-            <button
-              onClick={handleClose}
-              className={`flex-shrink-0 p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${colors.text}`}
-              aria-label="Close notification"
-            >
-              <X className="w-4 h-4" />
-            </button>
+
+          {/* Action + close rail */}
+          {(action || showCloseButton) && (
+            <div className="ml-1 flex shrink-0 items-center gap-1 self-center">
+              {action ? (
+                <Button
+                  type="button"
+                  variant="control"
+                  size="sm"
+                  onClick={action.onClick}
+                  className={`h-7 px-2.5 text-xs ${colors.text}`}
+                >
+                  {action.label}
+                </Button>
+              ) : null}
+
+              {showCloseButton && (
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className={`rounded-md p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${colors.text}`}
+                  aria-label="Close notification"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>

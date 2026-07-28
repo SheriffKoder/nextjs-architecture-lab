@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { POPUP_Z } from './layers'
 
 /**
  * Props for {@link Popup}.
@@ -71,7 +72,8 @@ export default function Popup({
 
   return (
     <div
-      className="fixed inset-0 z-[101] flex h-screen w-screen flex-col items-center justify-center bg-black/20 backdrop-blur-[2px]"
+      className="fixed inset-0 flex h-screen w-screen flex-col items-center justify-center bg-black/20 backdrop-blur-[2px]"
+      style={{ zIndex: POPUP_Z.overlay }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="popup-title"
@@ -99,7 +101,8 @@ export default function Popup({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-2 right-2 z-[2] cursor-pointer rounded-full bg-white/10 p-1"
+          className="absolute top-2 right-2 cursor-pointer rounded-full bg-white/10 p-1"
+          style={{ zIndex: POPUP_Z.closeButton }}
           aria-label="Close"
         >
           <X className="h-4 w-4 text-foreground/70 dark:text-foreground/50" />

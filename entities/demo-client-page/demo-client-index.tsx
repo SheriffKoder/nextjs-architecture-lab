@@ -15,7 +15,6 @@
 'use client'
 
 import { useCallback } from 'react'
-import PageHeader from '@/shared/ui/page-header/page-header'
 import { FiltersHeader } from '@/platform/url-kit/filters/components/filters-header'
 import { PaginationFooter } from '@/platform/url-kit/filters/components/pagination-footer'
 import { LoadingFiltersBar } from '@/platform/url-kit/filters/feature-filtering/components'
@@ -25,8 +24,6 @@ import { useUrlPagination } from '@/platform/url-kit/filters/feature-pagination/
 import ActionButtons from '@/views/demo-rsc-page/ui/action-buttons'
 
 // Toast Notifications
-import ToastContainer from '@/shared/ui/toast/toast-container'
-import { ToastPosition, ToastStacking } from '@/shared/ui/toast/toast'
 import { useToast } from '@/shared/ui/toast/use-toast'
 
 import {
@@ -124,14 +121,15 @@ export default function DemoClientIndex() {
 
   return (
     <div className="flex-1 flex flex-col h-full w-full min-w-0 overflow-hidden">
-
-      {/* Toast Notifications container */}
-      <ToastContainer
-        position={ToastPosition.BOTTOM_RIGHT}
-        stacking={ToastStacking.PUSH_DOWN}
-      />
       <header className="flex flex-col md:flex-row gap-4 p-4 border-b border-tertiary/10 items-center justify-between flex-shrink-0">
-        <PageHeader subTitle="Client-side data via TanStack Query, URL filters, and shared ViewOrchestrator" />
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg font-semibold tracking-tight">
+            Car Rentals (Client)
+          </h1>
+          <p className="hidden text-sm text-muted-foreground md:block">
+            Client-side data via TanStack Query, URL filters, and shared ViewOrchestrator
+          </p>
+        </div>
 
         {/* Action buttons */}
         <ActionButtons

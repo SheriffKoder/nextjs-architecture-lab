@@ -30,8 +30,8 @@ export default function AddCarButton({
         size="icon-sm"
         onClick={open}
         className="md:hidden"
-        aria-label="Add car"
-        title="Add car"
+        aria-label="Add Car"
+        title="Add Car"
       >
         <Plus className="h-4 w-4" strokeWidth={2} />
       </Button>
@@ -44,7 +44,7 @@ export default function AddCarButton({
         className="hidden h-auto py-2.5 md:inline-flex [&_svg]:size-5"
       >
         <Plus strokeWidth={2} />
-        Add car
+        Add Car
       </Button>
     </>
   )

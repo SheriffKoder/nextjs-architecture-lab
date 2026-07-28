@@ -169,7 +169,7 @@
         defaultOpen: true,
         children: [
           {
-            href: '/demo-rsc-page',
+            href: '/demo-rsc-page?view=list&groupBy=status',
             text: 'Car Rentals (Server)',
             subtext: 'Server-rendered',
             icon: FolderKanban,
@@ -187,7 +187,7 @@
             size: 'sm'
           },
           {
-            href: '/demo-hybrid-page',
+            href: '/demo-hybrid-page?view=list&groupBy=status',
             text: 'Car Rentals (Hybrid)',
             subtext: 'RSC prefetch + TanStack hydration',
             icon: FolderKanban,

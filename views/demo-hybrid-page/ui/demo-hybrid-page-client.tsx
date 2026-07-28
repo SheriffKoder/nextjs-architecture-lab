@@ -21,11 +21,8 @@ import {
 } from '@/entities/demo-hybrid-cars/queries'
 import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
 import { useUrlParamsTransport } from '@/platform/url-kit/url-params'
-import OfflineDetector from '@/shared/ui/offline/offline-detector'
 import FilterToolbarSkeleton from '@/shared/ui/loading-skeletons/filters/filter-toolbar-skeleton'
 import TableSkeleton from '@/shared/ui/loading-skeletons/table/table-skeleton'
-import ToastContainer from '@/shared/ui/toast/toast-container'
-import { ToastPosition, ToastStacking } from '@/shared/ui/toast/toast'
 import {
   DEMO_HYBRID_INFINITE_LOAD_TRIGGER,
   DEMO_RSC_DEFAULT_VIEW,
@@ -152,18 +149,12 @@ export function DemoHybridPageClient() {
 
   return (
     <>
-      <ToastContainer
-        position={ToastPosition.BOTTOM_RIGHT}
-        stacking={ToastStacking.PUSH_DOWN}
-      />
-      <OfflineDetector />
-
       <div className="flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden">
         <DemoHybridPageHeader />
 
         <DemoHybridDrawerLayer />
 
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden pb-0 pt-0 md:pt-2 md:px-2">
           {showFiltersLoading ? (
             <FilterToolbarSkeleton />
           ) : (

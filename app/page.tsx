@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 // import '../features/login/styles/login-background-light.css'
 import '../views/login/styles/main-background.css'
 
-const HOME_PATH = process.env.NEXT_PUBLIC_HOME_PATH || '/dashboard'
+const HOME_PATH = process.env.NEXT_PUBLIC_HOME_PATH || '/demo-rsc-page?view=list&groupBy=status'
 
 const page = () => {
   const router = useRouter()
@@ -27,7 +27,7 @@ const page = () => {
             {/* <div className='absolute inset-0 login-background-dark hidden dark:block z-0'></div> */}
             <div className='absolute inset-0 main-background opacity-80 dark:opacity-40 block z-0'></div>
 
-            <div className='absolute inset-0 z-1'>
+            <div className='absolute inset-0 z-[1]'>
                 <BlurGrid />
             </div>
 

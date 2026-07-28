@@ -14,6 +14,6 @@ import type { PlaceholderMarqueeProp } from '@/platform/url-kit/filters/feature-
  * - `{ desktop: { cycleMs: 12000 }, mobile: true }` → per-shell timing
  */
 export const DEMO_RSC_PLACEHOLDER_MARQUEE: PlaceholderMarqueeProp = {
-  desktop: true,
+  desktop: false,
   mobile: true,
 }
