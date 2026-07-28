@@ -1,7 +1,7 @@
 /**
  * Layering tokens for multi-view contextual chrome and overlays.
  *
- * @see docs/ui/z-index.md
+ * @see docs/reference/z-index.md
  */
 export const MULTI_VIEW_Z = {
   stickyHeader: 10,

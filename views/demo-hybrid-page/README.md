@@ -2,4 +2,6 @@
 
 Hybrid rental cars page: RSC cold-load prefetch into TanStack Query, client shell for subsequent fetches.
 
-Phase 0 scaffold — see [architecture/0-hybrid-scaffold.md](./docs/architecture/0-hybrid-scaffold.md).
+- **Kit:** [Starter kit](../../docs/guides/README.md)
+- **Bootstrap plan:** [implementation-plan.md](./implementation-plan.md)
+- **Lab / architecture story:** [docs/index.md](./docs/index.md)

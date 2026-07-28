@@ -1,6 +1,6 @@
 # Major shifts — RSC demo → hybrid
 
-Cross-cutting decisions and learnings from Phases 0–5. Phase-by-phase how-tos live in sibling docs; migration playbook and full ADRs live under `app/development/hybrid-migration/`.
+Cross-cutting decisions and learnings from Steps 0–5. Step-by-step narrative lives in sibling docs; conclusion in [reflections/hybrid-conclusion.md](../reflections/hybrid-conclusion.md).
 
 This page answers: **what changed architecturally vs pure RSC, and why we chose it.**
 
@@ -41,7 +41,7 @@ See: [0-hybrid-scaffold.md](./0-hybrid-scaffold.md), `entities/demo-hybrid-cars/
 
 1. Phase 2 — page-local shallow list params (learning prototype).
 2. Phase 2.5+ — unified **`platform/url-kit/url-params/`**: router adapter (RSC fallback) vs shallow adapter (`ShallowUrlProvider` on hybrid). Same chrome hooks; provider picks transport.
-3. nuqs deferred — reserved adapter slot only ([url-state.md](../../../../app/development/hybrid-migration/decisions/url-state.md), [url-kit-transport.md](../../../../app/development/hybrid-migration/decisions/url-kit-transport.md)).
+3. nuqs deferred — reserved adapter slot only; see [2.5-url-kit-transport-and-sections.md](./2.5-url-kit-transport-and-sections.md).
 
 **Learning:** Shareable URL ≠ App Router navigation. Shallow commit keeps the address bar; TanStack keys trigger fetch.
 
@@ -56,7 +56,7 @@ See: [2-shallow-url-and-queries.md](./2-shallow-url-and-queries.md), [2.5-url-ki
 | List data | `page`, `limit`, `sort`, `q`, filters | Yes — part of `RentalCarListQuery` |
 | View chrome | `view`, `groupBy`, … | Only if view mode changes data path (paginated / infinite / showAll) |
 | Drawer | `drawer`, `mode`, `id` | No list refetch — detail query only |
-| Confirm | `action=delete` (today) | No — Phase 6 moves off URL |
+| Confirm | `action=delete` (today) | No — [confirmation-modal-off-url.md](../to-implement/confirmation-modal-off-url.md) |
 
 Hybrid never needed a separate `demoRscDataParamsToCacheKey` for list: TanStack keys are built from the typed list query, which already omits UI-only params.
 
@@ -86,7 +86,7 @@ Early hybrid draft considered Zustand-only drawer open/mode/id to avoid RSC remo
 
 **Learning:** Instant drawer = shallow URL + warm detail cache — not “strip drawer from the URL.” Record drawers are shareable navigation state.
 
-See: [drawer-url-state.md](../../../../app/development/hybrid-migration/decisions/drawer-url-state.md), [3-url-drawer-client-content.md](../drawers/3-url-drawer-client-content.md).
+See: [3-url-drawer-client-content.md](../drawers/3-url-drawer-client-content.md).
 
 ---
 
@@ -129,7 +129,7 @@ Same GET handler (`page` + `limit`). Different cache shapes:
 
 **Bridge (Phase 5):** each infinite page success also `setQueryData` into `list({ …, page })` so exiting All / jumping pages can reuse work. Reverse (list → rebuild `InfiniteData`) stays out of scope.
 
-Full findings: [pagination.md](../../../../app/development/hybrid-migration/decisions/pagination.md). Plan: [phase-5-infinite-scroll.md](../../../../app/development/hybrid-migration/phase-5-infinite-scroll.md).
+Full findings: [5-infinite-scroll.md](../ui/5-infinite-scroll.md).
 
 ---
 
@@ -156,7 +156,7 @@ Same visual idea (delayed dim); different signal (client fetch vs navigation pen
 
 | Topic | Doc |
 |-------|-----|
-| Shallow URL vs nuqs (v1) | [url-state.md](../../../../app/development/hybrid-migration/decisions/url-state.md) |
-| `url-params` transport | [url-kit-transport.md](../../../../app/development/hybrid-migration/decisions/url-kit-transport.md) |
-| Drawer stays on URL | [drawer-url-state.md](../../../../app/development/hybrid-migration/decisions/drawer-url-state.md) |
-| List vs infinite cache | [pagination.md](../../../../app/development/hybrid-migration/decisions/pagination.md) |
+| Shallow URL vs nuqs (v1) | [2.5-url-kit-transport-and-sections.md](./2.5-url-kit-transport-and-sections.md) |
+| `url-params` transport | [2.5-url-kit-transport-and-sections.md](./2.5-url-kit-transport-and-sections.md) |
+| Drawer stays on URL | [3-url-drawer-client-content.md](../drawers/3-url-drawer-client-content.md) |
+| List vs infinite cache | [5-infinite-scroll.md](../ui/5-infinite-scroll.md) |

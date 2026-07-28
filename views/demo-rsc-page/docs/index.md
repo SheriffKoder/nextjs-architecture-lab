@@ -2,6 +2,8 @@
 
 Paths are relative to `views/demo-rsc-page/docs/`.
 
+**Root docs hub:** [`docs/lab/`](../../../docs/lab/README.md) · [`docs/guides/`](../../../docs/guides/README.md)
+
 ## Numbered series
 
 **[2-drawer-system](drawers/2-drawer-system.md)**  

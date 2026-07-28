@@ -1,7 +1,7 @@
 /**
  * Shared z-index tokens for RightDrawer shell.
  *
- * @see docs/ui/z-index.md
+ * @see docs/reference/z-index.md
  */
 export const RIGHT_DRAWER_Z = {
   overlay: 89,

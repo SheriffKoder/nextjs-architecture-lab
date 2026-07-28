@@ -1,31 +1,39 @@
-# Shallow URL + client list/facet queries
+# Step 2 — Shallow URL + TanStack list/facets
 
-## What changed
+## What this step introduced
 
-- List URL state updates without `router.replace` (no RSC remount on filter/sort/page).
+- Shallow URL writes — list state updates without `router.replace` (no RSC remount on filter/sort/page).
 - Shared parser: `parseListQueryFromSearchParams` used by RSC prefetch and the client hook.
 - `useRentalCars` / `useRentalCarFilterOptions` driven by `listQuery`, with `placeholderData: keepPreviousData`.
-- No `NavigationTransitionRoot` / navigation dimmer on the filter path — `FetchPendingDimmer` instead.
+- `FetchPendingDimmer` instead of `NavigationTransitionRoot` / navigation dimmer on the filter path.
 
-### Superseded note (Phase 2 → 2.5)
+## What bottleneck it fixed
 
-Phase 2 started with a page-local shallow list hook. That was replaced by **`platform/url-kit/url-params`** + `<ShallowUrlProvider>` so the same FilterToolbar / PaginationFooter chrome works on RSC (router fallback) and hybrid (shallow). See [2.5-url-kit-transport-and-sections.md](./2.5-url-kit-transport-and-sections.md). Cross-cutting shifts: [rsc-to-hybrid-shifts.md](./rsc-to-hybrid-shifts.md).
+- **`router.replace`-driven RSC remount on filter/sort/page changes** (RSC bottleneck 4). Every URL write re-ran the RSC tree and triggered Suspense islands + transition dimming workarounds.
+- **Perceived blocking latency** on soft navigations — the whole page felt frozen while the server re-rendered.
 
-## Network waterfall (verify in DevTools)
+## Findings during implementation
 
-1. **Cold load** — document request once; list + options hydrated from RSC (or client refill if miss).
-2. **Change filter / page / sort** — address bar updates immediately; **no** Next.js RSC document/flight refetch for the page. Only `GET /api/demo-hybrid-page/cars` and `…/options`.
-3. **While fetching** — previous rows stay visible; table dims after 150ms (`FetchPendingDimmer`, same as RSC `NavigationPendingDimmer`).
-4. **Back/forward** — `popstate` re-parses URL → same TanStack keys → cache hit or refetch.
+- Shareable URL ≠ App Router navigation. Shallow commit keeps the address bar; TanStack `queryKey` is the fetch trigger.
+- Previous-data + dimmer gives smoother UX than navigation pending for this model — rows stay visible while new data loads.
+- Hybrid never needed a separate `demoRscDataParamsToCacheKey` for list: TanStack keys are built from the typed `RentalCarListQuery`, which already omits UI-only params.
+- Early Phase 2 used a page-local shallow hook and a thin filter strip; Step 2.5 replaced that with unified `url-params` transport + full RSC-mirror sections.
 
-## Why this replaces RSC URL transitions
+## Fixes applied during the step
 
-Phase 1 drove list state through `searchParams` + `router.replace`, so every filter click remounted the RSC tree. Shallow URL keeps the shareable query string; TanStack `queryKey` is the fetch trigger.
+- `FetchPendingDimmer` (150ms delay) mirrors RSC `NavigationPendingDimmer` visual language but signals client fetch, not navigation pending.
+- `popstate` re-parses URL → same TanStack keys → cache hit or refetch on back/forward.
 
-## Intentional scope notes (historical Phase 2)
+## Trade-offs and remaining edges
 
-Early Phase 2 used a thin controlled filter strip before full url-kit chrome. Phases 2.5–2.6 restored RSC-parity toolbar / pagination / optional chrome via transport. Drawer URL + client body landed in Phase 3.
+- Requires `ShallowUrlProvider` on hybrid (Step 2.5) for full chrome parity — page-local hook was a learning prototype.
+- Drawer and confirm params remain UI-only and do not trigger list refetch — documented in Step 3.
 
-## No data-only cache key
+### Network waterfall (verify in DevTools)
 
-Hybrid never copied `demoRscDataParamsToCacheKey` / `unstable_cache` for list. TanStack keys already exclude UI-only params because those keys are not part of `RentalCarListQuery`.
+1. **Cold load** — document request once; list + options hydrated from RSC.
+2. **Change filter / page / sort** — address bar updates immediately; **no** RSC document/flight refetch. Only API GETs.
+3. **While fetching** — previous rows stay visible; table dims after 150ms.
+4. **Back/forward** — `popstate` → cache hit or refetch.
+
+Superseded by transport layer: [2.5-url-kit-transport-and-sections.md](./2.5-url-kit-transport-and-sections.md).
