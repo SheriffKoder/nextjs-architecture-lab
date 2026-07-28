@@ -71,8 +71,8 @@ export const subheadingsDisplayConfig: TableConfig<RentalCarTableItem> = {
  * Controls how items are grouped in the subheadings view
  */
 export const subheadingsGroupingConfig = {
-  // Required: Key to group by (defaults to 'status' if not provided)
-  columnKey: 'status',
+  // Optional: default group field when URL `groupBy` is unset. Omit for ungrouped subheadings.
+  // columnKey: 'status',
   
   // Optional: Explicit group configuration (shows all groups even if empty)
   // groups: [

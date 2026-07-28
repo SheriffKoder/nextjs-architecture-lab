@@ -30,7 +30,9 @@ Each phase has a runnable demo, a full lab write-up in this folder, and a step-b
 
 **Read the phase:** [Phase 2 — Hybrid RSC + TanStack](./phase-2-hybrid.md)
 
-**Journey docs:** [Journey index](../../views/demo-hybrid-page/docs/index.md) · [Conclusion](../../views/demo-hybrid-page/docs/reflections/hybrid-conclusion.md) · [RSC → hybrid shifts](../../views/demo-hybrid-page/docs/architecture/rsc-to-hybrid-shifts.md)
+**How it evolved:** [How the hybrid model evolved](../../views/demo-hybrid-page/docs/reflections/model-evolution.md) — what the earlier hybrid model got wrong and what the current model fixes.
+
+**Journey docs:** [Journey index](../../views/demo-hybrid-page/docs/index.md) · [Model evolution](../../views/demo-hybrid-page/docs/reflections/model-evolution.md) · [Conclusion](../../views/demo-hybrid-page/docs/reflections/hybrid-conclusion.md) · [RSC → hybrid shifts](../../views/demo-hybrid-page/docs/architecture/rsc-to-hybrid-shifts.md)
 
 **Route:** `/demo-hybrid-page`
 
@@ -76,6 +78,7 @@ Cross-phase decision index: [`views/demo-hybrid-page/docs/architecture/rsc-to-hy
 
 ## Stable concepts
 
+- [Config-driven pages](../architecture/config-driven-pages.md) — compose list pages from view-local config; platform widgets consume it
 - [Architecture philosophy](../architecture/philosophy.md) — when to prefer server vs client, RSC vs hybrid
 - [Project layers](../architecture/layers.md) — `app` → `views` → `entities` → `platform`
 

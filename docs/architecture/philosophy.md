@@ -56,6 +56,7 @@ Both demos share:
 - Same `platform/url-kit` chrome (transport adapter differs)
 - Same multi-view widget and config shape
 - Same list query contract (`params` → query builder → data)
+- **Config-driven composition** — filters, columns, and view modes declared in `views/*/config/`; see [Config-driven pages](./config-driven-pages.md)
 
 ## What changes
 

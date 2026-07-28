@@ -111,7 +111,7 @@ interface SubHeadingsContainerProps<T = any> {
   // ============================================
   // Grouping Props
   // ============================================
-  groupByKey?: string; // Key to group by (defaults to 'status')
+  groupByKey?: string; // Optional config default when URL groupBy is unset
   groupsConfig?: Array<{ key: string; label: string }>; // Explicit group configuration (shows all groups even if empty)
   nestedGrouping?: {
     enabled: boolean;
@@ -189,7 +189,7 @@ export function SubHeadingsContainer<T = any>({
   tableConfig,
   
   // Grouping Props
-  groupByKey = 'status',
+  groupByKey,
   groupsConfig,
   nestedGrouping,
   selectedGroupBy,
@@ -301,15 +301,10 @@ export function SubHeadingsContainer<T = any>({
   ////////////////////////////////////
   
   /**
-   * Determine effective groupByKey
-   * If minimalControlsConfig is present, use selectedGroupBy if set, otherwise fall back to groupByKey
-   * (Subheadings view always needs grouping, so we can't use undefined)
-   * Otherwise, use selectedGroupBy with config as fallback
+   * URL groupBy wins; otherwise optional config `groupByKey`. No implicit default.
    */
   const isMinimalControlsEnabled = minimalControlsConfig !== undefined;
-  const effectiveGroupByKey = isMinimalControlsEnabled
-    ? (selectedGroupBy ?? groupByKey)
-    : (selectedGroupBy ?? groupByKey);
+  const effectiveGroupByKey = selectedGroupBy ?? groupByKey ?? undefined;
 
   /**
    * Nested grouping: GroupingControl wins when minimal controls are on and both keys are set;
@@ -336,6 +331,10 @@ export function SubHeadingsContainer<T = any>({
     nestedGrouping,
   ]);
 
+  const isGrouped = Boolean(
+    effectiveNestedGrouping?.enabled || effectiveGroupByKey
+  );
+
   /**
    * Group data by the effectiveGroupByKey
    * Returns a map of group values to arrays of items
@@ -343,6 +342,18 @@ export function SubHeadingsContainer<T = any>({
    * Supports nested grouping with composite keys (primary|secondary)
    */
   const derivedGroupedData = useMemo(() => {
+    if (!isGrouped) {
+      const flat = [...displayData];
+      if (manualSorting) {
+        flat.sort(
+          (a, b) =>
+            ((a as Record<string, number>).manual_sorting ?? 0) -
+            ((b as Record<string, number>).manual_sorting ?? 0)
+        );
+      }
+      return flat.length > 0 ? { __flat__: flat } : {};
+    }
+
     const groups: Record<string, T[]> = {};
     
     // If groupsConfig is provided, initialize all groups first (ensures empty groups are shown)
@@ -384,7 +395,7 @@ export function SubHeadingsContainer<T = any>({
     }
     
     return groups;
-  }, [displayData, effectiveGroupByKey, groupsConfig, effectiveNestedGrouping, manualSorting]);
+  }, [displayData, effectiveGroupByKey, groupsConfig, effectiveNestedGrouping, manualSorting, isGrouped]);
 
   const manualSortActive = manualSorting === true;
 
@@ -393,7 +404,7 @@ export function SubHeadingsContainer<T = any>({
 
   const { state: boardState, dispatch } = useSubheadingsReducerState<T>(
     derivedGroupedData,
-    effectiveGroupByKey,
+    effectiveGroupByKey ?? '',
     isManualOnChangeRef,
     onSubheadingsItemUpdate,
     idKey,
@@ -453,13 +464,17 @@ export function SubHeadingsContainer<T = any>({
    * Get group keys - use config if provided, otherwise use data-driven keys
    */
   const groupKeys = useMemo(() => {
+    if (!isGrouped) {
+      return displayData.length > 0 ? ['__flat__'] : [];
+    }
+
     if (groupsConfig && groupsConfig.length > 0) {
       // Use configured groups in order, ensuring all groups are shown
       return groupsConfig.map(group => group.key);
     }
     // Fallback to data-driven groups (original behavior)
     return Object.keys(groupedData).sort();
-  }, [groupedData, groupsConfig]);
+  }, [groupedData, groupsConfig, isGrouped, displayData.length]);
 
   /**
    * Format group display name
@@ -595,7 +610,7 @@ export function SubHeadingsContainer<T = any>({
       return;
     }
 
-    if (!subheadingsDragEnd) {
+    if (!subheadingsDragEnd || !isGrouped) {
       return;
     }
 
@@ -615,7 +630,7 @@ export function SubHeadingsContainer<T = any>({
       data as Record<string, any>[],
       itemId,
       targetGroupKey,
-      effectiveGroupByKey,
+      effectiveGroupByKey!,
       effectiveNestedGrouping ?? undefined
     ) as T[];
 
@@ -820,6 +835,63 @@ export function SubHeadingsContainer<T = any>({
                       <p className="text-lg font-medium mb-2">No data found</p>
                       <p className="text-sm">No data available</p>
                     </div>
+                  </div>
+                ) : !isGrouped && !manualSortActive ? (
+                  <div className="flex flex-col w-full">
+                    {displayData.map((item, index) => {
+                      const isSelected =
+                        selectedItemId &&
+                        (item as any).id &&
+                        (item as any).id.toString() === selectedItemId.toString();
+                      const rowId = (item as any)?.id;
+                      const handleToggleRow = rowId
+                        ? async () => {
+                            await toggleRow(rowId, item);
+                            setTimeout(() => {
+                              resetAfterIndex(index);
+                            }, 0);
+                          }
+                        : undefined;
+
+                      return (
+                        <VirtualizedTableRow
+                          key={(item as any)?.id ?? (item as any)?._id ?? index}
+                          item={item}
+                          columns={visibleColumns}
+                          onRowClick={onRowClick}
+                          onRowPointerEnter={onRowPointerEnter}
+                          style={{ width: '100%' }}
+                          isLastRow={index === displayData.length - 1}
+                          onActionClick={onActionClick}
+                          actionMode={actionMode}
+                          actionConfigs={actionConfigs}
+                          truncateText={!effectiveDynamicRowHeight}
+                          isSelected={!!isSelected}
+                          editableColumns={editableColumns}
+                          onCellValueChange={onCellValueChange}
+                          rowIndex={index}
+                          calculatedRowHeight={calculatedRowHeight}
+                          groupStylerConfig={groupStylerConfig}
+                          rowStyler={rowStyler}
+                          rowHighlighting={rowHighlighting}
+                          searchHighlightStyle={undefined}
+                          rowExpansionEnabled={rowExpansionEnabled}
+                          isRowExpanded={rowId ? isRowExpanded(rowId) : false}
+                          onToggleRow={handleToggleRow}
+                          expandedChildren={
+                            rowId && rowExpansionEnabled ? getChildren(rowId) : []
+                          }
+                          isLoadingChildren={
+                            rowId && rowExpansionEnabled
+                              ? isLoadingChildren(rowId)
+                              : false
+                          }
+                          renderExpandedContent={rowExpansion?.renderExpandedContent}
+                          expandedContentHeight={rowExpansion?.expandedContentHeight}
+                          columnActions={columnActions}
+                        />
+                      );
+                    })}
                   </div>
                 ) : primaryGroupsMap ? (
                   // Nested rendering: Primary group headers with secondary groups
@@ -1201,7 +1273,7 @@ export function SubHeadingsContainer<T = any>({
                   <div className={`flex flex-col w-full ${listView ? "gap-0" : "gap-8"}`}>
                     {groupKeys.map((groupKey) => {
                       const groupItems = groupedData[groupKey];
-                      const isExpanded = listView ? true : expandedGroups.has(groupKey);
+                      const isExpanded = listView || !isGrouped ? true : expandedGroups.has(groupKey);
 
                       const groupShell = (inner: React.ReactNode) =>
                         manualSortActive ? (
@@ -1220,7 +1292,7 @@ export function SubHeadingsContainer<T = any>({
 
                       return groupShell(
                         <div className="w-full">
-                          {!listView && (
+                          {!listView && isGrouped && (
                             <div
                               className="w-[100%] flex items-center justify-between px-0 py-3 cursor-pointer hover:bg-tertiary/10 group transition-colors border-b border-tertiary/10"
                               onClick={() => toggleGroup(groupKey)}
@@ -1416,6 +1488,7 @@ export function SubHeadingsContainer<T = any>({
                                     items: groupItems,
                                     columns: visibleColumns,
                                   });
+                                  if (!isGrouped) return null;
                                   return (
                                     <GroupSummaryRow
                                       key={`summary-${groupKey}`}

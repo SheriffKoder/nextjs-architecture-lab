@@ -42,6 +42,9 @@ Major architectural shifts and decision index across all steps.
 
 ## Reflections
 
+**[model-evolution](reflections/model-evolution.md)**  
+What the earlier hybrid model got wrong; why the current model changed.
+
 **[first-review](reflections/first-review.md)**  
 Mid-course observations while building the hybrid page.
 

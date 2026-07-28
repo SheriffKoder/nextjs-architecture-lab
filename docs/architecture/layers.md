@@ -45,6 +45,7 @@ views → platform → shared
 ## Rules of thumb
 
 - Views compose; entities own data; platform owns URL/state systems; shared stays dumb.
+- **Config-driven pages** — view-local `config/` (contract / data / ui) describes list chrome; platform widgets consume it. See [config-driven-pages.md](./config-driven-pages.md).
 - Bootstrap shape for list pages:
   - RSC: [`views/demo-rsc-page/implementation-plan.md`](../../views/demo-rsc-page/implementation-plan.md)
   - Hybrid: [`views/demo-hybrid-page/implementation-plan.md`](../../views/demo-hybrid-page/implementation-plan.md)

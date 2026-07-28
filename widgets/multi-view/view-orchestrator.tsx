@@ -116,7 +116,7 @@ interface ViewOrchestratorProps<T extends Record<string, any> = Record<string, a
   };
   // SubHeadings configuration for grouped view
   subheadingsConfig?: {
-    columnKey: string;
+    columnKey?: string;
     groups?: Array<{ key: string; label: string }>;
     subheadingsDragEnd?: (updatedData: T[]) => void;
     nestedGrouping?: {
@@ -496,7 +496,7 @@ export function ViewOrchestrator<T extends Record<string, any> = Record<string, 
             openGroups={openGroups}
             isItemLoading={isItemLoading}
             tableConfig={subheadingsConfig}
-            groupByKey={subheadingsConfig?.columnKey || kanbanConfig?.columnKey || 'status'}
+            groupByKey={subheadingsConfig?.columnKey}
             groupsConfig={subheadingsConfig?.groups}
             subheadingsDragEnd={subheadingsConfig?.subheadingsDragEnd || (() => {})}
             nestedGrouping={subheadingsConfig?.nestedGrouping}

@@ -3,20 +3,12 @@
 > A Next.js **dashboard starter kit** and **architecture lab**.
 > Copy the kit to configure list pages. Follow the lab to understand RSC vs hybrid tradeoffs.
 
-<table>
+<table width="100%">
   <tr>
-    <td align="left"><strong>Starter demo</strong> · <a href="#">Open →</a></td>
-    <td align="right"><strong>The real product</strong> · <a href="#">Open →</a></td>
+    <td align="left" width="50%"><strong>Starter demo</strong> · <a href="#">Open →</a></td>
+    <td align="right" width="50%"><strong>The real product</strong> · <a href="#">Open →</a></td>
   </tr>
 </table>
-
-<p align="center">
-  <img
-    src="docs/assets/app-preview.png"
-    alt="Dashboard starter — list page with filters, multi-view modes, and record drawer"
-    width="100%"
-  />
-</p>
 
 ---
 
@@ -28,11 +20,21 @@
 | **Start here** | [Starter kit](docs/guides/README.md) | [Lab → phase journey](docs/lab/README.md) |
 | **Live demos** | Run locally, copy patterns from `/demo-rsc-page` and `/demo-hybrid-page` | Same routes — read step docs while clicking around |
 
+<p align="center">
+  <img
+    src="docs/assets/app-preview.png"
+    alt="Dashboard starter — list page with filters, multi-view modes, and record drawer"
+    width="100%"
+  />
+</p>
+
 ---
 
 ## What this is
 
-A **dashboard page** in this repo means: URL-driven list state (filters, sort, pagination, view mode), multi-view presentation (table, cards, kanban, …), optional record drawer, and loading/error UX.
+A **dashboard page** in this repo means: URL-driven list state (filters, sort, pagination, view mode), **list and cards** presentation (plus optional data-visualization views in the kit), optional record drawer, and loading/error UX.
+
+**Config-driven by default** — you describe columns, filters, views, and display behavior in view-local config; `url-kit` and `multi-view` compose the page. You wire data and handlers once. See [Config-driven pages](docs/architecture/config-driven-pages.md).
 
 **Variations** — same rental-cars domain, different data/render boundaries:
 
@@ -65,6 +67,7 @@ So the repo serves two goals that reinforce each other: **move faster on the nex
 | **Kit** | [`docs/guides/README.md`](docs/guides/README.md) → implementation plans |
 | **Lab** | [`docs/lab/`](docs/lab/) → phase summaries + view journey docs |
 | **Philosophy** | [`docs/architecture/philosophy.md`](docs/architecture/philosophy.md) — RSC vs hybrid, URL vs client |
+| **Config-driven pages** | [`docs/architecture/config-driven-pages.md`](docs/architecture/config-driven-pages.md) — compose list pages from config, not custom UI |
 | **Reference** | [`docs/reference/`](docs/reference/) — z-index, url-params transport |
 
 Journey docs stay co-located with demos (`views/*/docs/`).

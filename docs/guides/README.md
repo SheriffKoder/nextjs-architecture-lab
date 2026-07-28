@@ -6,6 +6,21 @@ For tradeoffs and phase narratives → [`docs/lab/`](../lab/README.md).
 
 ---
 
+## Config-driven pages (core model)
+
+List pages in this kit are **assembled from configuration**, not rebuilt feature-by-feature.
+
+You add view-local config under `views/<route>/config/` — filters, columns, per-view display (**list**, **cards**), toolbar layout — and wire **data + handlers** once in the view shell. Platform systems read the configs:
+
+- **`platform/url-kit`** — filters, sort, pagination, toolbar, drawer URL
+- **`widgets/multi-view`** — `ViewOrchestrator` + display configs per view mode
+
+The same config shape works for RSC and hybrid; only the fetch/mutation boundary changes.
+
+**Read:** [Config-driven pages](../architecture/config-driven-pages.md) · config type reference in [RSC implementation plan § Configuration](../../views/demo-rsc-page/implementation-plan.md#configuration-options-reference)
+
+---
+
 ## When to choose what
 
 | Strategy | Choose when | Demo | Bootstrap plan |
@@ -40,7 +55,7 @@ platform/
     │   └── feature-query-builder-filter/
     ├── filter-toolbar/               desktop + mobile toolbar shell
     ├── minimal-controls/             grouping, view resolution
-    ├── view-switchers/               table / cards / kanban toggle
+    ├── view-switchers/               list / cards toggle (+ optional data-viz views)
     ├── url-drawer/                   URL-driven drawer shell
     ├── ai-filter/                    NL filter assistant
     └── confirm/                      URL confirm-action (moving to local modal)
@@ -54,7 +69,7 @@ Composed page sections — import from each widget barrel (`@/widgets/...`).
 
 | Widget | Role | README |
 |--------|------|--------|
-| **`multi-view/`** | View orchestrator — table, cards, list, kanban, calendar, timeline, subheadings | [`README`](../../widgets/multi-view/README.md) |
+| **`multi-view/`** | View orchestrator — **list**, **cards**; optional data-driven / data-visualization modes (kanban, calendar, maps, timeline, …) | [`README`](../../widgets/multi-view/README.md) |
 | **`side-nav/`** | App sidebar — rail, mobile drawer, nav groups | [`README`](../../widgets/side-nav/README.md) |
 | **`maps-view/`** | Google Maps markers + autocomplete | [`README`](../../widgets/maps-view/README.md) |
 | **`score-cards/`** | Metric / health card row | — |
