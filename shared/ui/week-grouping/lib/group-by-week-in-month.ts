@@ -14,7 +14,7 @@
 import {
   getWeeksInMonth,
   type WeekInMonthRange,
-} from "@/shared/week-grouping/lib/get-weeks-in-month";
+} from "@/shared/ui/week-grouping/lib/get-weeks-in-month";
 
 const MONTH_KEY_PATTERN = /^\d{4}-\d{2}$/;
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;

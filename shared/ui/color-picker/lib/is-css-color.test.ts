@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isCssColor } from "@/shared/color-picker/lib/is-css-color";
+import { isCssColor } from "@/shared/ui/color-picker/lib/is-css-color";
 
 describe("isCssColor", () => {
   it("accepts common hex forms", () => {

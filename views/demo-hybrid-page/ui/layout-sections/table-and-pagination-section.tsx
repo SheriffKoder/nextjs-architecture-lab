@@ -9,13 +9,11 @@
 'use client'
 
 import { PaginationFooter } from '@/platform/url-kit/filters/components/pagination-footer'
-import { FolderTabs } from '@/platform/url-kit/view-switchers'
 import type { FilterConfig } from '@/platform/url-kit/filters/feature-filtering/components/filter-types'
 import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
 import { rentalCarPaginationConfig } from '../../config/data/rental-car-pagination-config'
 import {
   DEMO_HYBRID_INFINITE_LOAD_TRIGGER,
-  DEMO_RSC_AVAILABLE_VIEWS,
   DEMO_RSC_DEFAULT_VIEW,
   DEMO_RSC_USE_ALL_ITEMS_VIEWS,
   type HybridInfiniteLoadTrigger,
@@ -74,14 +72,6 @@ export function DemoHybridTableAndPaginationSection({
       pending={isListPending}
       className="flex min-h-0 flex-1 flex-col gap-4"
     >
-      {/* <div className="w-full flex justify-start shrink-0">
-        <FolderTabs
-          availableViews={DEMO_RSC_AVAILABLE_VIEWS}
-          defaultView={DEMO_RSC_DEFAULT_VIEW}
-          useAllItems={DEMO_RSC_USE_ALL_ITEMS_VIEWS}
-          defaultPageSize={10}
-        />
-      </div> */}
       <div className="flex min-h-0 flex-1 flex-col">
         <DemoHybridContent
           cars={cars}

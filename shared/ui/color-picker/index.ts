@@ -6,6 +6,6 @@
 export {
   ColorPicker,
   type ColorPickerProps,
-} from "@/shared/color-picker/ui/color-picker";
-export { DEFAULT_COLOR_PRESETS } from "@/shared/color-picker/lib/default-presets";
-export { isCssColor } from "@/shared/color-picker/lib/is-css-color";
+} from "@/shared/ui/color-picker/ui/color-picker";
+export { DEFAULT_COLOR_PRESETS } from "@/shared/ui/color-picker/lib/default-presets";
+export { isCssColor } from "@/shared/ui/color-picker/lib/is-css-color";

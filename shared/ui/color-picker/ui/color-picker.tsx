@@ -20,9 +20,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DEFAULT_COLOR_PRESETS } from "@/shared/color-picker/lib/default-presets";
-import { isCssColor } from "@/shared/color-picker/lib/is-css-color";
-import { cn } from "@/lib/utils";
+import { DEFAULT_COLOR_PRESETS } from "@/shared/ui/color-picker/lib/default-presets";
+import { isCssColor } from "@/shared/ui/color-picker/lib/is-css-color";
+import { cn } from "@/shared/lib/utils";
 
 export interface ColorPickerProps {
   /** Committed color (CSS color string), or `null` when cleared. */

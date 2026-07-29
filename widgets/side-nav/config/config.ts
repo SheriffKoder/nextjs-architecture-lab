@@ -178,15 +178,6 @@
             size: 'sm'
           },
           {
-            href: '/demo-client-page',
-            text: 'Car Rentals (Client)',
-            subtext: 'Client-rendered with TanStack Query',
-            icon: FolderKanban,
-            // expandable: false,
-            color: 'secondary',
-            size: 'sm'
-          },
-          {
             href: '/demo-hybrid-page?view=list&groupBy=status',
             text: 'Car Rentals (Hybrid)',
             subtext: 'RSC prefetch + TanStack hydration',

@@ -7,10 +7,10 @@
 
 import { useMemo, type ReactNode } from "react";
 
-import { groupItemsByWeekInMonth } from "@/shared/week-grouping/lib/group-by-week-in-month";
-import type { WeekGroupingConfig } from "@/shared/week-grouping/model/types";
-import { UngroupedItemsSection } from "@/shared/week-grouping/ui/ungrouped-items-section";
-import { WeekGroupSection } from "@/shared/week-grouping/ui/week-group-section";
+import { groupItemsByWeekInMonth } from "@/shared/ui/week-grouping/lib/group-by-week-in-month";
+import type { WeekGroupingConfig } from "@/shared/ui/week-grouping/model/types";
+import { UngroupedItemsSection } from "@/shared/ui/week-grouping/ui/ungrouped-items-section";
+import { WeekGroupSection } from "@/shared/ui/week-grouping/ui/week-group-section";
 
 export interface WeekOrganizerProps<T> {
   items: T[];

@@ -8,10 +8,10 @@
 import { ChevronDown } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
-import { cn } from "@/lib/utils";
-import { formatWeekRangeLabel } from "@/shared/week-grouping/lib/format-week-date-label";
-import type { WeekInMonthGroup } from "@/shared/week-grouping/lib/group-by-week-in-month";
-import { resolveWeekSectionOpen } from "@/shared/week-grouping/lib/week-open-state";
+import { cn } from "@/shared/lib/utils";
+import { formatWeekRangeLabel } from "@/shared/ui/week-grouping/lib/format-week-date-label";
+import type { WeekInMonthGroup } from "@/shared/ui/week-grouping/lib/group-by-week-in-month";
+import { resolveWeekSectionOpen } from "@/shared/ui/week-grouping/lib/week-open-state";
 
 export interface WeekGroupSectionProps<T> {
   week: WeekInMonthGroup<T>;

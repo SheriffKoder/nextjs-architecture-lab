@@ -1,13 +1,9 @@
 /**
- * Below `md`, table / list / subheadings render as `cards`.
+ * Below `md`, table / list render as `cards`.
  * URL view is preserved; only the orchestrator render target swaps.
  */
 
-export const MOBILE_FORCED_SOURCE_VIEWS = [
-  'table',
-  'list',
-  'subheadings',
-] as const
+export const MOBILE_FORCED_SOURCE_VIEWS = ['table', 'list'] as const
 
 export type MobileForcedSourceView =
   (typeof MOBILE_FORCED_SOURCE_VIEWS)[number]

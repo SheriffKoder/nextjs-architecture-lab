@@ -10,8 +10,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import { getWeeksInMonth } from "@/shared/week-grouping/lib/get-weeks-in-month";
-import { groupItemsByWeekInMonth } from "@/shared/week-grouping/lib/group-by-week-in-month";
+import { getWeeksInMonth } from "@/shared/ui/week-grouping/lib/get-weeks-in-month";
+import { groupItemsByWeekInMonth } from "@/shared/ui/week-grouping/lib/group-by-week-in-month";
 
 describe("getWeeksInMonth", () => {
   it("returns [] for invalid month keys", () => {

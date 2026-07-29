@@ -7,15 +7,15 @@
 
 import { useMemo } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 import {
   buildMonthGrid,
   formatDayAriaLabel,
   formatMonthAriaLabel,
   WEEKDAY_LABELS,
-} from "@/shared/calendar/lib/month-grid";
-import { useLocalTodayIsoDate } from "@/shared/lib/today";
-import type { InMonthDay, MonthCalendarProps } from "@/shared/calendar/model/types";
+} from "@/widgets/calendar/lib/month-grid";
+import { useLocalTodayIsoDate } from "@/shared/lib/use-local-today-iso-date";
+import type { InMonthDay, MonthCalendarProps } from "@/widgets/calendar/model/types";
 
 const frameClassName =
   "flex h-full min-h-0 w-full max-w-full flex-col overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]";

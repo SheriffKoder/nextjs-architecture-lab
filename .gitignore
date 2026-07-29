@@ -44,3 +44,13 @@ next-env.d.ts
 # development
 .cursor
 development
+
+# Local full-kit lab (not shipped)
+/views/demo-hybrid-page-2/
+/views/demo-rsc-page-2/
+/widgets/multi-view-2/
+/platform/url-kit-2/
+/widgets/maps-view/
+/app/api/nl-filters/
+/app/(root)/demo-hybrid-page-2/
+/app/(root)/demo-rsc-page-2/

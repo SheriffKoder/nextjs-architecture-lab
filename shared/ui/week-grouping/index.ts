@@ -7,17 +7,17 @@ export {
   formatWeekDateLabel,
   formatWeekDateLabelWithWeekday,
   formatWeekRangeLabel,
-} from "@/shared/week-grouping/lib/format-week-date-label";
+} from "@/shared/ui/week-grouping/lib/format-week-date-label";
 export {
   getWeeksInMonth,
   type WeekInMonthRange,
-} from "@/shared/week-grouping/lib/get-weeks-in-month";
+} from "@/shared/ui/week-grouping/lib/get-weeks-in-month";
 export {
   groupItemsByWeekInMonth,
   resolveItemDateByKey,
   type GroupByWeekInMonthOptions,
   type GroupByWeekInMonthResult,
   type WeekInMonthGroup,
-} from "@/shared/week-grouping/lib/group-by-week-in-month";
-export { type WeekGroupingConfig } from "@/shared/week-grouping/model/types";
-export { WeekOrganizer, type WeekOrganizerProps } from "@/shared/week-grouping/ui/week-organizer";
+} from "@/shared/ui/week-grouping/lib/group-by-week-in-month";
+export { type WeekGroupingConfig } from "@/shared/ui/week-grouping/model/types";
+export { WeekOrganizer, type WeekOrganizerProps } from "@/shared/ui/week-grouping/ui/week-organizer";

@@ -19,5 +19,4 @@ export const rentalCarFieldMap: Record<string, keyof RentalCarTableItem> = {
   rentalEndDate: 'rentalEndDate',
   color: 'color',
   licensePlate: 'licensePlate',
-  notes: 'notes',
 }

@@ -27,7 +27,6 @@ import { filterRentalCars } from '../repository/filter-rental-cars'
 import { parseSorts, applySorts } from '@/platform/url-kit/filters/feature-sorting/utils'
 import { parsePagination } from '@/platform/url-kit/filters/feature-pagination/utils'
 import { rentalCarPaginationConfig } from '@/views/demo-hybrid-page/config/data/rental-car-pagination-config'
-import { decodeFilters } from '@/platform/url-kit/filters/feature-query-builder-filter/utils'
 import {
   DEMO_RSC_SIMULATE_RENTAL_CARS_MS,
   simulateServerDelay,
@@ -58,19 +57,6 @@ export async function getRentalCarsData(
   // STEP 1: Filter cars based on URL parameters
   //////////////////////////////////
   const filtered = filterRentalCars(rentalCars, searchParams)
-  
-    //////////////////////////////////////////
-    // QUERY FILTER PARSING (for debugging)
-    //////////////////////////////////////////
-    const filterParam = typeof searchParams.filter === 'string' ? searchParams.filter : null
-    console.log('//////////////////////////////////////////')
-    console.log('QUERY FILTER - Raw param:', filterParam)
-    const decodedFilter = decodeFilters(filterParam)
-    console.log('QUERY FILTER - Decoded JSON:')
-    console.log(JSON.stringify(decodedFilter, null, 2))
-    console.log('//////////////////////////////////////////')
-    //////////////////////////////////////////
-    
 
   //////////////////////////////////
   // STEP 2: Apply sorting to filtered results

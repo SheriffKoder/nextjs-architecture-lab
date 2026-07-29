@@ -15,22 +15,16 @@ import { useToggleRentalCarActivity } from '@/entities/demo-hybrid-cars/mutation
 import { formatActivityStatusLabel } from '@/entities/demo-hybrid-cars/lib/rental-car-activity-status'
 import type { RentalCarStatusValue } from '@/entities/demo-hybrid-cars/model/rental-car-status'
 import type { RentalCarTableItem } from '@/entities/demo-hybrid-cars/model/rental-car-table-item'
-import type { SubheadingsUpdateContext } from '@/widgets/multi-view/features/subheadings/dnd'
 import { useToast } from '@/shared/ui/toast/use-toast'
 import {
   DEMO_RSC_AVAILABLE_VIEWS,
   DEMO_RSC_USE_ALL_ITEMS_VIEWS,
 } from '@/views/demo-hybrid-page/config/data/demo-rsc-views-config'
 import { DEMO_RSC_DEFAULT_GROUPS_EXPANDED } from '@/views/demo-hybrid-page/config/data/demo-rsc-grouping-config'
-import { DEMO_RSC_GROUPING_ALLOWED_KEYS } from '@/views/demo-hybrid-page/config/ui/demo-rsc-minimal-controls-config'
+import { DEMO_RSC_GROUPING_ALLOWED_KEYS } from '@/views/demo-hybrid-page/config/ui/demo-rsc-filter-toolbar-config'
 import { accordionConfig } from '@/views/demo-hybrid-page/config/ui/accordion-config'
 import { tableConfig } from '@/views/demo-hybrid-page/config/ui/displays/table-config'
 import { tableColumns } from '@/views/demo-hybrid-page/config/ui/columns'
-import { kanbanConfig } from '@/views/demo-hybrid-page/config/ui/displays/kanban-config'
-import { calendarConfig } from '@/views/demo-hybrid-page/config/ui/displays/calendar-config'
-import { mapConfig } from '@/views/demo-hybrid-page/config/ui/displays/map-config'
-import { timelineConfig } from '@/views/demo-hybrid-page/config/ui/displays/timeline-config'
-import { subheadingsConfig } from '@/views/demo-hybrid-page/config/ui/displays/subheadings-config'
 import { listViewConfig } from '@/views/demo-hybrid-page/config/ui/displays/list-config'
 import { mobileListConfig } from '@/views/demo-hybrid-page/config/ui/displays/mobile-list-config'
 import { demoRscRowActionConfigs } from '@/views/demo-hybrid-page/config/ui/demo-rsc-row-action-configs'
@@ -126,17 +120,6 @@ export function DemoHybridContent({
     [onActionClick],
   )
 
-  const subheadingsDragEnd = useCallback((updatedData: RentalCarTableItem[]) => {
-    setTableData(updatedData)
-  }, [])
-
-  const onSubheadingsItemUpdate = useCallback(
-    (ctx: SubheadingsUpdateContext<RentalCarTableItem>) => {
-      setTableData(ctx.data)
-    },
-    [],
-  )
-
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
       <ViewOrchestrator
@@ -159,19 +142,9 @@ export function DemoHybridContent({
         defaultPageSize={10}
         availableViews={[...DEMO_RSC_AVAILABLE_VIEWS]}
         tableConfig={tableConfig}
-        kanbanConfig={kanbanConfig}
         listViewConfig={listViewConfig}
         listEndRow={listEndRow}
         mobileListConfig={mobileListConfig}
-        calendarConfig={calendarConfig}
-        mapConfig={mapConfig}
-        timelineConfig={timelineConfig}
-        subheadingsConfig={{
-          ...subheadingsConfig,
-          headerFilters: subheadingsConfig.headerFilters,
-          subheadingsDragEnd,
-          onSubheadingsItemUpdate,
-        }}
       />
     </div>
   )

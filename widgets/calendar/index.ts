@@ -10,11 +10,11 @@ export {
   formatDayAriaLabel,
   formatMonthAriaLabel,
   WEEKDAY_LABELS,
-} from "@/shared/calendar/lib/month-grid";
+} from "@/widgets/calendar/lib/month-grid";
 export type {
   CalendarCellRenderContext,
   CalendarGridCell,
   InMonthDay,
   MonthCalendarProps,
-} from "@/shared/calendar/model/types";
-export { MonthCalendar } from "@/shared/calendar/ui/month-calendar";
+} from "@/widgets/calendar/model/types";
+export { MonthCalendar } from "@/widgets/calendar/ui/month-calendar";

@@ -3,7 +3,7 @@
  * Pure helpers for building a 6×7 ISO week month grid.
  */
 
-import type { CalendarGridCell, InMonthDay } from "@/shared/calendar/model/types";
+import type { CalendarGridCell, InMonthDay } from "@/widgets/calendar/model/types";
 
 const MONTH_KEY_PATTERN = /^\d{4}-\d{2}$/;
 const GRID_CELL_COUNT = 42;

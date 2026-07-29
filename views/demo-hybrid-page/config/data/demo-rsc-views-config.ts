@@ -1,31 +1,14 @@
 /**
  * Demo hybrid — available views and related URL / data-path behavior.
- * Shared by MinimalControls, ViewSwitcherWrapper, FolderTabs,
- * ViewOrchestrator, and pagination footer hide logic.
+ * Shared by FilterToolbar, ViewOrchestrator, and pagination footer hide logic.
  */
 
-export const DEMO_RSC_AVAILABLE_VIEWS = [
-  'table',
-  'kanban',
-  'calendar',
-  'map',
-  'timeline',
-  'subheadings',
-  'list',
-  'cards',
-] as const
+export const DEMO_RSC_AVAILABLE_VIEWS = ['list', 'cards'] as const
 
-/** Views that require the full filtered dataset in one request (`?all=1` + `useRentalCars`). */
-export const DEMO_RSC_USE_ALL_ITEMS_VIEWS = [
-  'kanban',
-  'calendar',
-  'map',
-  'timeline',
-  'subheadings',
-] as const
-// Note: `table` / `list` / `cards` use footer pagination; `all=1` on those uses infinite scroll.
+/** Views that require the full filtered dataset in one request (`?all=1`). Public demo has none. */
+export const DEMO_RSC_USE_ALL_ITEMS_VIEWS = [] as const
 
-export const DEMO_RSC_DEFAULT_VIEW = 'table'
+export const DEMO_RSC_DEFAULT_VIEW = 'list'
 
 /**
  * How infinite load-more advances pages when `all=1` on paginated views.
@@ -39,10 +22,7 @@ export const DEMO_HYBRID_INFINITE_LOAD_TRIGGER: HybridInfiniteLoadTrigger =
 
 export type DemoRscView = (typeof DEMO_RSC_AVAILABLE_VIEWS)[number]
 
-/**
- * Infinite replaces a single showAll dump when the user picks All on
- * table / list / cards. Board views (`USE_ALL_ITEMS`) still fetch the full set.
- */
+/** Infinite replaces a single showAll dump when the user picks All on table / list / cards. */
 export function isHybridInfiniteAllMode(
   view: string,
   showAll: boolean | undefined,
