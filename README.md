@@ -5,8 +5,8 @@
 
 <table width="100%">
   <tr>
-    <td align="left" width="50%"><strong>Starter demo</strong> · <a href="#">Open →</a></td>
-    <td align="right" width="50%"><strong>The real product</strong> · <a href="#">Open →</a></td>
+    <td align="left" width="50%"><strong>Starter demo</strong> · <a href="https://nextjs-architecture-lab-mu.vercel.app/">Open →</a></td>
+    <td align="right" width="50%"><strong>The real product</strong> · <a href="https://closer-crm-lovat.vercel.app/">Open →</a></td>
   </tr>
 </table>
 
