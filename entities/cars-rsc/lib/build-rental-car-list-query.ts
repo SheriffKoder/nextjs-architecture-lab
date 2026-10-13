@@ -54,6 +54,7 @@ function getList(params: PageSearchParams, key: string): string[] {
       key === 'make' ||
       key === 'location' ||
       key === 'model' ||
+      key === 'color' ||
       key === 'licensePlate')
       ? new Set(
           rentalCars.map((c) =>
@@ -103,6 +104,7 @@ export function buildRentalCarListQuery(params: PageSearchParams): RentalCarList
     make: getList(params, 'make'),
     location: getList(params, 'location'),
     model: getList(params, 'model'),
+    color: getList(params, 'color'),
     licensePlate: getList(params, 'licensePlate'),
     ...(year && (year.min !== undefined || year.max !== undefined) ? { year } : {}),
     ...(pricePerDay &&
@@ -147,6 +149,7 @@ export function rentalCarListQueryToSearchParams(
   if (query.make?.length) out.make = encodeUrlParamList(query.make)
   if (query.location?.length) out.location = encodeUrlParamList(query.location)
   if (query.model?.length) out.model = encodeUrlParamList(query.model)
+  if (query.color?.length) out.color = encodeUrlParamList(query.color)
   if (query.licensePlate?.length)
     out.licensePlate = encodeUrlParamList(query.licensePlate)
 

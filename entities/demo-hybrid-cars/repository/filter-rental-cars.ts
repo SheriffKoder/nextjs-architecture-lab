@@ -52,6 +52,7 @@ function parseList(
       key === 'make' ||
       key === 'location' ||
       key === 'model' ||
+      key === 'color' ||
       key === 'licensePlate')
       ? new Set(
           cars.map((c) => String(c[field as keyof RentalCarTableItem])),
@@ -144,6 +145,12 @@ export function filterRentalCars(
   const modelFilter = parseList(searchParams, 'model', cars)
   if (modelFilter.length > 0) {
     filtered = filtered.filter((car) => modelFilter.includes(car.model))
+  }
+
+  // Filter by color (multi-select)
+  const colorFilter = parseList(searchParams, 'color', cars)
+  if (colorFilter.length > 0) {
+    filtered = filtered.filter((car) => colorFilter.includes(car.color))
   }
 
   const licensePlateFilter = parseList(
@@ -248,6 +255,14 @@ export function filterRentalCarsExcludingColumn(
     const modelFilter = parseList(searchParams, 'model', cars)
     if (modelFilter.length > 0) {
       filtered = filtered.filter((car) => modelFilter.includes(car.model))
+    }
+  }
+
+  // Filter by color (if not excluded)
+  if (excludeColumn !== 'color') {
+    const colorFilter = parseList(searchParams, 'color', cars)
+    if (colorFilter.length > 0) {
+      filtered = filtered.filter((car) => colorFilter.includes(car.color))
     }
   }
 

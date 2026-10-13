@@ -17,6 +17,7 @@ export const DEMO_RSC_LIST_DATA_SEARCH_PARAM_KEYS = [
   'make',
   'location',
   'model',
+  'color',
   'licensePlate',
   'year',
   'pricePerDay',

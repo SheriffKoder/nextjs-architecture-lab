@@ -26,6 +26,7 @@ export interface RentalCarListQuery {
   make?: string[]
   location?: string[]
   model?: string[]
+  color?: string[]
   licensePlate?: string[]
   year?: RentalCarNumberRange
   pricePerDay?: RentalCarNumberRange
